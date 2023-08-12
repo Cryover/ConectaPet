@@ -10,6 +10,9 @@
     "test": "jest"
   },
   "dependencies": {
+    "axios": "^1.4.0",
+    "express": "^4.18.2",
+    "pg": "^8.11.2",
     "react": "18.2.0",
     "react-native": "0.72.3"
   },
