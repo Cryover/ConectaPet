@@ -1,9 +1,10 @@
 import * as React from 'react';
-import {NavigationContainer} from '@react-navigation/native';
-import {createNativeStackNavigator} from '@react-navigation/native-stack';
-import Dashboard from './screens/DashboardScreen/DashboardScreen';
+import { NavigationContainer } from '@react-navigation/native';
+import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import Loading from './components/atoms/loading';
-import AuthScreen from './screens/AuthScreen/AuthScreen';
+import Home from './screens/Home/Home';
+import Login from './screens/Login/Login';
+import { PaperProvider } from 'react-native-paper';
 
 const Stack = createNativeStackNavigator();
 
@@ -36,22 +37,31 @@ export default function App() {
 
   return (
     <NavigationContainer>
-      <Stack.Navigator>
-        {userToken == null ? (
-          // No token found, user isn't signed in
-          <Stack.Screen
-            name="Login"
-            component={AuthScreen}
-            options={{
-              title: 'Login',
-            }}
-            initialParams={{setUserToken}}
-          />
-        ) : (
-          // User is signed in
-          <Stack.Screen name="Dashboard" component={Dashboard} />
-        )}
-      </Stack.Navigator>
+      <PaperProvider>
+        <Stack.Navigator >
+          {userToken == null ? (
+            // No token found, user isn't signed in
+            <Stack.Screen
+              name="Login"
+              component={Login}
+              options={{
+                title: 'Login',
+                headerShown: false,
+              }}
+              initialParams={{ setUserToken }}
+            />
+          ) : (
+            // User is signed in
+            <Stack.Screen
+              name="Home"
+              component={Home}
+              options={{
+                title: 'Login',
+              }}
+            />
+          )}
+        </Stack.Navigator>
+      </PaperProvider>
     </NavigationContainer>
   );
 }
