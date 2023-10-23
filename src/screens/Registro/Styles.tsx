@@ -17,7 +17,7 @@ export const styles = StyleSheet.create({
   },
   links: {
     marginTop: 20,
-    color: 'white',
+    color: '#5D6BB0',
   },
   logo: {
     width: 200,

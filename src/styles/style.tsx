@@ -1,4 +1,7 @@
-import {StyleSheet} from 'react-native';
+import {Dimensions, StyleSheet} from 'react-native';
+
+export const windowWidth = Dimensions.get('window').width;
+export const windowHeight = Dimensions.get('window').height;
 
 const GlobalStyles = StyleSheet.create({
   container: {
@@ -16,17 +19,17 @@ const GlobalStyles = StyleSheet.create({
   red: {
     color: 'red',
   },
-  center: {
+  centerView: {
+    display: 'flex',
+    flexDirection: 'column',
+    marginLeft: 'auto',
+    marginRight: 'auto',
+    width: '80%',
+  },
+  centerItem: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-  },
-  divCenter: {
-    flex: 1,
-    'justify-content': 'center',
-    'align-items': 'center',
-    'text-align': 'center',
-    'min-height': '100vh',
   },
 });
 

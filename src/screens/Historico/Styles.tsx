@@ -1,11 +1,15 @@
 import {StyleSheet} from 'react-native';
 
 export const styles = StyleSheet.create({
-  centerView: {
+  center: {
     alignItems: 'center',
-    flex: 1,
     justifyContent: 'center',
-    backgroundColor: '#5D6BB0',
+    flex: 1,
+  },
+  scrollView: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    flexGrow: 1,
   },
   input: {
     //height: 40,
@@ -18,11 +22,5 @@ export const styles = StyleSheet.create({
   links: {
     marginTop: 20,
     color: 'white',
-  },
-  logo: {
-    width: 200,
-    height: 200,
-    borderRadius: 100,
-    marginBottom: 40,
   },
 });

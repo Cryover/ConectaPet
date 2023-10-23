@@ -1,16 +1,19 @@
 /* eslint-disable @typescript-eslint/no-shadow */
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import * as React from 'react';
-import {Image, Linking, Text, View} from 'react-native';
-import {Button} from 'react-native-paper';
+import React from 'react';
+import {Image, Linking, View} from 'react-native';
+import {Appbar, Button, HelperText, Text, TextInput} from 'react-native-paper';
 import {styles} from './Styles';
-import {HelperText, TextInput} from 'react-native-paper';
-import {LogBox} from 'react-native';
+import Home from '../Root/Root';
 
-function Login({navigation, route}: any) {
+export function Registro({props}: any, {navigation}: any) {
+  const [hasAvatar, setHasAvatar] = React.useState(props);
   const [email, setEmail] = React.useState('');
   const [password, setPassword] = React.useState('');
-  const {setUserToken} = route.params;
+
+  const _goBack = () => console.log('Went back');
+  const _handleSearch = () => console.log('Searching');
+  const _handleMore = () => console.log('Shown more');
 
   const emailError = () => {
     if (!email.includes('@') && email.length > 0) {
@@ -21,6 +24,12 @@ function Login({navigation, route}: any) {
 
   return (
     <View style={styles.centerView}>
+      <Appbar.Header mode="center-aligned">
+        <Appbar.BackAction onPress={_goBack} />
+        <Appbar.Content title="Registro" />
+        <Appbar.Action icon="magnify" onPress={_handleSearch} />
+        <Appbar.Action icon="dots-vertical" onPress={_handleMore} />
+      </Appbar.Header>
       <Image
         style={styles.logo}
         source={require('../../assets/images/rwIARcq.webp')}
@@ -48,23 +57,11 @@ function Login({navigation, route}: any) {
         onPress={() => Linking.openURL('http://google.com')}>
         Esqueceu a senha?
       </Text>
-      <Text style={styles.links} onPress={() => navigation.navigate('Home')}>
+      <Text style={styles.links} onPress={() => navigation.navigate(Home)}>
         Não possui conta? clique aqui!
       </Text>
-
-      <Button
-        icon="login"
-        mode="contained"
-        style={styles.button}
-        onPress={() => setUserToken('token')}>
-        Log In
-      </Button>
     </View>
   );
 }
 
-LogBox.ignoreLogs([
-  'Non-serializable values were found in the navigation state',
-]);
-
-export default Login;
+export default Registro;

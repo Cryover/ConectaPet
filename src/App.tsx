@@ -1,10 +1,17 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import * as React from 'react';
-import { NavigationContainer } from '@react-navigation/native';
-import { createNativeStackNavigator } from '@react-navigation/native-stack';
+import {NavigationContainer} from '@react-navigation/native';
+import {createNativeStackNavigator} from '@react-navigation/native-stack';
+import {PaperProvider} from 'react-native-paper';
 import Loading from './components/atoms/loading';
-import Home from './screens/Home/Home';
 import Login from './screens/Login/Login';
-import { PaperProvider } from 'react-native-paper';
+import Root from './screens/Root/Root';
+
+type RootStackParamList = {
+  Home: undefined;
+  Profile: {userId: string};
+  Feed: {sort: 'latest' | 'top'} | undefined;
+};
 
 const Stack = createNativeStackNavigator();
 
@@ -38,7 +45,7 @@ export default function App() {
   return (
     <NavigationContainer>
       <PaperProvider>
-        <Stack.Navigator >
+        <Stack.Navigator>
           {userToken == null ? (
             // No token found, user isn't signed in
             <Stack.Screen
@@ -48,15 +55,15 @@ export default function App() {
                 title: 'Login',
                 headerShown: false,
               }}
-              initialParams={{ setUserToken }}
+              initialParams={{setUserToken}}
             />
           ) : (
             // User is signed in
             <Stack.Screen
-              name="Home"
-              component={Home}
+              name="Root"
+              component={Root}
               options={{
-                title: 'Login',
+                headerShown: false,
               }}
             />
           )}
