@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import React from 'react';
-import {View} from 'react-native';
-import {Appbar, Avatar, Text} from 'react-native-paper';
+import {StyleSheet, View} from 'react-native';
+import {Avatar, Text} from 'react-native-paper';
 import GlobalStyles from '../../styles/Style';
 
 export function Profile({props}: any) {
@@ -56,3 +56,23 @@ export function Profile({props}: any) {
 }
 
 export default Profile;
+
+const styles = StyleSheet.create({
+  scrollView: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    flexGrow: 1,
+  },
+  input: {
+    //height: 40,
+    width: 300,
+  },
+  button: {
+    marginTop: 20,
+    color: '#5D6BB0',
+  },
+  links: {
+    marginTop: 20,
+    color: 'white',
+  },
+});

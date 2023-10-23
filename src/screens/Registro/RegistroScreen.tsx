@@ -1,12 +1,11 @@
 /* eslint-disable @typescript-eslint/no-shadow */
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import React from 'react';
-import {Image, Linking, View} from 'react-native';
-import {Appbar, Button, HelperText, Text, TextInput} from 'react-native-paper';
-import {styles} from './Styles';
-import Home from '../Root/Root';
+import {Image, Linking, StyleSheet, View} from 'react-native';
+import {Appbar, HelperText, Text, TextInput} from 'react-native-paper';
+import Home from '../Home/Home';
 
-export function Registro({props}: any, {navigation}: any) {
+export function RegistroScreen({props}: any, {navigation}: any) {
   const [hasAvatar, setHasAvatar] = React.useState(props);
   const [email, setEmail] = React.useState('');
   const [password, setPassword] = React.useState('');
@@ -24,12 +23,6 @@ export function Registro({props}: any, {navigation}: any) {
 
   return (
     <View style={styles.centerView}>
-      <Appbar.Header mode="center-aligned">
-        <Appbar.BackAction onPress={_goBack} />
-        <Appbar.Content title="Registro" />
-        <Appbar.Action icon="magnify" onPress={_handleSearch} />
-        <Appbar.Action icon="dots-vertical" onPress={_handleMore} />
-      </Appbar.Header>
       <Image
         style={styles.logo}
         source={require('../../assets/images/rwIARcq.webp')}
@@ -64,4 +57,31 @@ export function Registro({props}: any, {navigation}: any) {
   );
 }
 
-export default Registro;
+export default RegistroScreen;
+
+const styles = StyleSheet.create({
+  centerView: {
+    alignItems: 'center',
+    flex: 1,
+    justifyContent: 'center',
+    backgroundColor: '#5D6BB0',
+  },
+  input: {
+    //height: 40,
+    width: 300,
+  },
+  button: {
+    marginTop: 20,
+    color: '#5D6BB0',
+  },
+  links: {
+    marginTop: 20,
+    color: '#5D6BB0',
+  },
+  logo: {
+    width: 200,
+    height: 200,
+    borderRadius: 100,
+    marginBottom: 40,
+  },
+});

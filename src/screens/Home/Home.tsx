@@ -2,27 +2,25 @@
 import * as React from 'react';
 import {createMaterialBottomTabNavigator} from '@react-navigation/material-bottom-tabs';
 import {Appbar, Avatar, IconButton, Menu} from 'react-native-paper';
+import {Platform, StyleSheet} from 'react-native';
 import Profile from '../Profile/Profile';
 import Dashboard from '../Dashboard/Dashboard';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import Historico from '../Historico/Historico';
-import {Platform} from 'react-native';
-import {useRoute} from '@react-navigation/native';
+//import {useRoute} from '@react-navigation/native';
 
-const Root = () => {
+const Home = () => {
   const Tab = createMaterialBottomTabNavigator();
-
   const [visible, setVisible] = React.useState(true);
   const openMenu = () => setVisible(true);
   const closeMenu = () => setVisible(false);
   const MORE_ICON = Platform.OS === 'ios' ? 'dots-horizontal' : 'dots-vertical';
-
-  const route = useRoute();
+  //const route = useRoute();
 
   return (
     <>
       <Appbar.Header mode="center-aligned">
-        <Appbar.Content title={route.name} />
+        <Appbar.Content title="" />
         <Avatar.Image
           size={40}
           source={require('../../assets/images/avatar.webp')}
@@ -91,4 +89,24 @@ const Root = () => {
   );
 };
 
-export default Root;
+export default Home;
+
+const styles = StyleSheet.create({
+  scrollView: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    flexGrow: 1,
+  },
+  input: {
+    //height: 40,
+    width: 300,
+  },
+  button: {
+    marginTop: 20,
+    color: '#5D6BB0',
+  },
+  links: {
+    marginTop: 20,
+    color: 'white',
+  },
+});

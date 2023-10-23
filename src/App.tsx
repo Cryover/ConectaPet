@@ -1,74 +1,21 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
-import * as React from 'react';
-import {NavigationContainer} from '@react-navigation/native';
-import {createNativeStackNavigator} from '@react-navigation/native-stack';
 import {PaperProvider} from 'react-native-paper';
-import Loading from './components/atoms/loading';
-import Login from './screens/Login/Login';
-import Root from './screens/Root/Root';
-
-type RootStackParamList = {
-  Home: undefined;
-  Profile: {userId: string};
-  Feed: {sort: 'latest' | 'top'} | undefined;
-};
-
-const Stack = createNativeStackNavigator();
+import {SafeAreaView} from 'react-native-safe-area-context';
+import Navigation from './navigation';
+import {StyleSheet} from 'react-native';
 
 export default function App() {
-  const [isLoading, setIsLoading] = React.useState(true);
-  const [userToken, setUserToken] = React.useState(null);
-
-  const getUserToken = async () => {
-    // testing purposes
-    const sleep = (ms: number | undefined) =>
-      new Promise(r => setTimeout(r, ms));
-    try {
-      // custom logic
-      await sleep(2000);
-      const token = null;
-      setUserToken(token);
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  React.useEffect(() => {
-    getUserToken();
-  }, []);
-
-  if (isLoading) {
-    // We haven't finished checking for the token yet
-    return <Loading />;
-  }
-
   return (
-    <NavigationContainer>
+    <SafeAreaView style={styles.root}>
       <PaperProvider>
-        <Stack.Navigator>
-          {userToken == null ? (
-            // No token found, user isn't signed in
-            <Stack.Screen
-              name="Login"
-              component={Login}
-              options={{
-                title: 'Login',
-                headerShown: false,
-              }}
-              initialParams={{setUserToken}}
-            />
-          ) : (
-            // User is signed in
-            <Stack.Screen
-              name="Root"
-              component={Root}
-              options={{
-                headerShown: false,
-              }}
-            />
-          )}
-        </Stack.Navigator>
+        <Navigation />
       </PaperProvider>
-    </NavigationContainer>
+    </SafeAreaView>
   );
 }
+
+const styles = StyleSheet.create({
+  root: {
+    flex: 1,
+    backgroundColor: '#fffff',
+  },
+});

@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable @typescript-eslint/no-shadow */
 import * as React from 'react';
-import {ScrollView} from 'react-native';
+import {ScrollView, StyleSheet} from 'react-native';
 import {
   Avatar,
   Modal,
@@ -10,7 +10,6 @@ import {
   Portal,
   Text,
 } from 'react-native-paper';
-import {styles} from './Styles';
 import Calendario from '../../components/molecules/Calendario/Calendario';
 
 const Historico = () => {
@@ -176,3 +175,28 @@ const Historico = () => {
 };
 
 export default Historico;
+
+const styles = StyleSheet.create({
+  center: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    flex: 1,
+  },
+  scrollView: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    flexGrow: 1,
+  },
+  input: {
+    //height: 40,
+    width: 300,
+  },
+  button: {
+    marginTop: 20,
+    color: '#5D6BB0',
+  },
+  links: {
+    marginTop: 20,
+    color: 'white',
+  },
+});
