@@ -15,23 +15,23 @@ const Home = () => {
   const openMenu = () => setVisible(true);
   const closeMenu = () => setVisible(false);
   const MORE_ICON = Platform.OS === 'ios' ? 'dots-horizontal' : 'dots-vertical';
-  //const route = useRoute();
 
   return (
     <>
       <Appbar.Header mode="center-aligned">
         <Appbar.Content title="" />
+        <Menu
+          style={styles.menu}
+          visible={visible}
+          onDismiss={closeMenu}
+          anchor={<IconButton icon={MORE_ICON} onPress={openMenu} />}>
+          <Menu.Item title="Reportar Bug" />
+          <Menu.Item title="Logout" />
+        </Menu>
         <Avatar.Image
           size={40}
           source={require('../../assets/images/avatar.webp')}
         />
-        <Menu
-          style={{marginTop: 55}}
-          visible={visible}
-          onDismiss={closeMenu}
-          anchor={<IconButton icon={MORE_ICON} onPress={openMenu} />}>
-          <Menu.Item title="Logout" />
-        </Menu>
       </Appbar.Header>
 
       <Tab.Navigator
@@ -109,4 +109,9 @@ const styles = StyleSheet.create({
     marginTop: 20,
     color: 'white',
   },
+  menu: {
+    marginTop: 60,
+    marginLeft: 40,
+  },
+  menu_item: {},
 });

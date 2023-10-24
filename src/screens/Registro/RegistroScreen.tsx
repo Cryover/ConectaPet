@@ -1,24 +1,20 @@
-/* eslint-disable @typescript-eslint/no-shadow */
-/* eslint-disable @typescript-eslint/no-unused-vars */
 import React from 'react';
-import {Image, Linking, StyleSheet, View} from 'react-native';
-import {Appbar, HelperText, Text, TextInput} from 'react-native-paper';
-import Home from '../Home/Home';
+import {Image, StyleSheet, View} from 'react-native';
+import {Button} from 'react-native-paper';
+import {Form, useForm} from 'react-hook-form';
+import {ControlTextInput} from '../../components/atoms/controller/ControlTextInput';
 
-export function RegistroScreen({props}: any, {navigation}: any) {
-  const [hasAvatar, setHasAvatar] = React.useState(props);
-  const [email, setEmail] = React.useState('');
-  const [password, setPassword] = React.useState('');
+export function RegistroScreen() {
+  const {control, handleSubmit, watch} = useForm({mode: 'onChange'});
+  const watchSenha = watch('senha');
+  const EMAIL_REGEX: RegExp =
+    /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
 
-  const _goBack = () => console.log('Went back');
-  const _handleSearch = () => console.log('Searching');
-  const _handleMore = () => console.log('Shown more');
-
-  const emailError = () => {
-    if (!email.includes('@') && email.length > 0) {
-      return !email.includes('@');
-    }
-    console.log(email);
+  const onRegisterPressed = (data: any) => {
+    // Validate User
+    console.log(data);
+    //navigation.navigate('Home');
+    console.log(watchSenha);
   };
 
   return (
@@ -27,32 +23,71 @@ export function RegistroScreen({props}: any, {navigation}: any) {
         style={styles.logo}
         source={require('../../assets/images/rwIARcq.webp')}
       />
-      <TextInput
+      <ControlTextInput
+        control={control}
+        name="usuario"
+        rules={{
+          required: 'Senha Obrigatória',
+          minLength: {
+            value: 6,
+            message: 'Mínimo de 6 caracteres',
+          },
+        }}
+        style={styles.input}
+        placeHolder="Digite sua Senha"
+        label="Nome de Usuário"
+      />
+
+      <ControlTextInput
+        control={control}
+        name="email"
+        rules={{
+          required: 'Email Obrigatório',
+          pattern: {
+            value: EMAIL_REGEX,
+            message: 'Email Invalido',
+          },
+        }}
+        style={styles.input}
+        placeHolder="Digite seu Email"
         label="Email"
-        value={email}
-        style={styles.input}
-        onChangeText={email => setEmail(email)}
       />
-      <HelperText style={{color: 'white'}} type="error" visible={emailError()}>
-        Endereço de e-mail inválido
-      </HelperText>
 
-      <TextInput
-        label="Senha"
-        value={password}
+      <ControlTextInput
+        control={control}
+        name="senha"
+        rules={{
+          required: 'Senha Obrigatória',
+          minLength: {
+            value: 8,
+            message: 'Mínimo de oito caracteres',
+          },
+        }}
         style={styles.input}
+        placeHolder="Digite sua Senha"
         secureTextEntry={true}
-        onChangeText={password => setEmail(password)}
+        label="Senha"
       />
 
-      <Text
-        style={styles.links}
-        onPress={() => Linking.openURL('http://google.com')}>
-        Esqueceu a senha?
-      </Text>
-      <Text style={styles.links} onPress={() => navigation.navigate(Home)}>
-        Não possui conta? clique aqui!
-      </Text>
+      <ControlTextInput
+        control={control}
+        name="confirmarSenha"
+        rules={{
+          validade: (value: string, formValues) =>
+            value === watchSenha || 'As senhas não conferem',
+        }}
+        style={styles.input}
+        placeHolder="Digite sua Senha"
+        secureTextEntry={true}
+        label="Confirmar Senha"
+      />
+
+      <Button
+        mode="contained"
+        style={styles.button}
+        onPress={handleSubmit(onRegisterPressed)}>
+        Registrar
+      </Button>
     </View>
   );
 }

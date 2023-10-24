@@ -1,30 +1,27 @@
-/* eslint-disable @typescript-eslint/no-shadow */
 import React from 'react';
+import {useForm} from 'react-hook-form';
 import {Image, View} from 'react-native';
-import {Button, HelperText, TextInput} from 'react-native-paper';
+import {Button, TextInput} from 'react-native-paper';
 
-export function RecuperacaoContaScreen({navigation}: any) {
-  const [email, setEmail] = React.useState('');
-
-  const emailError = () => {
-    if (!email.includes('@') && email.length > 0) {
-      return !email.includes('@');
-    }
-    console.log(email);
-  };
+export function RecuperacaoContaScreen() {
+  const [code, setCode] = React.useState('');
+  const [newPassword, setNewPassword] = React.useState('');
+  const {control, handleSubmit} = useForm();
 
   return (
     <View>
       <Image source={require('../../assets/images/rwIARcq.webp')} />
 
       <TextInput
-        label="Email"
-        value={email}
-        onChangeText={email => setEmail(email)}
+        label="Código recebido no email"
+        value={code}
+        onChangeText={() => setCode(code)}
       />
-      <HelperText style={{color: 'white'}} type="error" visible={emailError()}>
-        Endereço de e-mail inválido
-      </HelperText>
+      <TextInput
+        label="Nova Senha"
+        value={newPassword}
+        onChangeText={() => setNewPassword(newPassword)}
+      />
 
       <Button icon="login" mode="contained">
         Registrar

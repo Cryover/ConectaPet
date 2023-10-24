@@ -1,18 +1,22 @@
-/* eslint-disable @typescript-eslint/no-shadow */
-/* eslint-disable @typescript-eslint/no-unused-vars */
 import * as React from 'react';
-import {Image, Linking, StyleSheet, Text, View} from 'react-native';
+import {Image, StyleSheet, Text, View} from 'react-native';
 import {Button} from 'react-native-paper';
-import {HelperText, TextInput} from 'react-native-paper';
 import {LogBox} from 'react-native';
+import {useNavigation} from '@react-navigation/native';
+import {useForm} from 'react-hook-form';
+import {ControlTextInput} from '../../components/atoms/controller/ControlTextInput';
 
-function LoginScreen({navigation, route}: any) {
-  const [email, setEmail] = React.useState('');
-  const [password, setPassword] = React.useState('');
-  const {setUserToken} = route.params;
+const LoginScreen = () => {
+  //const {setUserToken} = route.params;
+  const navigation: any = useNavigation();
+  const {control, handleSubmit} = useForm();
+  const EMAIL_REGEX: RegExp =
+    /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
 
-  const onLoginPressed = () => {
+  const onLoginPressed = (data: any) => {
     // Validate User
+    console.log(data);
+    //navigation.navigate('Home');
   };
 
   return (
@@ -21,19 +25,36 @@ function LoginScreen({navigation, route}: any) {
         style={styles.logo}
         source={require('../../assets/images/rwIARcq.webp')}
       />
-      <TextInput
-        label="Email"
-        value={email}
+
+      <ControlTextInput
+        control={control}
+        name="Email"
+        rules={{
+          required: 'Email Obrigatório',
+          pattern: {
+            value: EMAIL_REGEX,
+            message: 'Email Invalido',
+          },
+        }}
         style={styles.input}
-        onChangeText={email => setEmail(email)}
+        placeHolder="Digite seu Email"
+        label="Email"
       />
 
-      <TextInput
-        label="Senha"
-        value={password}
+      <ControlTextInput
+        control={control}
+        name="Senha"
+        rules={{
+          required: 'Senha Obrigatória',
+          minLength: {
+            value: 8,
+            message: 'Mínimo de oito caracteres',
+          },
+        }}
         style={styles.input}
+        placeHolder="Digite sua Senha"
         secureTextEntry={true}
-        onChangeText={password => setEmail(password)}
+        label="Senha"
       />
 
       <Text
@@ -51,12 +72,12 @@ function LoginScreen({navigation, route}: any) {
         icon="login"
         mode="contained"
         style={styles.button}
-        onPress={() => navigation.navigate('Home')}>
+        onPress={handleSubmit(onLoginPressed)}>
         Log In
       </Button>
     </View>
   );
-}
+};
 
 LogBox.ignoreLogs([
   'Non-serializable values were found in the navigation state',
@@ -66,14 +87,14 @@ export default LoginScreen;
 
 const styles = StyleSheet.create({
   centerView: {
-    alignItems: 'center',
     flex: 1,
+    alignItems: 'center',
     justifyContent: 'center',
     backgroundColor: '#5D6BB0',
   },
   input: {
-    //height: 40,
-    width: 300,
+    width: 350,
+    marginBottom: 5,
   },
   button: {
     marginTop: 20,
