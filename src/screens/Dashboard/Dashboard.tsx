@@ -79,7 +79,7 @@ const styles = StyleSheet.create({
   centerView: {
     maxWidth: '80%',
     margin: 'auto',
-    backgroundColor: '#5D6BB0',
+    backgroundColor: '#ffffff',
   },
   input: {
     //height: 40,

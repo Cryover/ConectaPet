@@ -16,7 +16,11 @@ const LoginScreen = () => {
   const onLoginPressed = (data: any) => {
     // Validate User
     console.log(data);
-    //navigation.navigate('Home');
+    navigation.navigate('Home');
+  };
+
+  const onBypassLoginPressed = () => {
+    navigation.navigate('Home');
   };
 
   return (
@@ -73,6 +77,13 @@ const LoginScreen = () => {
         mode="contained"
         style={styles.button}
         onPress={handleSubmit(onLoginPressed)}>
+        Log In
+      </Button>
+      <Button
+        icon="login"
+        mode="contained"
+        style={styles.button}
+        onPress={onBypassLoginPressed}>
         Log In
       </Button>
     </View>

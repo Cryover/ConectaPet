@@ -41,7 +41,7 @@ const Navigation = () => {
         <Stack.Screen
           name="Login"
           component={LoginScreen}
-          initialParams={{setUserToken}}
+          //initialParams={{setUserToken}}
         />
         <Stack.Screen name="Registro" component={RegistroScreen} />
         <Stack.Screen

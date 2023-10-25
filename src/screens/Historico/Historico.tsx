@@ -11,6 +11,8 @@ import {
   Text,
 } from 'react-native-paper';
 import Calendario from '../../components/molecules/Calendario/Calendario';
+import {CadastroDepesasModal} from '../../components/Modal/CadastroDespesasModal';
+import AddDespesaButton from '../../components/Buttons/AddDespesaButton';
 
 const Historico = () => {
   const [page, setPage] = React.useState<number>(0);
@@ -105,72 +107,83 @@ const Historico = () => {
 
   const from = page * itemsPerPage;
   const to = Math.min((page + 1) * itemsPerPage, items.length);
-  const [visible, setVisible] = React.useState(false);
+  const [visibleModal, setVisibleModal] = React.useState(false);
+  const [isExtended, setIsExtended] = React.useState(true);
 
-  const showModal = () => setVisible(true);
-  const hideModal = () => setVisible(false);
-  const containerStyle = {backgroundColor: 'white', padding: 20};
+  const showModal = () => setVisibleModal(true);
+  const hideModal = () => setVisibleModal(false);
+
+  const onScroll = ({nativeEvent}: any) => {
+    const currentScrollPosition =
+      Math.floor(nativeEvent?.contentOffset?.y) ?? 0;
+
+    setIsExtended(currentScrollPosition <= 0);
+  };
 
   React.useEffect(() => {
     setPage(0);
   }, [itemsPerPage]);
 
   return (
-    <ScrollView contentContainerStyle={styles.scrollView}>
-      <Avatar.Image
-        style={{marginTop: 20}}
-        size={64}
-        source={require('../../assets/images/avatar.webp')}
-      />
-      <Text variant="titleMedium">{nomePet}</Text>
-
-      <Calendario />
-      <Portal>
-        <Modal
-          style={{width: '80%', height: '80%', margin: 'auto'}}
-          visible={visible}
-          onDismiss={hideModal}
-          contentContainerStyle={containerStyle}>
-          <Text>Example Modal. Click outside this area to dismiss.</Text>
-        </Modal>
-      </Portal>
-
-      <Button style={{marginTop: 30}} onPress={showModal}>
-        Adicionar
-      </Button>
-
-      <DataTable>
-        <DataTable.Header>
-          <DataTable.Title style={{flex: 4}}>Nome do Item</DataTable.Title>
-          <DataTable.Title style={{flex: 2}} numeric>
-            Valor
-          </DataTable.Title>
-        </DataTable.Header>
-
-        {items.slice(from, to).map(item => (
-          <DataTable.Row key={item.key}>
-            <Text numberOfLines={3} style={{flex: 3}}>
-              {item.name}
-            </Text>
-            <DataTable.Cell style={{flex: 2}} numeric>
-              R$ {item.gastos}
-            </DataTable.Cell>
-          </DataTable.Row>
-        ))}
-
-        <DataTable.Pagination
-          page={page}
-          numberOfPages={Math.ceil(items.length / itemsPerPage)}
-          onPageChange={page => setPage(page)}
-          label={`Pag. ${from + 1} de ${to} de ${items.length}`}
-          numberOfItemsPerPageList={numberOfItemsPerPageList}
-          numberOfItemsPerPage={itemsPerPage}
-          onItemsPerPageChange={onItemsPerPageChange}
-          showFastPaginationControls
-          selectPageDropdownLabel={'Itens por Pagina'}
+    <>
+      <ScrollView contentContainerStyle={styles.scrollView} onScroll={onScroll}>
+        <Avatar.Image
+          style={{marginTop: 20}}
+          size={64}
+          source={require('../../assets/images/avatar.webp')}
         />
-      </DataTable>
-    </ScrollView>
+        <Text variant="titleMedium">{nomePet}</Text>
+
+        <Calendario />
+
+        <CadastroDepesasModal visible={visibleModal} onDismiss={hideModal} />
+
+        <Button style={{marginTop: 30}} onPress={showModal}>
+          Adicionar
+        </Button>
+
+        <DataTable>
+          <DataTable.Header>
+            <DataTable.Title style={{flex: 4}}>Nome do Item</DataTable.Title>
+            <DataTable.Title style={{flex: 2}} numeric>
+              Valor
+            </DataTable.Title>
+          </DataTable.Header>
+
+          {items.slice(from, to).map(item => (
+            <DataTable.Row key={item.key}>
+              <Text numberOfLines={3} style={{flex: 3}}>
+                {item.name}
+              </Text>
+              <DataTable.Cell style={{flex: 2}} numeric>
+                R$ {item.gastos}
+              </DataTable.Cell>
+            </DataTable.Row>
+          ))}
+
+          <DataTable.Pagination
+            page={page}
+            numberOfPages={Math.ceil(items.length / itemsPerPage)}
+            onPageChange={page => setPage(page)}
+            label={`Pag. ${from + 1} de ${to} de ${items.length}`}
+            numberOfItemsPerPageList={numberOfItemsPerPageList}
+            numberOfItemsPerPage={itemsPerPage}
+            onItemsPerPageChange={onItemsPerPageChange}
+            showFastPaginationControls
+            selectPageDropdownLabel={'Itens por Pagina'}
+          />
+        </DataTable>
+      </ScrollView>
+
+      <AddDespesaButton
+        visible={true}
+        extended={isExtended}
+        label={undefined}
+        animateFrom={'right'}
+        style={undefined}
+        iconMode={undefined}
+      />
+    </>
   );
 };
 
@@ -198,5 +211,10 @@ const styles = StyleSheet.create({
   links: {
     marginTop: 20,
     color: 'white',
+  },
+  modal: {
+    backgroundColor: 'white',
+    padding: 20,
+    alignSelf: 'center',
   },
 });

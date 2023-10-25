@@ -1,7 +1,9 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import React from 'react';
 import {Image, StyleSheet, View} from 'react-native';
 import {Button} from 'react-native-paper';
-import {Form, useForm} from 'react-hook-form';
+import {useForm} from 'react-hook-form';
+import {useNavigation} from '@react-navigation/native';
 import {ControlTextInput} from '../../components/atoms/controller/ControlTextInput';
 
 export function RegistroScreen() {
@@ -9,12 +11,13 @@ export function RegistroScreen() {
   const watchSenha = watch('senha');
   const EMAIL_REGEX: RegExp =
     /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+  const navigation: any = useNavigation();
 
   const onRegisterPressed = (data: any) => {
     // Validate User
     console.log(data);
-    //navigation.navigate('Home');
     console.log(watchSenha);
+    navigation.navigate('Home');
   };
 
   return (
@@ -34,7 +37,6 @@ export function RegistroScreen() {
           },
         }}
         style={styles.input}
-        placeHolder="Digite sua Senha"
         label="Nome de Usuário"
       />
 
@@ -49,8 +51,7 @@ export function RegistroScreen() {
           },
         }}
         style={styles.input}
-        placeHolder="Digite seu Email"
-        label="Email"
+        //label="Email"
       />
 
       <ControlTextInput
@@ -64,20 +65,18 @@ export function RegistroScreen() {
           },
         }}
         style={styles.input}
-        placeHolder="Digite sua Senha"
         secureTextEntry={true}
-        label="Senha"
+        //label="Senha"
       />
 
       <ControlTextInput
         control={control}
         name="confirmarSenha"
         rules={{
-          validade: (value: string, formValues) =>
+          validade: (value: string, formValues: any) =>
             value === watchSenha || 'As senhas não conferem',
         }}
         style={styles.input}
-        placeHolder="Digite sua Senha"
         secureTextEntry={true}
         label="Confirmar Senha"
       />
