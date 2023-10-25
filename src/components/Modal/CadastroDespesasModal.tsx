@@ -1,68 +1,34 @@
 import React from 'react';
-import {useForm} from 'react-hook-form';
-import {StyleSheet, View} from 'react-native';
-import {Button, Modal, Portal, Text} from 'react-native-paper';
-import {ControlTextInput} from '../atoms/controller/ControlTextInput';
+import {useForm, FormProvider} from 'react-hook-form';
+import {View, Button, StyleSheet} from 'react-native';
+import ControlTextInput from '../atoms/controller/ControlTextInput';
 
-export function CadastroDepesasModal(props: any) {
-  const {control, handleSubmit} = useForm({mode: 'onChange'});
-  const [visible, setVisible] = React.useState(props.visible);
+const CadastroDespesasModal = () => {
+  const {control, handleSubmit} = useForm();
+  const methods = useForm();
 
-  /* React.useEffect(() => {
-    setVisible(props.visible);
-  }, [props.visible]); */
-
-  const onRegisterPressed = (data: any) => {
-    // Validate User
-    console.log(data);
-  };
-
-  const onCancelPressed = (data: any) => {
-    // Validate User
-    setVisible(false);
+  const onSubmit = (data: any) => {
     console.log(data);
   };
 
   return (
-    <View>
-      <Portal>
-        <Modal
-          visible={props.visible}
-          onDismiss={props.hideModal}
-          contentContainerStyle={styles.modal}>
-          <View>
-            <Text>Cadastro de Despesas</Text>
-            <ControlTextInput
-              control={control}
-              name="usuario"
-              rules={{
-                required: 'Senha Obrigatória',
-                minLength: {
-                  value: 6,
-                  message: 'Mínimo de 6 caracteres',
-                },
-              }}
-              style={styles.input}
-              label="Nome de Usuário"
-            />
-            <Button
-              mode="contained"
-              style={styles.button}
-              onPress={handleSubmit(onRegisterPressed)}>
-              Registrar
-            </Button>
-            <Button
-              mode="contained"
-              style={styles.button}
-              onPress={onCancelPressed}>
-              Cancelar
-            </Button>
-          </View>
-        </Modal>
-      </Portal>
-    </View>
+    <FormProvider {...methods}>
+      <View>
+        <ControlTextInput
+          name={'nomeItem'}
+          control={control}
+          label={'Nome do Item'}
+          style={styles.input}
+        />
+
+        <Button title="Submit" onPress={handleSubmit(onSubmit)} />
+      </View>
+    </FormProvider>
   );
-}
+};
+
+export default CadastroDespesasModal;
+
 const styles = StyleSheet.create({
   centerView: {
     alignItems: 'center',

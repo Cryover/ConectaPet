@@ -2,17 +2,10 @@
 /* eslint-disable @typescript-eslint/no-shadow */
 import * as React from 'react';
 import {ScrollView, StyleSheet} from 'react-native';
-import {
-  Avatar,
-  Modal,
-  Button,
-  DataTable,
-  Portal,
-  Text,
-} from 'react-native-paper';
+import {Avatar, Button, DataTable, Text} from 'react-native-paper';
 import Calendario from '../../components/molecules/Calendario/Calendario';
-import {CadastroDepesasModal} from '../../components/Modal/CadastroDespesasModal';
-import AddDespesaButton from '../../components/Buttons/AddDespesaButton';
+import CustomFabButton from '../../components/Buttons/CustomFabButton';
+import CadastroDespesasModal from '../../components/Modal/CadastroDespesasModal';
 
 const Historico = () => {
   const [page, setPage] = React.useState<number>(0);
@@ -136,7 +129,7 @@ const Historico = () => {
 
         <Calendario />
 
-        <CadastroDepesasModal visible={visibleModal} onDismiss={hideModal} />
+        {/*  <CadastroDespesasModal> */}
 
         <Button style={{marginTop: 30}} onPress={showModal}>
           Adicionar
@@ -175,13 +168,11 @@ const Historico = () => {
         </DataTable>
       </ScrollView>
 
-      <AddDespesaButton
+      <CustomFabButton
         visible={true}
-        extended={isExtended}
-        label={undefined}
-        animateFrom={'right'}
-        style={undefined}
-        iconMode={undefined}
+        style={styles.fabStyle}
+        isExtended={isExtended}
+        onPress={showModal}
       />
     </>
   );
@@ -216,5 +207,10 @@ const styles = StyleSheet.create({
     backgroundColor: 'white',
     padding: 20,
     alignSelf: 'center',
+  },
+  fabStyle: {
+    bottom: 16,
+    right: 16,
+    position: 'absolute',
   },
 });

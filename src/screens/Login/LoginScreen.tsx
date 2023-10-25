@@ -4,7 +4,7 @@ import {Button} from 'react-native-paper';
 import {LogBox} from 'react-native';
 import {useNavigation} from '@react-navigation/native';
 import {useForm} from 'react-hook-form';
-import {ControlTextInput} from '../../components/atoms/controller/ControlTextInput';
+import ControlTextInput from '../../components/atoms/controller/ControlTextInput';
 
 const LoginScreen = () => {
   //const {setUserToken} = route.params;
@@ -41,8 +41,8 @@ const LoginScreen = () => {
           },
         }}
         style={styles.input}
-        placeHolder="Digite seu Email"
         label="Email"
+        secureTextEntry={false}
       />
 
       <ControlTextInput
@@ -56,7 +56,6 @@ const LoginScreen = () => {
           },
         }}
         style={styles.input}
-        placeHolder="Digite sua Senha"
         secureTextEntry={true}
         label="Senha"
       />

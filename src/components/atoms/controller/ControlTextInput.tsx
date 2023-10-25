@@ -1,41 +1,53 @@
 import React from 'react';
-import {Controller} from 'react-hook-form';
-import {View} from 'react-native';
-import {Text, TextInput, useTheme} from 'react-native-paper';
+import {
+  Control,
+  Controller,
+  FieldValues,
+  RegisterOptions,
+} from 'react-hook-form';
+import {StyleProp, TextStyle, ViewStyle} from 'react-native';
+import {TextInput as PaperTextInput, Text} from 'react-native-paper';
 
-export function ControlTextInput({
-  control,
-  name,
-  rules,
-  ...textInputProps
-}: any) {
-  const theme = useTheme();
-  return (
-    <View>
-      <Controller
-        control={control}
-        name={name}
-        rules={rules}
-        render={({field, fieldState}) => (
-          <>
-            <View>
-              <TextInput
-                {...textInputProps}
-                value={field.value}
-                onChangeText={field.onChange}
-                onBlur={field.onBlur}
-                error={fieldState.error}
-              />
-            </View>
-            <Text
-              style={{
-                color: theme.colors.error,
-              }}>
-              {fieldState.error ? fieldState.error.message : ''}
-            </Text>
-          </>
-        )}
-      />
-    </View>
-  );
+interface CustomTextInputProps {
+  name: string;
+  label: string;
+  control: Control<FieldValues>;
+  rules: RegisterOptions<FieldValues, string>; // Define the 'rules' property
+  style: StyleProp<TextStyle | ViewStyle>;
+  secureTextEntry: boolean;
 }
+
+const ControlTextInput: React.FC<CustomTextInputProps> = ({
+  name,
+  label,
+  control,
+  style,
+  rules,
+  secureTextEntry,
+}) => {
+  return (
+    <Controller
+      name={name}
+      control={control}
+      rules={rules}
+      render={({field, fieldState}) => (
+        <>
+          <PaperTextInput
+            label={label}
+            value={field.value}
+            onChangeText={field.onChange}
+            onBlur={field.onBlur}
+            secureTextEntry={secureTextEntry}
+            error={fieldState.error ? true : false}
+            style={style}
+          />
+          {fieldState.error && (
+            <Text style={{color: 'red'}}>{fieldState.error.message}</Text>
+          )}
+        </>
+      )}
+    />
+  );
+};
+
+export default ControlTextInput;
