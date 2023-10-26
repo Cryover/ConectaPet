@@ -1,46 +1,39 @@
 import React from 'react';
-import {StyleSheet, TextStyle, ViewStyle} from 'react-native';
-import {AnimatedFAB} from 'react-native-paper';
+import {TextStyle, ViewStyle} from 'react-native';
+import {AnimatedFAB, AnimatedFABAnimateFrom} from 'react-native-paper';
 import {StyleProp} from 'react-native';
 
 interface CustomFabButtonProps {
+  label: string;
   visible: boolean;
   isExtended: boolean;
+  animateFrom: AnimatedFABAnimateFrom;
   style: StyleProp<TextStyle | ViewStyle>;
   onPress: () => void;
 }
 
 const CustomFabButton: React.FC<CustomFabButtonProps> = ({
+  label,
   visible,
   isExtended,
   style,
+  animateFrom,
   onPress,
 }) => {
-  //const fabStyle = {[animateFrom]: 16};
+  const fabStyle = {[animateFrom]: 16};
 
   return (
     <AnimatedFAB
       icon={'plus'}
-      label={'Label'}
-      extended={isExtended}
+      label={label}
+      extended={!isExtended}
       onPress={onPress}
       visible={visible}
-      animateFrom={'right'}
+      animateFrom={animateFrom}
       iconMode={'static'}
-      style={[styles.fabStyle, style]}
+      style={[style, fabStyle]}
     />
   );
 };
 
 export default CustomFabButton;
-
-const styles = StyleSheet.create({
-  container: {
-    flexGrow: 1,
-  },
-  fabStyle: {
-    bottom: 16,
-    right: 16,
-    position: 'absolute',
-  },
-});

@@ -2,99 +2,84 @@
 /* eslint-disable @typescript-eslint/no-shadow */
 import * as React from 'react';
 import {ScrollView, StyleSheet} from 'react-native';
-import {Avatar, Button, DataTable, Text} from 'react-native-paper';
+import {Button, DataTable, Text} from 'react-native-paper';
 import Calendario from '../../components/molecules/Calendario/Calendario';
 import CustomFabButton from '../../components/Buttons/CustomFabButton';
-import CadastroDespesasModal from '../../components/Modal/CadastroDespesasModal';
+import CustomModal from '../../components/Modal/CustomModal';
+import ControlTextInput from '../../components/atoms/controller/ControlTextInput';
+import {useForm} from 'react-hook-form';
+
+type Item = {
+  id: string;
+  nome: string;
+  valor: number;
+  dataDespesa: Date;
+};
 
 const Historico = () => {
   const [page, setPage] = React.useState<number>(0);
   const [nomePet, setNomePet] = React.useState<string>('Rabada');
-  const [numberOfItemsPerPageList] = React.useState([8, 16, 24]);
+  const [numberOfItemsPerPageList] = React.useState([5, 10, 24]);
   const [itemsPerPage, onItemsPerPageChange] = React.useState(
     numberOfItemsPerPageList[0],
   );
 
-  const value = 22.9;
+  const {control, handleSubmit} = useForm();
 
-  const [items] = React.useState([
+  const [items] = React.useState<Item[]>([
     {
-      key: 1,
-      name: 'Ração Premier Pet Formula Cães Adultos Raças Pequenas 2,5KG',
-      gastos: 71.91,
-      fat: 16,
+      id: '1',
+      nome: 'Ração Premier Pet Formula Cães Adultos Raças Pequenas 2,5KG',
+      valor: 71.91,
+      dataDespesa: new Date('12/10/2023'),
     },
     {
-      key: 2,
-      name: 'Shampoo Antipulgas Sanol Dog para Cães',
-      gastos: value.toFixed(2),
-      fat: 16,
+      id: '2',
+      nome: 'Shampoo Antipulgas Sanol Dog para Cães',
+      valor: 60.92,
+      dataDespesa: new Date('12/10/2023'),
     },
     {
-      key: 3,
-      name: 'Frozen yogurt',
-      gastos: 159,
-      fat: 6,
+      id: '3',
+      nome: 'Ossinho para Cães Smartbones Sweet Potato Medium',
+      valor: 33.54,
+      dataDespesa: new Date('12/10/2023'),
     },
     {
-      key: 4,
-      name: 'Gingerbread',
-      gastos: 305,
-      fat: 3.7,
+      id: '4',
+      nome: 'Tapete Higiênico MyHug para Cães Adultos e Filhotes',
+      valor: 99.9,
+      dataDespesa: new Date('12/10/2023'),
     },
     {
-      key: 5,
-      name: 'Gingerbread',
-      gastos: 305,
-      fat: 3.7,
+      id: '5',
+      nome: 'Antipulgas Simparic 10 a 20kg Cães 40mg',
+      valor: 119.9,
+      dataDespesa: new Date('12/10/2023'),
     },
     {
-      key: 6,
-      name: 'Gingerbread',
-      gastos: 305,
-      fat: 3.7,
+      id: '6',
+      nome: 'Ração GranPlus Gourmet Gatos Adultos Castrados',
+      valor: 28.62,
+      dataDespesa: new Date('12/10/2023'),
     },
     {
-      key: 7,
-      name: 'Gingerbread',
-      gastos: 305,
-      fat: 3.7,
+      id: '7',
+      nome: 'Areia para Gato Katbom Natural Granulado Higiênico',
+      valor: 45.5,
+      dataDespesa: new Date('12/10/2023'),
     },
     {
-      key: 8,
-      name: 'Gingerbread',
-      gastos: 305,
-      fat: 3.7,
+      id: '8',
+      nome: 'Areia Higiênica Biodegradável Vida Descomplicada Viva Verde',
+      valor: 59.4,
+      dataDespesa: new Date('12/10/2023'),
     },
     {
-      key: 9,
-      name: 'Gingerbread',
-      gastos: 305,
-      fat: 3.7,
-    },
-    {
-      key: 10,
-      name: 'Gingerbread',
-      gastos: 305,
-      fat: 3.7,
-    },
-    {
-      key: 11,
-      name: 'Gingerbread',
-      gastos: 305,
-      fat: 3.7,
-    },
-    {
-      key: 12,
-      name: 'Gingerbread',
-      gastos: 305,
-      fat: 3.7,
-    },
-    {
-      key: 13,
-      name: 'Gingerbread',
-      gastos: 305,
-      fat: 3.7,
+      id: '9',
+      nome: 'Antipulgas Simparic 5 a 10kg Cães 20mg',
+      valor: 100.5,
+      dataDespesa: new Date('12/10/2023'),
     },
   ]);
 
@@ -120,22 +105,54 @@ const Historico = () => {
   return (
     <>
       <ScrollView contentContainerStyle={styles.scrollView} onScroll={onScroll}>
-        <Avatar.Image
-          style={{marginTop: 20}}
-          size={64}
-          source={require('../../assets/images/avatar.webp')}
-        />
-        <Text variant="titleMedium">{nomePet}</Text>
-
+        <Text variant="titleMedium" style={{marginBottom: 20}}>
+          Historico de Despesas
+        </Text>
         <Calendario />
 
-        {/*  <CadastroDespesasModal> */}
+        <CustomModal
+          visible={visibleModal}
+          onDismiss={hideModal}
+          containerStyle={styles.containerStyle}>
+          <Text
+            variant="titleMedium"
+            style={[styles.textCenter, {marginBottom: 10}]}>
+            Cadastro de Despesa
+          </Text>
+          <ControlTextInput
+            name={'nomeItem'}
+            label={'Nome do Item'}
+            control={control}
+            rules={{required: 'Nome do item Obrigatório'}}
+            style={styles.input}
+            secureTextEntry={false}
+          />
+          <ControlTextInput
+            name={'nomeItem'}
+            label={'Nome do Item'}
+            control={control}
+            rules={{required: 'Nome do item Obrigatório'}}
+            style={styles.input}
+            secureTextEntry={false}
+          />
+          <Button
+            icon="plus"
+            mode="contained"
+            style={styles.button}
+            //onPress={handleSubmit(onLoginPressed)}
+          >
+            Registrar Item
+          </Button>
+          <Button
+            icon="cancel"
+            mode="contained"
+            style={styles.button}
+            onPress={handleSubmit(hideModal)}>
+            Cancelar
+          </Button>
+        </CustomModal>
 
-        <Button style={{marginTop: 30}} onPress={showModal}>
-          Adicionar
-        </Button>
-
-        <DataTable>
+        <DataTable style={{marginBottom: 70}}>
           <DataTable.Header>
             <DataTable.Title style={{flex: 4}}>Nome do Item</DataTable.Title>
             <DataTable.Title style={{flex: 2}} numeric>
@@ -144,12 +161,12 @@ const Historico = () => {
           </DataTable.Header>
 
           {items.slice(from, to).map(item => (
-            <DataTable.Row key={item.key}>
+            <DataTable.Row id={item.id}>
               <Text numberOfLines={3} style={{flex: 3}}>
-                {item.name}
+                {item.nome}
               </Text>
               <DataTable.Cell style={{flex: 2}} numeric>
-                R$ {item.gastos}
+                R$ {item.valor}
               </DataTable.Cell>
             </DataTable.Row>
           ))}
@@ -173,6 +190,8 @@ const Historico = () => {
         style={styles.fabStyle}
         isExtended={isExtended}
         onPress={showModal}
+        label={'Add Despesa'}
+        animateFrom={'left'}
       />
     </>
   );
@@ -181,10 +200,8 @@ const Historico = () => {
 export default Historico;
 
 const styles = StyleSheet.create({
-  center: {
-    alignItems: 'center',
-    justifyContent: 'center',
-    flex: 1,
+  textCenter: {
+    textAlign: 'center',
   },
   scrollView: {
     alignItems: 'center',
@@ -192,7 +209,6 @@ const styles = StyleSheet.create({
     flexGrow: 1,
   },
   input: {
-    //height: 40,
     width: 300,
   },
   button: {
@@ -212,5 +228,14 @@ const styles = StyleSheet.create({
     bottom: 16,
     right: 16,
     position: 'absolute',
+    backgroundColor: '#5D6BB0',
+  },
+  containerStyle: {
+    backgroundColor: 'white',
+    gap: 10,
+    width: '80%',
+    height: 400,
+    alignSelf: 'center',
+    padding: 20,
   },
 });

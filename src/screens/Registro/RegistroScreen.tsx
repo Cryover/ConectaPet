@@ -24,7 +24,7 @@ export function RegistroScreen() {
     <View style={styles.centerView}>
       <Image
         style={styles.logo}
-        source={require('../../assets/images/rwIARcq.webp')}
+        source={require('../../assets/images/avatar.webp')}
       />
       <ControlTextInput
         control={control}

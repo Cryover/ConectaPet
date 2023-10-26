@@ -1,16 +1,14 @@
 import React from 'react';
-import {useForm} from 'react-hook-form';
 import {Image, View} from 'react-native';
 import {Button, TextInput} from 'react-native-paper';
 
 export function RecuperacaoContaScreen() {
   const [code, setCode] = React.useState('');
   const [newPassword, setNewPassword] = React.useState('');
-  const {control, handleSubmit} = useForm();
 
   return (
     <View>
-      <Image source={require('../../assets/images/rwIARcq.webp')} />
+      <Image source={require('../../assets/images/defaultAvatar.webp')} />
 
       <TextInput
         label="Código recebido no email"
