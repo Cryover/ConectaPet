@@ -16,21 +16,27 @@ const LoginScreen = () => {
 
   const apiUrl = process.env.API_URL;
 
-  const onLoginPressed = (data: FieldValues) => {
-    /*  axios
+  const onLoginPressed = async (data: FieldValues) => {
+    axios
       .post(`${apiUrl}/login`, data)
       .then(response => {
         // Handle the response here
         console.log(response.data);
+        navigation.navigate('Home');
       })
       .catch(error => {
-        // Handle errors here
+        if (error.response) {
+          console.error('Erro na resposta do servidor:', error.response.data);
+        } else if (error.request) {
+          console.error('Sem resposta do servidor:', error.request);
+        } else {
+          console.error('Erro na conexão:', error.message);
+        }
         console.error(error);
-      }); */
+      });
 
     // Validate User
     console.log(data);
-    navigation.navigate('Home');
   };
 
   const onBypassLoginPressed = () => {
