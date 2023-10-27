@@ -3,8 +3,9 @@ import {Image, StyleSheet, Text, View} from 'react-native';
 import {Button} from 'react-native-paper';
 import {LogBox} from 'react-native';
 import {useNavigation} from '@react-navigation/native';
-import {useForm} from 'react-hook-form';
+import {FieldValues, useForm} from 'react-hook-form';
 import ControlTextInput from '../../components/atoms/controller/ControlTextInput';
+import axios from 'axios';
 
 const LoginScreen = () => {
   //const {setUserToken} = route.params;
@@ -13,7 +14,20 @@ const LoginScreen = () => {
   const EMAIL_REGEX: RegExp =
     /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
 
-  const onLoginPressed = (data: any) => {
+  const apiUrl = process.env.API_URL;
+
+  const onLoginPressed = (data: FieldValues) => {
+    /*  axios
+      .post(`${apiUrl}/login`, data)
+      .then(response => {
+        // Handle the response here
+        console.log(response.data);
+      })
+      .catch(error => {
+        // Handle errors here
+        console.error(error);
+      }); */
+
     // Validate User
     console.log(data);
     navigation.navigate('Home');
@@ -32,7 +46,7 @@ const LoginScreen = () => {
 
       <ControlTextInput
         control={control}
-        name="Email"
+        name="username"
         rules={{
           required: 'Email Obrigatório',
           pattern: {
@@ -41,13 +55,13 @@ const LoginScreen = () => {
           },
         }}
         style={styles.input}
-        label="Email"
+        label="Nome de Usuário"
         secureTextEntry={false}
       />
 
       <ControlTextInput
         control={control}
-        name="Senha"
+        name="senha"
         rules={{
           required: 'Senha Obrigatória',
           minLength: {
