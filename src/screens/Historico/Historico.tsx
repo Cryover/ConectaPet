@@ -161,7 +161,7 @@ const Historico = () => {
           </DataTable.Header>
 
           {items.slice(from, to).map(item => (
-            <DataTable.Row id={item.id}>
+            <DataTable.Row key={item.id}>
               <Text numberOfLines={3} style={{flex: 3}}>
                 {item.nome}
               </Text>
