@@ -91,13 +91,13 @@ const LoginScreen = () => {
         Não possui conta? clique aqui!
       </Text>
 
-      <Button
+      {/* <Button
         icon="login"
         mode="contained"
         style={styles.button}
         onPress={handleSubmit(onLoginPressed)}>
         Log In
-      </Button>
+      </Button> */}
       <Button
         icon="login"
         mode="contained"

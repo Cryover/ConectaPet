@@ -4,7 +4,7 @@ import {Image, StyleSheet, View} from 'react-native';
 import {Button} from 'react-native-paper';
 import {useForm} from 'react-hook-form';
 import {useNavigation} from '@react-navigation/native';
-import {ControlTextInput} from '../../components/atoms/controller/ControlTextInput';
+import ControlTextInput from '../../components/atoms/controller/ControlTextInput';
 
 export function RegistroScreen() {
   const {control, handleSubmit, watch} = useForm({mode: 'onChange'});
@@ -24,13 +24,13 @@ export function RegistroScreen() {
     <View style={styles.centerView}>
       <Image
         style={styles.logo}
-        source={require('../../assets/images/avatar.webp')}
+        source={require('../../assets/images/logo.webp')}
       />
       <ControlTextInput
         control={control}
-        name="usuario"
+        name="username"
         rules={{
-          required: 'Senha Obrigatória',
+          required: 'Nome de Usuário Obrigatório',
           minLength: {
             value: 6,
             message: 'Mínimo de 6 caracteres',
@@ -38,6 +38,7 @@ export function RegistroScreen() {
         }}
         style={styles.input}
         label="Nome de Usuário"
+        secureTextEntry={false}
       />
 
       <ControlTextInput
@@ -51,7 +52,22 @@ export function RegistroScreen() {
           },
         }}
         style={styles.input}
-        //label="Email"
+        label={'Email'}
+        secureTextEntry={false} //label="Email"
+      />
+
+      <ControlTextInput
+        control={control}
+        name="name"
+        rules={{
+          minLength: {
+            value: 0,
+            message: '',
+          },
+        }}
+        style={styles.input}
+        label="Nome Completo (Opcional)"
+        secureTextEntry={false}
       />
 
       <ControlTextInput
@@ -66,10 +82,10 @@ export function RegistroScreen() {
         }}
         style={styles.input}
         secureTextEntry={true}
-        //label="Senha"
+        label={'Senha'} //label="Senha"
       />
 
-      <ControlTextInput
+      {/* <ControlTextInput
         control={control}
         name="confirmarSenha"
         rules={{
@@ -79,7 +95,7 @@ export function RegistroScreen() {
         style={styles.input}
         secureTextEntry={true}
         label="Confirmar Senha"
-      />
+      /> */}
 
       <Button
         mode="contained"
@@ -102,6 +118,7 @@ const styles = StyleSheet.create({
   },
   input: {
     //height: 40,
+    marginBottom: 10,
     width: 300,
   },
   button: {

@@ -12,7 +12,7 @@ interface CustomTextInputProps {
   name: string;
   label: string;
   control: Control<FieldValues>;
-  rules: RegisterOptions<FieldValues, string>; // Define the 'rules' property
+  rules: RegisterOptions<FieldValues, string> | undefined; // Define the 'rules' property
   style: StyleProp<TextStyle | ViewStyle>;
   secureTextEntry: boolean;
 }

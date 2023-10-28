@@ -1,6 +1,6 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
-import React from 'react';
-import {ImageURISource, ScrollView, StyleSheet, View} from 'react-native';
+/* eslint-disable react-hooks/exhaustive-deps */
+import React, {useEffect} from 'react';
+import {ScrollView, StyleSheet, View} from 'react-native';
 import {Card, Text} from 'react-native-paper';
 
 type Pet = {
@@ -20,7 +20,9 @@ type InfoMedica = {
 };
 
 export function ProfilePets() {
-  const [pets, setPets] = React.useState<Pet[]>([
+  const [pets, setPets] = React.useState<Pet[]>([]);
+
+  const petsArray: Pet[] = [
     {
       id: '1',
       nome: 'Kabosu',
@@ -40,7 +42,7 @@ export function ProfilePets() {
       raca: 'Dálmata',
       idade: 4,
       tipoAnimal: 'Cachorro',
-      imagem: '../../../assets/images/avatar.webp',
+      imagem: '../../../assets/images/dalmata.webp',
       dataNascimento: new Date('10/09/2020'),
       infoMedica: {
         alergias: 'Batata Doce',
@@ -50,10 +52,10 @@ export function ProfilePets() {
     {
       id: '3',
       nome: 'Elias',
-      raca: 'Barros',
+      raca: 'Persa',
       idade: 2,
-      tipoAnimal: 'Cachorro',
-      imagem: '../../../assets/images/avatar.webp',
+      tipoAnimal: 'Gato',
+      imagem: '../../../assets/images/gatoPersa.webp',
       dataNascimento: new Date('10/09/2020'),
       infoMedica: {
         alergias: 'Batata Doce',
@@ -66,19 +68,33 @@ export function ProfilePets() {
       raca: 'Papagaio-de-cara-roxa',
       idade: 2,
       tipoAnimal: 'Papagaio',
-      imagem: '../../../assets/images/avatar.webp',
+      imagem: '../../../assets/images/papagaio.webp',
       dataNascimento: new Date('10/09/2020'),
       infoMedica: {
         alergias: 'Batata Doce',
         tipoSanguineo: 'DEA 1',
       },
     },
-  ]);
+  ];
+
+  /* const processArray = async () => {
+    const mappedArray = await Promise.all(
+      dataArray.map(async item => {
+        return await setPets(item);
+      }),
+    );
+
+    // Now you can work with the mappedArray which contains the results of the async operations
+  }; */
+
+  useEffect(() => {
+    setPets(petsArray);
+  }, []);
 
   return (
     <ScrollView>
       <View style={styles.cardContainer}>
-        {pets.map(pet => (
+        {pets?.map(pet => (
           <Card key={pet.id} style={styles.card}>
             <Card.Cover
               style={{width: 'auto'}}
