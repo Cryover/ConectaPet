@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
 import React from 'react';
 import {Image, StyleSheet, View} from 'react-native';
 import {Button} from 'react-native-paper';

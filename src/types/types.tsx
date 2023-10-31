@@ -1,18 +1,10 @@
-import type {RouteProp} from '@react-navigation/native';
+export interface RootState {
+  data: DataState; // DataState is the state for the data reducer
+  // Add other reducer states as needed
+}
 
-type RootStackParamList = {
-  Home: undefined;
-  Dashboard: {userId: string};
-  Login: undefined;
-  //Feed: { sort: 'latest' | 'top' } | undefined;
-};
-
-type HomeScreenRouteProp = RouteProp<RootStackParamList, 'Home'>;
-type DashboardScreenRouteProp = RouteProp<RootStackParamList, 'Dashboard'>;
-type LoginScreenRouteProp = RouteProp<RootStackParamList, 'Login'>;
-
-export type {
-  HomeScreenRouteProp,
-  DashboardScreenRouteProp,
-  LoginScreenRouteProp,
-};
+export interface DataState {
+  data: string | null;
+  loading: boolean;
+  error: string | null;
+}

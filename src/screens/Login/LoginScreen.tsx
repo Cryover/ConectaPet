@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import * as React from 'react';
 import {Image, StyleSheet, Text, View} from 'react-native';
 import {Button} from 'react-native-paper';
@@ -5,7 +6,8 @@ import {LogBox} from 'react-native';
 import {useNavigation} from '@react-navigation/native';
 import {FieldValues, useForm} from 'react-hook-form';
 import ControlTextInput from '../../components/atoms/controller/ControlTextInput';
-import axios from 'axios';
+import {useDispatch, useSelector} from 'react-redux';
+import {login} from '../../store/actions/actions';
 
 const LoginScreen = () => {
   //const {setUserToken} = route.params;
@@ -14,34 +16,31 @@ const LoginScreen = () => {
   const EMAIL_REGEX: RegExp =
     /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
 
+  //onst dispatch = useDispatch();
+  //const isAuthenticated = useSelector((state: RootState) => state.isAuthenticated);
+  //const loginError = useSelector((state: RootState) => state.loginError);
+
   const apiUrl = process.env.API_URL;
 
   const onLoginPressed = async (data: FieldValues) => {
-    axios
-      .post(`${apiUrl}/login`, data)
-      .then(response => {
-        // Handle the response here
-        console.log(response.data);
-        navigation.navigate('Home');
-      })
-      .catch(error => {
-        if (error.response) {
-          console.error('Erro na resposta do servidor:', error.response.data);
-        } else if (error.request) {
-          console.error('Sem resposta do servidor:', error.request);
-        } else {
-          console.error('Erro na conexão:', error.message);
-        }
-        console.error(error);
-      });
+    const authenticationEndpoint = 'https://api.example.com/login';
 
-    // Validate User
+    // Define custom headers if needed
+    const customHeaders = {
+      Authorization: 'Bearer YourAccessToken',
+      'X-Custom-Header': 'Custom-Value',
+    };
+    // TODO verificar como usar o redux aqui
+    //dispatch(login(authenticationEndpoint, username, password, customHeaders));
     console.log(data);
   };
 
   const onBypassLoginPressed = () => {
     navigation.navigate('Home');
   };
+
+  const count = useSelector(state => state);
+  const dispatch = useDispatch();
 
   return (
     <View style={styles.centerView}>
