@@ -1,26 +1,28 @@
-name: Docker Image CI
+name: Build Docker Image
 
 on:
   push:
-    branches: [ "main" ]
-  pull_request:
-    branches: [ "main" ]
+    branches:
+      - main # Modify this to match your branch
 
 jobs:
-
   build:
-
     runs-on: ubuntu-latest
 
     steps:
-                  
-    - name: Cache              
-      uses: actions/cache@v3.3.2
-    - name: Setup Node.js environment
-      uses: actions/setup-node@v4.0.0
-    - uses: actions/checkout@v4
-    - uses: actions/setup-node@v3
-      with:
-        node-version: 18
-    - name: Build the Docker image
-      run: docker build . --file ConectaPet --tag v0.0.1:$(date +%s)
+    - name: Checkout code
+      uses: actions/checkout@v2
+
+    - name: Build and tag Docker image
+      run: |
+        docker build -t my-image:v0.0.1-$(date +%s) -f path/to/Dockerfile .
+      working-directory: ./path/to/context
+
+    - name: Push Docker image to a registry (if needed)
+      run: |
+        # Use this step if you want to push the image to a container registry
+        # docker push my-image:v0.0.1-$(date +%s)
+      # You may need to set up Docker login and credentials here if pushing to a registry
+
+    - name: Cleanup
+      run: docker system prune -af
