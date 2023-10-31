@@ -23,4 +23,4 @@ jobs:
       with:
         node-version: 18
     - name: Build the Docker image
-      run: docker build . --file Dockerfile --tag my-image-name:$(date +%s)
+      run: docker build . --file ConectaPet --tag v0.0.1:$(date +%s)
