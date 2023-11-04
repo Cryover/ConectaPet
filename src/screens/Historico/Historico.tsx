@@ -147,7 +147,7 @@ const Historico = () => {
             icon="cancel"
             mode="contained"
             style={styles.button}
-            onPress={handleSubmit(hideModal)}>
+            onPress={hideModal}>
             Cancelar
           </Button>
         </CustomModal>
