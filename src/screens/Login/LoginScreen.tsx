@@ -66,7 +66,7 @@ const LoginScreen = () => {
           required: 'Nome de Usuario Obrigatório',
         }}
         style={styles.input}
-        label="Nome de Usuário"
+        label="Nome de Usuário ou Email"
         secureTextEntry={false}
       />
 
