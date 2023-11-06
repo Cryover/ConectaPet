@@ -1,12 +1,10 @@
-/* eslint-disable no-catch-shadow */
-/* eslint-disable @typescript-eslint/no-shadow */
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import React, { useState } from 'react';
 import {Image, StyleSheet, Text, View} from 'react-native';
 import {Button} from 'react-native-paper';
 import {LogBox} from 'react-native';
 import {useNavigation} from '@react-navigation/native';
-import {FieldValues, useForm} from 'react-hook-form';
+import {useForm} from 'react-hook-form';
 import ControlTextInput from '../../components/atoms/controller/ControlTextInput';
 import axiosInstance from '../../utils/axiosIstance';
 import Loading from '../../components/atoms/loading';
@@ -18,35 +16,32 @@ const LoginScreen = () => {
   const {control, handleSubmit} = useForm();
   const EMAIL_REGEX: RegExp =
     /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
-  const [data, setData] = useState([]);
   const [loading, setLoading] = useState(true);
-
-  const [username, setUsername] = useState('');
-  const [password, setPassword] = useState('');
   const [error, setError] = useState('');
 
 
   const onLoginPressed = async (dataFields: any) => {
     console.log(dataFields);
-    console.log(process.env.API_URL);
+    console.log(process.env.API_DEV_URL);
+
+    //dataFields.username:
     try {
-      const response = await axiosInstance.post('/login', {
-        dataFields,
-      });
+      setLoading(true);
+      const response = await axiosInstance.post('/login', dataFields);
       const token = response.data.token; // Replace with the actual response structure
 
       console.log('token', token);
 
       if (token){
         navigation.navigate('Home');
-      }
-      // Store the token in a secure way, such as in local storage or a state management system
+        // Store the token in a secure way, such as in local storage or a state management system
       await AsyncStorage.setItem('token', token);
-
-      // Perform any additional actions after a successful login, such as redirecting the user
-    } catch (error) {
-      //setError('Login failed. Please check your credentials.');
-      console.log(error);
+      }
+      setLoading(false);
+    } catch (err) {
+      setError('Nome do usuário ou senha incorreto.\n Tente novamente.');
+      setLoading(false);
+      console.log(err);
     }
   };
 
@@ -89,6 +84,12 @@ const LoginScreen = () => {
         secureTextEntry={true}
         label="Senha"
       />
+
+      {loading ? (
+        <Loading />
+      ) : (
+        <Text style={{color:'red', textAlign: 'center'}}>{error}</Text>
+      )}
 
       <Text
         style={styles.links}
