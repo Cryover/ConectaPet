@@ -8,6 +8,9 @@ import Dashboard from '../Dashboard/Dashboard';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import Historico from '../Historico/Historico';
 import Profile from '../Profile/ProfilePets/ProfilePets';
+import AgendaScreen from '../../components/molecules/Agenda/Agenda';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { useNavigation } from '@react-navigation/native';
 
 const Home = () => {
   const Tab = createMaterialBottomTabNavigator();
@@ -18,6 +21,16 @@ const Home = () => {
   const openPetOptionsMenu = () => setVisiblePetMenu(true);
   const closePetOptionsMenu = () => setVisiblePetMenu(false);
   const MORE_ICON = Platform.OS === 'ios' ? 'dots-horizontal' : 'dots-vertical';
+  const navigation:any = useNavigation();
+
+  const logout = async () => {
+    try {
+      await AsyncStorage.removeItem('userToken');
+      navigation.navigate('Login');
+    } catch (err) {
+      console.error(err);
+    }
+  };
 
   return (
     <>
@@ -29,7 +42,7 @@ const Home = () => {
           onDismiss={closeOptionsMenu}
           anchor={<IconButton icon={MORE_ICON} onPress={openOptionsMenu} />}>
           <Menu.Item title="Reportar Bug" />
-          <Menu.Item title="Logout" />
+          <Menu.Item title="Logout" onPress={logout} />
         </Menu>
         <Menu
           style={styles.petMenu}
@@ -63,7 +76,23 @@ const Home = () => {
             tabBarColor: '#EDBA54',
             tabBarIcon: ({color}) => (
               <MaterialCommunityIcons
-                name="clock-time-three-outline"
+                name="credit-card-clock-outline"
+                color={color}
+                size={26}
+              />
+            ),
+          }}
+        />
+        <Tab.Screen
+          name="Agenda"
+          component={AgendaScreen}
+          options={{
+            title: 'Agenda',
+            tabBarLabel: 'Agenda',
+            tabBarColor: '#EDBA54',
+            tabBarIcon: ({color}) => (
+              <MaterialCommunityIcons
+                name="calendar-account-outline"
                 color={color}
                 size={26}
               />

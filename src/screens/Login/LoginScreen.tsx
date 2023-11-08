@@ -10,6 +10,18 @@ import axiosInstance from '../../utils/axiosIstance';
 import Loading from '../../components/atoms/loading';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
+type UsuarioInfo = {
+  usuario: {
+    username: string,
+    email: string,
+    nome: string,
+    senha: string,
+    id: string,
+    tipo_usuario: string,
+    criado_em: Date
+  }
+}
+
 const LoginScreen = () => {
   //const {setUserToken} = route.params;
   const navigation: any = useNavigation();
@@ -28,14 +40,16 @@ const LoginScreen = () => {
     try {
       setLoading(true);
       const response = await axiosInstance.post('/login', dataFields);
-      const token = response.data.token; // Replace with the actual response structure
+      const userToken = response.data.userToken; // Replace with the actual response structure
 
-      console.log('token', token);
+      console.log('teste', JSON.stringify(response.data, null, 2));
 
-      if (token){
+      if (userToken){
+        const usuarioInfo:string = response.data.usuario;
+        await AsyncStorage.setItem('userToken', userToken);
+        await AsyncStorage.setItem('usuarioInfo', usuarioInfo);
+        console.log('usuarioInfo',usuarioInfo);
         navigation.navigate('Home');
-        // Store the token in a secure way, such as in local storage or a state management system
-      await AsyncStorage.setItem('token', token);
       }
       setLoading(false);
     } catch (err) {
@@ -85,11 +99,12 @@ const LoginScreen = () => {
         label="Senha"
       />
 
-      {loading ? (
+      {/* {loading ? (
         <Loading />
       ) : (
         <Text style={{color:'red', textAlign: 'center'}}>{error}</Text>
-      )}
+      )} */}
+      <Text style={{color:'red', textAlign: 'center'}}>{error}</Text>
 
       <Text
         style={styles.links}

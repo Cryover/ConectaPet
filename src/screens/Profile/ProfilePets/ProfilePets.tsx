@@ -1,7 +1,8 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable react-hooks/exhaustive-deps */
-import React, {useEffect} from 'react';
-import {ScrollView, StyleSheet, View} from 'react-native';
-import {Card, Text} from 'react-native-paper';
+import React, { useEffect, useState } from 'react';
+import { ScrollView, StyleSheet, View } from 'react-native';
+import { Card, Text } from 'react-native-paper';
 
 type Pet = {
   id: string;
@@ -20,7 +21,9 @@ type InfoMedica = {
 };
 
 export function ProfilePets() {
-  const [pets, setPets] = React.useState<Pet[]>([]);
+  const [pets, setPets] = useState<Pet[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
 
   const petsArray: Pet[] = [
     {
@@ -88,34 +91,60 @@ export function ProfilePets() {
   }; */
 
   useEffect(() => {
+
+    try {
+      setLoading(true);
+      //const response = await axiosInstance.post(`/pets/${idDono}`);
+      //const token = response.data.token; // Replace with the actual response structure
+
+
+
+
+
+      // Store the token in a secure way, such as in local storage or a state management system
+      //await AsyncStorage.getItem()
+
+      setLoading(false);
+    } catch (err) {
+      setError('Nome do usuário ou senha incorreto.\n Tente novamente.');
+      setLoading(false);
+      console.log(err);
+    }
+
+
     setPets(petsArray);
   }, []);
 
   return (
     <ScrollView>
       <View style={styles.cardContainer}>
-        {pets?.map(pet => (
-          <Card key={pet.id} style={styles.card}>
-            <Card.Cover
-              style={{width: 'auto'}}
-              source={require('../../../assets/images/avatar.webp')}
-            />
-            <Card.Title title={pet.nome} subtitle={pet.raca} />
-            <Card.Content>
-              <Text variant="bodyLarge">Nome: {pet.nome}</Text>
-              <Text variant="bodyLarge">
-                Idade: {pet.dataNascimento.toDateString()}
-              </Text>
-              <Text variant="bodyLarge">Raça: {pet.raca}</Text>
-              <Text variant="bodyLarge">
-                Tipo Sanguíneo: {pet.infoMedica.tipoSanguineo}
-              </Text>
-              <Text variant="bodyLarge">
-                Alergias: {pet.infoMedica.alergias}
-              </Text>
-            </Card.Content>
-          </Card>
-        ))}
+        {pets && pets.length > 0 ? (
+          pets.map((pet) => (
+            <Card key={pet.id} style={styles.card}>
+              <Card.Cover
+                style={{ width: 'auto' }}
+                source={require('../../../assets/images/avatar.webp')}
+              />
+              <Card.Title title={pet.nome} subtitle={pet.raca} />
+              <Card.Content>
+                <Text variant="bodyLarge">Nome: {pet.nome}</Text>
+                <Text variant="bodyLarge">
+                  Idade: {pet.dataNascimento.toDateString()}
+                </Text>
+                <Text variant="bodyLarge">Raça: {pet.raca}</Text>
+                <Text variant="bodyLarge">
+                  Tipo Sanguíneo: {pet.infoMedica.tipoSanguineo}
+                </Text>
+                <Text variant="bodyLarge">
+                  Alergias: {pet.infoMedica.alergias}
+                </Text>
+              </Card.Content>
+            </Card>
+          ))
+        ) : (
+          // Render a message or component when pets is empty or null
+          <Text>Nenhum Pet Cadastrado</Text>
+        )}
       </View>
     </ScrollView>
   );
