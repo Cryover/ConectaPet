@@ -54,7 +54,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     try {
       const token = await AsyncStorage.getItem('userToken');
       if (token !== undefined || token !== null){
-        console.log(token);
+        //console.log(token);
         setUserToken(token);
       }
     } catch (err){

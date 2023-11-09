@@ -11,10 +11,12 @@ export default function Loading() {
 
 const styles = StyleSheet.create({
   centerView: {
-    flex: 1,
-    alignItems: 'center',
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
     justifyContent: 'center',
-    backgroundColor: '#5D6BB0',
   },
   loadingIndicator: {
     position: 'absolute',
