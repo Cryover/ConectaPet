@@ -7,3 +7,23 @@ export interface DataState {
   loading: boolean;
   error: string | null;
 }
+
+export interface UserInfo {
+  username: string,
+  email: string,
+  nome: string,
+  senha: string,
+  id: string,
+  tipo_usuario: string,
+  criado_em: Date
+}
+
+export interface UserInfoResponse {
+  userToken: string,
+  usuario: UserInfo
+}
+
+export type ColorProps = {
+  color: string;
+  focused: boolean;
+};

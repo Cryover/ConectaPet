@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable @typescript-eslint/no-shadow */
-import * as React from 'react';
+import React, {useEffect, useState} from 'react';
 import {ScrollView, StyleSheet} from 'react-native';
 import {Button, DataTable, Text} from 'react-native-paper';
 import Calendario from '../../components/molecules/Calendario/Calendario';
@@ -17,16 +17,16 @@ type Item = {
 };
 
 const AgendaScreen = () => {
-  const [page, setPage] = React.useState<number>(0);
-  const [nomePet, setNomePet] = React.useState<string>('Rabada');
-  const [numberOfItemsPerPageList] = React.useState([5, 10, 24]);
-  const [itemsPerPage, onItemsPerPageChange] = React.useState(
+  const [page, setPage] = useState<number>(0);
+  const [nomePet, setNomePet] = useState<string>('Rabada');
+  const [numberOfItemsPerPageList] = useState([5, 10, 24]);
+  const [itemsPerPage, onItemsPerPageChange] = useState(
     numberOfItemsPerPageList[0],
   );
 
   const {control, handleSubmit} = useForm();
 
-  const [items] = React.useState<Item[]>([
+  const [items] = useState<Item[]>([
     {
       id: '1',
       nome: 'Ração Premier Pet Formula Cães Adultos Raças Pequenas 2,5KG',
@@ -85,8 +85,8 @@ const AgendaScreen = () => {
 
   const from = page * itemsPerPage;
   const to = Math.min((page + 1) * itemsPerPage, items.length);
-  const [visibleModal, setVisibleModal] = React.useState(false);
-  const [isExtended, setIsExtended] = React.useState(true);
+  const [visibleModal, setVisibleModal] = useState(false);
+  const [isExtended, setIsExtended] = useState(true);
 
   const showModal = () => setVisibleModal(true);
   const hideModal = () => setVisibleModal(false);
@@ -98,7 +98,7 @@ const AgendaScreen = () => {
     setIsExtended(currentScrollPosition <= 0);
   };
 
-  React.useEffect(() => {
+  useEffect(() => {
     setPage(0);
   }, [itemsPerPage]);
 
@@ -117,21 +117,21 @@ const AgendaScreen = () => {
           <Text
             variant="titleMedium"
             style={[styles.textCenter, {marginBottom: 10}]}>
-            Cadastro de Despesa
+            Cadastro de Compromisso
           </Text>
           <ControlTextInput
-            name={'nomeItem'}
-            label={'Nome do Item'}
+            name={'nome'}
+            label={'Título'}
             control={control}
-            rules={{required: 'Nome do item Obrigatório'}}
+            rules={{required: 'Título de compromisso é Obrigatório'}}
             style={styles.input}
             secureTextEntry={false}
           />
           <ControlTextInput
-            name={'nomeItem'}
-            label={'Nome do Item'}
+            name={'descricao'}
+            label={'Descrição'}
             control={control}
-            rules={{required: 'Nome do item Obrigatório'}}
+            rules={{required: 'Descrição é Obrigatório'}}
             style={styles.input}
             secureTextEntry={false}
           />

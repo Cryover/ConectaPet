@@ -1,7 +1,9 @@
-import {PaperProvider} from 'react-native-paper';
-import {SafeAreaView} from 'react-native-safe-area-context';
+import { PaperProvider } from 'react-native-paper';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import Navigation from './navigation';
-import {StyleSheet} from 'react-native';
+import { StyleSheet } from 'react-native';
+import { AuthProvider } from './contexts/authContext';
+import { LoadingProvider } from './contexts/loadingContext';
 //import {Provider} from 'react-redux';
 //import store from './store/store';
 
@@ -9,7 +11,11 @@ export default function App() {
   return (
     <SafeAreaView style={styles.root}>
       <PaperProvider>
-          <Navigation />
+        <LoadingProvider>
+          <AuthProvider>
+            <Navigation />
+          </AuthProvider>
+        </LoadingProvider>
       </PaperProvider>
     </SafeAreaView>
   );

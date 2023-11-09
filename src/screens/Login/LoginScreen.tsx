@@ -1,70 +1,49 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
 import React, { useState } from 'react';
 import {Image, StyleSheet, Text, View} from 'react-native';
 import {Button} from 'react-native-paper';
-import {LogBox} from 'react-native';
-import {useNavigation} from '@react-navigation/native';
+import {NavigationProp, ParamListBase, useNavigation} from '@react-navigation/native';
 import {useForm} from 'react-hook-form';
 import ControlTextInput from '../../components/atoms/controller/ControlTextInput';
+import { useAuthContext } from '../../contexts/authContext';
 import axiosInstance from '../../utils/axiosIstance';
-import Loading from '../../components/atoms/loading';
+import { UserInfoResponse } from '../../types/types';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
-type UsuarioInfo = {
-  usuario: {
-    username: string,
-    email: string,
-    nome: string,
-    senha: string,
-    id: string,
-    tipo_usuario: string,
-    criado_em: Date
-  }
-}
 
 const LoginScreen = () => {
-  //const {setUserToken} = route.params;
-  const navigation: any = useNavigation();
+  const navigation: NavigationProp<ParamListBase> = useNavigation();
   const {control, handleSubmit} = useForm();
-  const EMAIL_REGEX: RegExp =
-    /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
-  const [loading, setLoading] = useState(true);
+  /* const EMAIL_REGEX: RegExp =
+    /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/; */
   const [error, setError] = useState('');
+  const { logIn } = useAuthContext();
 
 
   const onLoginPressed = async (dataFields: any) => {
-    console.log(dataFields);
-    console.log(process.env.API_DEV_URL);
 
-    //dataFields.username:
     try {
-      setLoading(true);
       const response = await axiosInstance.post('/login', dataFields);
-      const userToken = response.data.userToken; // Replace with the actual response structure
+      //console.log('response', response.data);
+      const newResponde:UserInfoResponse = response.data;
+      //console.log('newResponde', newResponde);
 
-      console.log('teste', JSON.stringify(response.data, null, 2));
-
-      if (userToken){
-        const usuarioInfo:string = response.data.usuario;
-        await AsyncStorage.setItem('userToken', userToken);
-        await AsyncStorage.setItem('usuarioInfo', usuarioInfo);
-        console.log('usuarioInfo',usuarioInfo);
-        navigation.navigate('Home');
+      const teste = await logIn(response);
+      if (teste){
+          await AsyncStorage.setItem('userToken',newResponde.userToken);
+          await AsyncStorage.setItem('userInfo', JSON.stringify(newResponde.usuario));
+         console.log('Passou');
+         navigation.navigate('Home');
+      } else {
+         console.log('Falhou');
+         setError('Nome do usuário ou senha incorreto.\n Tente novamente.');
       }
-      setLoading(false);
+
+      //console.log('Passou');
     } catch (err) {
-      setError('Nome do usuário ou senha incorreto.\n Tente novamente.');
-      setLoading(false);
       console.log(err);
+      setError('Nome do usuário ou senha incorreto.\n Tente novamente.');
     }
   };
-
-  const onBypassLoginPressed = () => {
-    navigation.navigate('Home');
-  };
-
-  //const count = useSelector(state => state);
-  //const dispatch = useDispatch();
 
   return (
     <View style={styles.centerView}>
@@ -134,10 +113,6 @@ const LoginScreen = () => {
     </View>
   );
 };
-
-LogBox.ignoreLogs([
-  'Non-serializable values were found in the navigation state',
-]);
 
 export default LoginScreen;
 

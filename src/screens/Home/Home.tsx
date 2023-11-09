@@ -1,16 +1,15 @@
-/* eslint-disable react/no-unstable-nested-components */
-
 import * as React from 'react';
 import {createMaterialBottomTabNavigator} from '@react-navigation/material-bottom-tabs';
 import {Appbar, Avatar, IconButton, Menu} from 'react-native-paper';
 import {Platform, StyleSheet, TouchableOpacity} from 'react-native';
 import Dashboard from '../Dashboard/Dashboard';
-import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import Historico from '../Historico/Historico';
 import Profile from '../Profile/ProfilePets/ProfilePets';
 import AgendaScreen from '../../components/molecules/Agenda/Agenda';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { useNavigation } from '@react-navigation/native';
+import { useAuthContext } from '../../contexts/authContext';
+import { NavigationProp, ParamListBase, useNavigation } from '@react-navigation/native';
+import { RenderAgendaTabBarIcon, RenderDashboardTabBarIcon, RenderHistoricoTabBarIcon, RenderPerfilTabBarIcon } from '../../components/molecules/MaterialCommunityIcons/MaterialCommunityIcons';
 
 const Home = () => {
   const Tab = createMaterialBottomTabNavigator();
@@ -21,14 +20,18 @@ const Home = () => {
   const openPetOptionsMenu = () => setVisiblePetMenu(true);
   const closePetOptionsMenu = () => setVisiblePetMenu(false);
   const MORE_ICON = Platform.OS === 'ios' ? 'dots-horizontal' : 'dots-vertical';
-  const navigation:any = useNavigation();
+  const { logOut } = useAuthContext();
+  const navigation: NavigationProp<ParamListBase> = useNavigation();
 
   const logout = async () => {
     try {
       await AsyncStorage.removeItem('userToken');
+      logOut();
+      console.log('userToken removido com sucesso.');
+      closeOptionsMenu();
       navigation.navigate('Login');
     } catch (err) {
-      console.error(err);
+      console.error('Erro ao remover userToken:', err);
     }
   };
 
@@ -74,13 +77,7 @@ const Home = () => {
             title: 'Histórico',
             tabBarLabel: 'Historico',
             tabBarColor: '#EDBA54',
-            tabBarIcon: ({color}) => (
-              <MaterialCommunityIcons
-                name="credit-card-clock-outline"
-                color={color}
-                size={26}
-              />
-            ),
+            tabBarIcon: RenderHistoricoTabBarIcon,
           }}
         />
         <Tab.Screen
@@ -90,13 +87,7 @@ const Home = () => {
             title: 'Agenda',
             tabBarLabel: 'Agenda',
             tabBarColor: '#EDBA54',
-            tabBarIcon: ({color}) => (
-              <MaterialCommunityIcons
-                name="calendar-account-outline"
-                color={color}
-                size={26}
-              />
-            ),
+            tabBarIcon: RenderAgendaTabBarIcon,
           }}
         />
         <Tab.Screen
@@ -106,13 +97,7 @@ const Home = () => {
             title: 'Dashboard',
             tabBarLabel: 'Dasboard',
             tabBarColor: '#000000',
-            tabBarIcon: ({color}) => (
-              <MaterialCommunityIcons
-                name="view-dashboard"
-                color={color}
-                size={26}
-              />
-            ),
+            tabBarIcon: RenderDashboardTabBarIcon,
           }}
         />
         <Tab.Screen
@@ -122,9 +107,7 @@ const Home = () => {
             title: 'Pets',
             tabBarLabel: 'Pets',
             tabBarColor: '#EDBA54',
-            tabBarIcon: ({color}) => (
-              <MaterialCommunityIcons name="dog" color={color} size={26} />
-            ),
+            tabBarIcon: RenderPerfilTabBarIcon,
           }}
         />
       </Tab.Navigator>
