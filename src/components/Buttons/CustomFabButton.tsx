@@ -26,6 +26,7 @@ const CustomFabButton: React.FC<CustomFabButtonProps> = ({
     <AnimatedFAB
       icon={'plus'}
       label={label}
+      color={'black'}
       extended={!isExtended}
       onPress={onPress}
       visible={visible}

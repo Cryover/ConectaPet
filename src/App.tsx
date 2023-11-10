@@ -1,5 +1,5 @@
 import { PaperProvider } from 'react-native-paper';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { SafeAreaProvider } from 'react-native-safe-area-context';
 import Navigation from './navigation';
 import { StyleSheet } from 'react-native';
 import { AuthProvider } from './contexts/authContext';
@@ -9,7 +9,7 @@ import { LoadingProvider } from './contexts/loadingContext';
 
 export default function App() {
   return (
-    <SafeAreaView style={styles.root}>
+    <SafeAreaProvider style={styles.root}>
       <PaperProvider>
         <LoadingProvider>
           <AuthProvider>
@@ -17,7 +17,7 @@ export default function App() {
           </AuthProvider>
         </LoadingProvider>
       </PaperProvider>
-    </SafeAreaView>
+    </SafeAreaProvider>
   );
 }
 

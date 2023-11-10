@@ -5,7 +5,8 @@ import { ScrollView, StyleSheet, View } from 'react-native';
 import { Card, Text } from 'react-native-paper';
 import { useAuthContext } from '../../../contexts/authContext';
 import axiosInstance from '../../../utils/axiosIstance';
-import { Pet } from '../../../types/types';
+import { Pet, UserInfo } from '../../../types/types';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const petsArray: Pet[] = [
   {
@@ -69,9 +70,16 @@ export function ProfilePets() {
 
   const getPetsByOwner = async () => {
     try {
+      console.log('userInfo', userInfo);
+      const userTeste = await AsyncStorage.getItem('userInfo');
+      if (userTeste){
+        const formattedUser:UserInfo = JSON.parse(userTeste);
+      }
+      //console.log('userTeste', formattedUser);
       if (userInfo?.id){
         const response = await axiosInstance.post(`/pets/${userInfo.id}`);
         console.log('pet response', response);
+        setPets(response);
         //const petInfo = await AsyncStorage.setItem('petInfo', response.data);
       } else {
         throw new Error('ID de dono nao encontrado');

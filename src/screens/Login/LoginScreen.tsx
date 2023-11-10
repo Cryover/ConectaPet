@@ -1,45 +1,52 @@
 import React, { useState } from 'react';
-import {Image, StyleSheet, Text, View} from 'react-native';
-import {Button} from 'react-native-paper';
-import {NavigationProp, ParamListBase, useNavigation} from '@react-navigation/native';
-import {useForm} from 'react-hook-form';
+import { Image, StyleSheet, Text, View } from 'react-native';
+import { Button } from 'react-native-paper';
+import { NavigationProp, ParamListBase, useNavigation } from '@react-navigation/native';
+import { useForm } from 'react-hook-form';
 import ControlTextInput from '../../components/atoms/controller/ControlTextInput';
 import { useAuthContext } from '../../contexts/authContext';
 import axiosInstance from '../../utils/axiosIstance';
-import { UserInfoResponse } from '../../types/types';
+import { UserInfo, UserInfoResponse } from '../../types/types';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { useLoading } from '../../contexts/loadingContext';
+import LoadingOverlay from '../../components/atoms/LoadingOverlay';
+import { formatAndStringify } from '../../pipes/formatJson';
 
 
 const LoginScreen = () => {
   const navigation: NavigationProp<ParamListBase> = useNavigation();
-  const {control, handleSubmit} = useForm();
+  const { control, handleSubmit } = useForm();
   /* const EMAIL_REGEX: RegExp =
     /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/; */
   const [error, setError] = useState('');
   const { logIn } = useAuthContext();
-
+  const { startLoading, stopLoading, isLoading } = useLoading();
 
   const onLoginPressed = async (dataFields: any) => {
-
     try {
+      startLoading();
       const response = await axiosInstance.post('/login', dataFields);
-      //console.log('response', response.data);
-      const newResponde:UserInfoResponse = response.data;
-      //console.log('newResponde', newResponde);
+      console.log('response', response.data);
+      const newResponde: UserInfoResponse = response.data;
 
       const teste = await logIn(response);
-      if (teste){
-          await AsyncStorage.setItem('userToken',newResponde.userToken);
-          await AsyncStorage.setItem('userInfo', JSON.stringify(newResponde.usuario));
-         console.log('Passou');
-         navigation.navigate('Home');
+      if (teste) {
+        await AsyncStorage.setItem('userToken', newResponde.userToken);
+        await AsyncStorage.setItem('userInfo', JSON.stringify(newResponde.usuario));
+        const userInfo = await AsyncStorage.getItem('userInfo');
+        const userInfoObj:UserInfo = formatAndStringify(userInfo);
+        console.log('saveInfo', userInfoObj);
+        console.log('saveInfoOBJ', userInfoObj.nome);
+        stopLoading();
+        navigation.navigate('Home');
       } else {
-         console.log('Falhou');
-         setError('Nome do usuário ou senha incorreto.\n Tente novamente.');
+        stopLoading();
+        setError('Nome do usuário ou senha incorreto.\n Tente novamente.');
       }
 
       //console.log('Passou');
     } catch (err) {
+      stopLoading();
       console.log(err);
       setError('Nome do usuário ou senha incorreto.\n Tente novamente.');
     }
@@ -77,13 +84,8 @@ const LoginScreen = () => {
         secureTextEntry={true}
         label="Senha"
       />
-
-      {/* {loading ? (
-        <Loading />
-      ) : (
-        <Text style={{color:'red', textAlign: 'center'}}>{error}</Text>
-      )} */}
-      <Text style={{color:'red', textAlign: 'center'}}>{error}</Text>
+      {isLoading ? <LoadingOverlay /> : <Text />}
+      <Text style={{ color: 'red', textAlign: 'center' }}>{error}</Text>
 
       <Text
         style={styles.links}

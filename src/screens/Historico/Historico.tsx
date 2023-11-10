@@ -228,6 +228,7 @@ const styles = StyleSheet.create({
     bottom: 16,
     right: 16,
     position: 'absolute',
+    textColor: 'white',
     backgroundColor: '#5D6BB0',
   },
   containerStyle: {
