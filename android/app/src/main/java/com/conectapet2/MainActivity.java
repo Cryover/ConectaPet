@@ -1,4 +1,4 @@
-package com.conectapet2;
+package com.conectapet;
 
 import com.facebook.react.ReactActivity;
 import com.facebook.react.ReactActivityDelegate;
@@ -13,7 +13,7 @@ public class MainActivity extends ReactActivity {
    */
   @Override
   protected String getMainComponentName() {
-    return "ConectaPet2";
+    return "ConectaPet";
   }
 
   /**

@@ -1,14 +1,18 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable react-hooks/exhaustive-deps */
 import React, { useEffect, useState } from 'react';
-import { ScrollView, StyleSheet, View } from 'react-native';
-import { Card, Text } from 'react-native-paper';
+import { Image, ScrollView, StyleSheet, View } from 'react-native';
+import { Button, Card, Text } from 'react-native-paper';
 import { useAuthContext } from '../../../contexts/authContext';
 import axiosInstance from '../../../utils/axiosIstance';
-import { Pet, UserInfo } from '../../../types/types';
+import { PetInfo, SelectOptionEntry, UserInfo } from '../../../types/types';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import CustomModal from '../../../components/Modal/CustomModal';
+import ControlTextInput from '../../../components/atoms/controller/ControlTextInput';
+import { useForm } from 'react-hook-form';
+import ControlSelectInput from '../../../components/atoms/controller/ControlSelectInput';
 
-const petsArray: Pet[] = [
+const petsArray: PetInfo[] = [
   {
     id: '1',
     nome: 'Kabosu',
@@ -64,19 +68,49 @@ const petsArray: Pet[] = [
 ];
 
 export function ProfilePets() {
-  const [pets, setPets] = useState<Pet[]>([]);
+  const [pets, setPets] = useState<PetInfo[]>([]);
   const [error, setError] = useState('');
   const { userInfo } = useAuthContext();
+  const [visibleModal, setVisibleModal] = React.useState(false);
+  const [isExtended, setIsExtended] = React.useState(true);
+  const { control, handleSubmit } = useForm();
+
+  const showModal = () => setVisibleModal(true);
+  const hideModal = () => setVisibleModal(false);
 
   const getPetsByOwner = async () => {
     try {
       console.log('userInfo', userInfo);
       const userTeste = await AsyncStorage.getItem('userInfo');
-      if (userTeste){
-        const formattedUser:UserInfo = JSON.parse(userTeste);
+      if (userTeste) {
+        const formattedUser: UserInfo = JSON.parse(userTeste);
       }
       //console.log('userTeste', formattedUser);
-      if (userInfo?.id){
+      if (userInfo?.id) {
+        const response = await axiosInstance.post(`/pets/${userInfo.id}`);
+        console.log('pet response', response);
+        setPets(response);
+        //const petInfo = await AsyncStorage.setItem('petInfo', response.data);
+      } else {
+        throw new Error('ID de dono nao encontrado');
+      }
+
+    } catch (err) {
+      setError('Nome do usuário ou senha incorreto.\n Tente novamente.');
+      console.log(err);
+    }
+  };
+
+  const registerPet = async (formData:any) => {
+    try {
+      console.log('userInfo', userInfo);
+      console.log('formData', formData);
+      const userTeste = await AsyncStorage.getItem('userInfo');
+      if (userTeste) {
+        const formattedPet: PetInfo = JSON.parse(userTeste);
+      }
+      //console.log('userTeste', formattedUser);
+      if (userInfo?.id) {
         const response = await axiosInstance.post(`/pets/${userInfo.id}`);
         console.log('pet response', response);
         setPets(response);
@@ -94,6 +128,40 @@ export function ProfilePets() {
   useEffect(() => {
     getPetsByOwner();
   }, []);
+
+  const tiposAnimais: SelectOptionEntry[] = [
+    {
+      label: 'Cachorro',
+      value: 'cachorro',
+    },
+    {
+      label: 'Gato',
+      value: 'gato',
+    },
+    {
+      label: 'Ave',
+      value: 'ave',
+    },
+    {
+      label: 'Roedor',
+      value: 'roedor',
+    },
+    {
+      label: 'Outro',
+      value: 'outro',
+    },
+  ];
+
+  const sexoAnimais: SelectOptionEntry[] = [
+    {
+      label: 'Macho',
+      value: 'Macho',
+    },
+    {
+      label: 'Fêmea',
+      value: 'femea',
+    },
+  ];
 
   return (
     <ScrollView>
@@ -113,22 +181,87 @@ export function ProfilePets() {
                 </Text>
                 <Text variant="bodyLarge">Raça: {pet.raca}</Text>
                 <Text variant="bodyLarge">
-                  Tipo Sanguíneo: {pet.infoMedica.tipoSanguineo}
+                  Tipo Sanguíneo: {pet.infoMedica?.tipoSanguineo}
                 </Text>
                 <Text variant="bodyLarge">
-                  Alergias: {pet.infoMedica.alergias}
+                  Alergias: {pet.infoMedica?.alergias}
                 </Text>
               </Card.Content>
             </Card>
           ))
         ) : (
-          <>
-           {/*  <Image
-              href={styles.logo}
+          <View style={styles.notFound}>
+            <Image
+              style={styles.sadDoge}
               source={require('../../../assets/images/sadDoge.webp')}
-            /> */}
+            />
             <Text>Nenhum Pet Cadastrado</Text>
-          </>
+            <Button
+                icon="plus"
+                mode="contained"
+                style={styles.button}
+                onPress={showModal}>
+                Cadastrar Pet
+            </Button>
+            <CustomModal
+              visible={visibleModal}
+              onDismiss={hideModal}
+              containerStyle={styles.containerStyle}>
+              <Text
+                variant="titleMedium"
+                style={[styles.textCenter, { marginBottom: 10 }]}>
+                Cadastro de Pet
+              </Text>
+              <ControlTextInput
+                name={'nome'}
+                label={'Nome'}
+                mode={'outlined'}
+                control={control}
+                rules={{ required: 'Nome de Pet Obrigatório' }}
+                style={styles.input}
+                secureTextEntry={false}
+              />
+              <ControlSelectInput
+                  control={control}
+                  name={'tipoPet'}
+                  options={tiposAnimais}
+                  label={'Tipo de Pet'}
+              />
+              <ControlTextInput
+                name={'raca'}
+                label={'Raça'}
+                mode={'outlined'}
+                control={control}
+                rules={{ required: 'Raça de pet Obrigatório' }}
+                style={styles.input}
+                secureTextEntry={false}
+              />
+              <ControlSelectInput
+                  control={control}
+                  name={'sexo'}
+                  options={sexoAnimais}
+                  label={'Sexo de Pet'}
+              />
+              <View style={styles.divButtons}>
+                <Button
+                  icon="plus"
+                  mode="outlined"
+                  style={styles.button}
+                  onPress={handleSubmit(registerPet)}
+                >
+                  Registrar Item
+                </Button>
+                <Button
+                  icon="cancel"
+                  mode="outlined"
+                  style={styles.button}
+                  onPress={hideModal}>
+                  Cancelar
+                </Button>
+              </View>
+            </CustomModal>
+
+          </View>
         )}
       </View>
     </ScrollView>
@@ -137,8 +270,9 @@ export function ProfilePets() {
 
 export default ProfilePets;
 
-const styles = StyleSheet.create({
+const styles = StyleSheet.create<any>({
   cardContainer: {
+    borderRadius: 10,
     justifyContent: 'center',
     padding: 20,
     gap: 10,
@@ -150,10 +284,40 @@ const styles = StyleSheet.create({
     width: '48%',
     height: 'auto',
   },
-  logo: {
-    width: 200,
-    height: 200,
-    //borderRadius: 100,
-    //marginBottom: 40,
+  notFound: {
+    justifyContent: 'center',
+    alignContent: 'center',
+    padding: 20,
+    gap: 20,
+    flexDirection: 'column',
+  },
+  sadDoge: {
+    alignSelf: 'center',
+    width: 100,
+    height: 100,
+  },
+  containerStyle: {
+    backgroundColor: 'white',
+    gap: 5,
+    width: '80%',
+    borderRadius: 5,
+    height: 500,
+    alignSelf: 'center',
+    padding: 15,
+  },
+  textCenter: {
+    textAlign: 'center',
+  },
+  divButtons: {
+    flex: 1,
+    gap: 10,
+    marginTop: 10,
+  },
+  button: {
+    color: '#5D6BB0',
+  },
+  input: {
+    width: '100%',
+    height: 50,
   },
 });

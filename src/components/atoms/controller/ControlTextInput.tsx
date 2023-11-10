@@ -11,6 +11,7 @@ import {TextInput as PaperTextInput, Text} from 'react-native-paper';
 interface CustomTextInputProps {
   name: string;
   label: string;
+  mode?: 'flat' | 'outlined' | undefined
   control: Control<FieldValues>;
   rules: RegisterOptions<FieldValues, string> | undefined; // Define the 'rules' property
   style: StyleProp<TextStyle | ViewStyle>;
@@ -20,6 +21,7 @@ interface CustomTextInputProps {
 const ControlTextInput: React.FC<CustomTextInputProps> = ({
   name,
   label,
+  mode,
   control,
   style,
   rules,
@@ -34,6 +36,7 @@ const ControlTextInput: React.FC<CustomTextInputProps> = ({
         <>
           <PaperTextInput
             label={label}
+            mode={mode ? mode : 'flat'}
             value={field.value}
             onChangeText={field.onChange}
             onBlur={field.onBlur}

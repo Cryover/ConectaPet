@@ -31,6 +31,9 @@ const GlobalStyles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
   },
+  textCenter: {
+    textAlign: 'center',
+  }
 });
 
 export default GlobalStyles;

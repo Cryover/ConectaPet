@@ -28,18 +28,30 @@ export type ColorProps = {
   focused: boolean;
 };
 
-export type Pet = {
+export type PetInfo = {
   id: string;
   nome: string;
   tipoAnimal: string;
   idade: number;
-  imagem: string; // Testar o type do dado
+  imagem?: string; // Testar o type do dado
   dataNascimento: Date;
   raca: string;
-  infoMedica: InfoMedica;
+  infoMedica?: InfoMedica;
 };
 
 export type InfoMedica = {
   alergias: string;
   tipoSanguineo: string;
 };
+
+export type Item = {
+  id: string;
+  nome: string;
+  valor: number;
+  dataDespesa: string;
+};
+
+export type SelectOptionEntry = {
+  label: string,
+  value: string,
+}

@@ -1,4 +1,4 @@
-package com.conectapet2;
+package com.conectapet;
 
 import android.app.Application;
 import com.facebook.react.PackageList;

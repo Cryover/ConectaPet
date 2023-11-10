@@ -74,9 +74,9 @@ android {
 
     compileSdkVersion rootProject.ext.compileSdkVersion
 
-    namespace "com.conectapet2"
+    namespace "com.conectapet"
     defaultConfig {
-        applicationId "com.conectapet2"
+        applicationId "com.conectapet"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
         versionCode 1
