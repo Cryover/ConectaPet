@@ -89,7 +89,7 @@ export function ProfilePets() {
       if (userInfo?.id) {
         const response = await axiosInstance.post(`/pets/${userInfo.id}`);
         console.log('pet response', response);
-        setPets(response);
+        //setPets(response);
         //const petInfo = await AsyncStorage.setItem('petInfo', response.data);
       } else {
         throw new Error('ID de dono nao encontrado');
@@ -106,14 +106,15 @@ export function ProfilePets() {
       console.log('userInfo', userInfo);
       console.log('formData', formData);
       const userTeste = await AsyncStorage.getItem('userInfo');
+      console.log('userTeste', userTeste);
       if (userTeste) {
         const formattedPet: PetInfo = JSON.parse(userTeste);
+        console.log('userTeste', formattedPet);
       }
-      //console.log('userTeste', formattedUser);
       if (userInfo?.id) {
         const response = await axiosInstance.post(`/pets/${userInfo.id}`);
         console.log('pet response', response);
-        setPets(response);
+        //setPets(response);
         //const petInfo = await AsyncStorage.setItem('petInfo', response.data);
       } else {
         throw new Error('ID de dono nao encontrado');

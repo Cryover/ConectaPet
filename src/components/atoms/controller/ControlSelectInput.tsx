@@ -18,10 +18,10 @@ const ControlSelectInput: React.FC<ControlSelectInputProps> = ({ control, name, 
       <Text>{label}</Text>
       <Controller
         control={control}
-        render={({ field: { onChange, value } }) => (
+        render={({ field }) => (
           <Picker
-            selectedValue={value}
-            onValueChange={(itemValue) => onChange(itemValue)}
+            selectedValue={field.value}
+            onValueChange={(itemValue) => field.onChange(itemValue)}
           >
             {options.map((option) => (
               <Picker.Item key={option.value} label={option.label} value={option.value} />
@@ -29,7 +29,7 @@ const ControlSelectInput: React.FC<ControlSelectInputProps> = ({ control, name, 
           </Picker>
         )}
         name={name}
-        defaultValue=""
+        defaultValue={options[0].value}
       />
     </View>
   );
