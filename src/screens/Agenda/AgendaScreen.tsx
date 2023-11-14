@@ -6,7 +6,7 @@ import {Button, DataTable, Text} from 'react-native-paper';
 import Calendario from '../../components/molecules/Calendario/Calendario';
 import CustomFabButton from '../../components/Buttons/CustomFabButton';
 import CustomModal from '../../components/Modal/CustomModal';
-import ControlTextInput from '../../components/atoms/controller/ControlTextInput';
+import ControlTextInput from '../../components/atoms/controller/TextInputWithError';
 import {useForm} from 'react-hook-form';
 
 type Item = {

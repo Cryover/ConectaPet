@@ -1,14 +1,10 @@
-import {useNavigation} from '@react-navigation/native';
 import React from 'react';
 import {Image, StyleSheet, View} from 'react-native';
 import {Button} from 'react-native-paper';
-import ControlTextInput from '../../components/atoms/controller/ControlTextInput';
-import {useForm} from 'react-hook-form';
+import { RecuperacaoContaScreenNavigationProp } from '../../types/types';
 
-export function RecuperacaoContaScreen() {
-  const {control, handleSubmit} = useForm({mode: 'onChange'});
+export const RecuperacaoContaScreen: React.FC<{ navigation: RecuperacaoContaScreenNavigationProp }> = ({ navigation }) => {
   //const [code, setCode] = React.useState('');
-  const navigation: any = useNavigation();
 
   const onRegisterPressed = (data: any) => {
     // Validate User
@@ -54,7 +50,7 @@ export function RecuperacaoContaScreen() {
       </Button>
     </View>
   );
-}
+};
 
 export default RecuperacaoContaScreen;
 

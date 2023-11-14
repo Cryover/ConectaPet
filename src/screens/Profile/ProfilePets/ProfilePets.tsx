@@ -1,109 +1,62 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable react-hooks/exhaustive-deps */
-import React, { useEffect, useState } from 'react';
-import { Image, ScrollView, StyleSheet, View } from 'react-native';
-import { Button, Card, Text } from 'react-native-paper';
-import { useAuthContext } from '../../../contexts/authContext';
+/* eslint-disable @typescript-eslint/no-unused-vars */
+import React, {useEffect, useState} from 'react';
+import {Button, Card, Text} from 'react-native-paper';
+import {
+  ScrollView,
+  StyleSheet,
+  View,
+  GestureResponderEvent,
+  Image,
+} from 'react-native';
+import {useAuthContext} from '../../../contexts/authContext';
 import axiosInstance from '../../../utils/axiosIstance';
-import { PetInfo, SelectOptionEntry, UserInfo } from '../../../types/types';
+import {PetInfo, SelectOptionEntry} from '../../../types/types';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import CustomModal from '../../../components/Modal/CustomModal';
-import ControlTextInput from '../../../components/atoms/controller/ControlTextInput';
-import { useForm } from 'react-hook-form';
-import ControlSelectInput from '../../../components/atoms/controller/ControlSelectInput';
-
-const petsArray: PetInfo[] = [
-  {
-    id: '1',
-    nome: 'Kabosu',
-    raca: 'Shiba',
-    idade: 3,
-    tipoAnimal: 'Cachorro',
-    imagem: '../../../assets/images/avatar.webp',
-    dataNascimento: new Date('10/09/2020'),
-    infoMedica: {
-      alergias: 'Batata Doce',
-      tipoSanguineo: 'DEA 1',
-    },
-  },
-  {
-    id: '2',
-    nome: 'Will',
-    raca: 'Dálmata',
-    idade: 4,
-    tipoAnimal: 'Cachorro',
-    imagem: '../../../assets/images/dalmata.webp',
-    dataNascimento: new Date('10/09/2020'),
-    infoMedica: {
-      alergias: 'Batata Doce',
-      tipoSanguineo: 'DEA 1',
-    },
-  },
-  {
-    id: '3',
-    nome: 'Elias',
-    raca: 'Persa',
-    idade: 2,
-    tipoAnimal: 'Gato',
-    imagem: '../../../assets/images/gatoPersa.webp',
-    dataNascimento: new Date('10/09/2020'),
-    infoMedica: {
-      alergias: 'Batata Doce',
-      tipoSanguineo: 'DEA 1',
-    },
-  },
-  {
-    id: '4',
-    nome: 'Tupa',
-    raca: 'Papagaio-de-cara-roxa',
-    idade: 2,
-    tipoAnimal: 'Papagaio',
-    imagem: '../../../assets/images/papagaio.webp',
-    dataNascimento: new Date('10/09/2020'),
-    infoMedica: {
-      alergias: 'Batata Doce',
-      tipoSanguineo: 'DEA 1',
-    },
-  },
-];
+import moment from 'moment';
+import Collapsible from 'react-native-collapsible';
+import CustomFabButton from '../../../components/Buttons/CustomFabButton';
 
 export function ProfilePets() {
   const [pets, setPets] = useState<PetInfo[]>([]);
   const [error, setError] = useState('');
-  const { userInfo } = useAuthContext();
-  const [visibleModal, setVisibleModal] = React.useState(false);
-  const [isExtended, setIsExtended] = React.useState(true);
-  const { control, handleSubmit } = useForm();
+  const [visibleModal, setVisibleModal] = useState(false);
+  const {user, userToken} = useAuthContext();
+  const [isExtended, setIsExtended] = useState(true);
 
   const showModal = () => setVisibleModal(true);
   const hideModal = () => setVisibleModal(false);
 
+  const [isCollapsed, setIsCollapsed] = useState(false);
+
   const getPetsByOwner = async () => {
     try {
-      console.log('userInfo', userInfo);
-      const userTeste = await AsyncStorage.getItem('userInfo');
-      if (userTeste) {
-        const formattedUser: UserInfo = JSON.parse(userTeste);
-      }
-      //console.log('userTeste', formattedUser);
-      if (userInfo?.id) {
-        const response = await axiosInstance.post(`/pets/${userInfo.id}`);
-        console.log('pet response', response);
-        //setPets(response);
-        //const petInfo = await AsyncStorage.setItem('petInfo', response.data);
-      } else {
-        throw new Error('ID de dono nao encontrado');
-      }
+      //console.log('user in pets', user);
 
+      if (user) {
+        const response = await axiosInstance.get(`/pets/byOwner/${user.id}`, {
+          headers: {
+            Authorization: `Bearer ${userToken}`,
+          },
+        });
+        if (response.status === 200) {
+          const formatedPets: PetInfo[] = response.data;
+          console.log('formatedPets', formatedPets[0].tipo_pet);
+          setPets(formatedPets);
+        }
+      } else {
+        setError('Nenhum pet cadastrado neste perfil.');
+      }
     } catch (err) {
-      setError('Nome do usuário ou senha incorreto.\n Tente novamente.');
+      setError('Erro ao buscar pets de dono.');
       console.log(err);
     }
   };
 
-  const registerPet = async (formData:any) => {
+  const registerPet = async (formData: any) => {
     try {
-      console.log('userInfo', userInfo);
+      //console.log('userInfo', userInfo);
       console.log('formData', formData);
       const userTeste = await AsyncStorage.getItem('userInfo');
       console.log('userTeste', userTeste);
@@ -111,24 +64,36 @@ export function ProfilePets() {
         const formattedPet: PetInfo = JSON.parse(userTeste);
         console.log('userTeste', formattedPet);
       }
-      if (userInfo?.id) {
-        const response = await axiosInstance.post(`/pets/${userInfo.id}`);
+      if (user) {
+        const response = await axiosInstance.post(`/pets/${user.id}`);
         console.log('pet response', response);
         //setPets(response);
         //const petInfo = await AsyncStorage.setItem('petInfo', response.data);
       } else {
         throw new Error('ID de dono nao encontrado');
       }
-
     } catch (err) {
       setError('Nome do usuário ou senha incorreto.\n Tente novamente.');
       console.log(err);
     }
   };
 
+  const toggleModal = () => {
+    setVisibleModal(!visibleModal);
+  };
+
+  const handleClick = (event: GestureResponderEvent): void => {
+    // Some logic here
+    console.log('Button pressed');
+    setIsCollapsed(!isCollapsed);
+    /* if (event) {
+      onPress(event);
+    } */
+  };
+
   useEffect(() => {
     getPetsByOwner();
-  }, []);
+  }, [setPets]);
 
   const tiposAnimais: SelectOptionEntry[] = [
     {
@@ -168,26 +133,29 @@ export function ProfilePets() {
     <ScrollView>
       <View style={styles.cardContainer}>
         {pets && pets.length > 0 ? (
-          pets.map((pet) => (
+          pets.map(pet => (
             <Card key={pet.id} style={styles.card}>
               <Card.Cover
-                style={{ width: 'auto' }}
+                style={{width: 'auto'}}
                 source={require('../../../assets/images/avatar.webp')}
               />
               <Card.Title title={pet.nome} subtitle={pet.raca} />
-              <Card.Content>
-                <Text variant="bodyLarge">Nome: {pet.nome}</Text>
-                <Text variant="bodyLarge">
-                  Idade: {pet.dataNascimento.toDateString()}
-                </Text>
-                <Text variant="bodyLarge">Raça: {pet.raca}</Text>
-                <Text variant="bodyLarge">
-                  Tipo Sanguíneo: {pet.infoMedica?.tipoSanguineo}
-                </Text>
-                <Text variant="bodyLarge">
-                  Alergias: {pet.infoMedica?.alergias}
-                </Text>
-              </Card.Content>
+              <Collapsible collapsed={isCollapsed}>
+                <Card.Content>
+                  <Text variant="bodyLarge">Tipo: {pet.tipo_pet}</Text>
+                  <Text variant="bodyLarge">Raça: {pet.raca}</Text>
+                  <Text variant="bodyLarge">
+                    Data Nasc.:{' '}
+                    {moment(pet.dataNascimento).format('DD/MM/YYYY')}
+                  </Text>
+                  <Text variant="bodyLarge">
+                    Tipo Sanguíneo: {pet.infoMedica?.tipoSanguineo}
+                  </Text>
+                  <Text variant="bodyLarge">
+                    Alergias: {pet.infoMedica?.alergias}
+                  </Text>
+                </Card.Content>
+              </Collapsible>
             </Card>
           ))
         ) : (
@@ -196,74 +164,53 @@ export function ProfilePets() {
               style={styles.sadDoge}
               source={require('../../../assets/images/sadDoge.webp')}
             />
-            <Text>Nenhum Pet Cadastrado</Text>
+            <Text>{error}</Text>
             <Button
-                icon="plus"
-                mode="contained"
-                style={styles.button}
-                onPress={showModal}>
-                Cadastrar Pet
+              icon="plus"
+              mode="contained"
+              style={styles.button}
+              onPress={toggleModal}>
+              Cadastrar Pet
             </Button>
-            <CustomModal
-              visible={visibleModal}
-              onDismiss={hideModal}
-              containerStyle={styles.containerStyle}>
-              <Text
-                variant="titleMedium"
-                style={[styles.textCenter, { marginBottom: 10 }]}>
-                Cadastro de Pet
-              </Text>
-              <ControlTextInput
-                name={'nome'}
-                label={'Nome'}
-                mode={'outlined'}
-                control={control}
-                rules={{ required: 'Nome de Pet Obrigatório' }}
-                style={styles.input}
-                secureTextEntry={false}
-              />
-              <ControlSelectInput
-                  control={control}
-                  name={'tipoPet'}
-                  options={tiposAnimais}
-                  label={'Tipo de Pet'}
-              />
-              <ControlTextInput
-                name={'raca'}
-                label={'Raça'}
-                mode={'outlined'}
-                control={control}
-                rules={{ required: 'Raça de pet Obrigatório' }}
-                style={styles.input}
-                secureTextEntry={false}
-              />
-              <ControlSelectInput
-                  control={control}
-                  name={'sexo'}
-                  options={sexoAnimais}
-                  label={'Sexo de Pet'}
-              />
-              <View style={styles.divButtons}>
-                <Button
-                  icon="plus"
-                  mode="outlined"
-                  style={styles.button}
-                  onPress={handleSubmit(registerPet)}
-                >
-                  Registrar Item
-                </Button>
-                <Button
-                  icon="cancel"
-                  mode="outlined"
-                  style={styles.button}
-                  onPress={hideModal}>
-                  Cancelar
-                </Button>
-              </View>
-            </CustomModal>
-
           </View>
         )}
+
+        <CustomModal
+          visible={visibleModal}
+          onDismiss={toggleModal}
+          containerStyle={styles.containerStyle}>
+          <Text
+            variant="titleMedium"
+            style={[styles.textCenter, {marginBottom: 10}]}>
+            Cadastro de Pet
+          </Text>
+
+          <View style={styles.divButtons}>
+            <Button
+              icon="plus"
+              mode="outlined"
+              style={styles.button}
+              >
+              Registrar Item
+            </Button>
+            <Button
+              icon="cancel"
+              mode="outlined"
+              style={styles.button}
+              onPress={toggleModal}>
+              Cancelar
+            </Button>
+          </View>
+        </CustomModal>
+
+        <CustomFabButton
+          visible={true}
+          style={styles.fabStyle}
+          isExtended={isExtended}
+          onPress={showModal}
+          label={'Add Despesa'}
+          animateFrom={'right'}
+        />
       </View>
     </ScrollView>
   );
@@ -282,8 +229,17 @@ const styles = StyleSheet.create<any>({
     flexWrap: 'wrap',
   },
   card: {
-    width: '48%',
+    display: 'flex',
+    overflowX: 'auto',
+    width: '90%',
     height: 'auto',
+  },
+  fabStyle: {
+    bottom: 16,
+    right: 16,
+    position: 'absolute',
+    textColor: 'white',
+    backgroundColor: '#5D6BB0',
   },
   notFound: {
     justifyContent: 'center',
@@ -302,7 +258,7 @@ const styles = StyleSheet.create<any>({
     gap: 5,
     width: '80%',
     borderRadius: 5,
-    height: 500,
+    height: 550,
     alignSelf: 'center',
     padding: 15,
   },

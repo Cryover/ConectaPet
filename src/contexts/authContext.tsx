@@ -1,15 +1,15 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import React, { ReactNode, createContext, useContext, useEffect, useState } from 'react';
-import { UserInfo, UserInfoResponse } from '../types/types';
+import { UserInfo } from '../types/types';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import axiosInstance from '../utils/axiosIstance';
 import { useLoading } from './loadingContext';
 
 interface AuthContextType {
-    userToken: string | null;
-    userInfo: UserInfo | undefined;
-    logIn: (dataFields: any) => Promise<boolean>;
-    logOut: () => void;
+  userToken: string | null,
+  user: UserInfo | undefined;
+  logIn: (dataFields: any) => Promise<boolean>;
+  logOut: () => void;
 }
 
 interface AuthProviderProps {
@@ -29,61 +29,84 @@ export const useAuthContext = () => {
 };
 
 export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
+  const [user, setUser] = useState<UserInfo>();
   const [userToken, setUserToken] = useState<string | null>(null);
-  const [userInfo, setUserInfo] = useState<any>(undefined);
   const { startLoading, stopLoading } = useLoading();
 
-  const logIn = async (response: UserInfoResponse) => {
+  const logIn = async (dataFields:any) => {
     try {
-        const formatedResponse = response;
+        startLoading();
+        await AsyncStorage.clear();
+        const response = await axiosInstance.post('/login', dataFields);
+        console.log('Response.data', response.data);
+        console.log('Usuario', response.data.usuario);
+        if (response){
+          setUser(response.data.usuario);
+          setUserToken(response.data.userToken);
 
-        console.log('Response login', response);
-        setUserToken(formatedResponse.userToken);
-        setUserInfo(formatedResponse.usuario);
+          await AsyncStorage.setItem('userToken', response.data.userToken);
+          await AsyncStorage.setItem('userStored', JSON.stringify(response.data.usuario));
+        }
         return true;
       } catch (err) {
-        console.error('Erro ao salvar userInfo and Token:', err);
+        console.error(err);
         return false;
+      } finally {
+        stopLoading();
       }
   };
 
   const logOut = async () => {
     try {
+        setUser(undefined);
         setUserToken(null);
+        await AsyncStorage.removeItem('userStored');
+        await AsyncStorage.removeItem('userToken');
       } catch (err) {
-        console.error('Error ao remover userToken:', err);
+        console.error('Erro ao remover userStored e UserToken:', err);
       }
   };
 
-  const getUserToken = async () => {
+  const getUserInfo = async () => {
     try {
       startLoading();
-      const tokenResponse = await AsyncStorage.getItem('userToken');
-
-      if (tokenResponse && tokenResponse !== null){
-        const newToken = {
-          token: tokenResponse,
-        };
-        const response = await axiosInstance.post('/login/verificartoken', newToken);
-        if (response){
-          setUserToken(newToken.token);
-          console.log('Token is still valid:', newToken.token);
+      //await AsyncStorage.clear();
+      const [userStored, userTokenStored] = await Promise.all([
+        AsyncStorage.getItem('userStored'),
+        AsyncStorage.getItem('userToken'),
+      ]);
+      const formatedUserToken = {
+        token: userTokenStored,
+      };
+      console.log('userStored', userStored);
+      console.log('userToken', userTokenStored);
+      if (userStored && userTokenStored){
+        const response = await axiosInstance.post('/login/verificartoken', formatedUserToken);
+        console.log('response', response.status);
+        if (response.status === 200){
+          const formatedUser:UserInfo = JSON.parse(userStored);
+          setUser(formatedUser);
+          setUserToken(userTokenStored);
+        } else {
+          throw Error('Token Expirado');
         }
       }
+      return true;
     } catch (err){
         console.log(err);
-        console.log('User needs to login again');
+        console.error('Token Expirado favor fazer login novamente');
+        return false;
     } finally {
         stopLoading();
     }
   };
 
   useEffect(() => {
-    getUserToken();
+    getUserInfo();
   }, []);
 
   return (
-    <AuthContext.Provider value={{ userToken, userInfo, logIn, logOut }}>
+    <AuthContext.Provider value={{ userToken, user, logIn, logOut }}>
       {children}
     </AuthContext.Provider>
   );

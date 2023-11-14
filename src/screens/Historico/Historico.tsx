@@ -1,13 +1,11 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable @typescript-eslint/no-shadow */
+
 import React, { useEffect, useState } from 'react';
 import {ScrollView, StyleSheet} from 'react-native';
 import {Button, DataTable, Text} from 'react-native-paper';
 import Calendario from '../../components/molecules/Calendario/Calendario';
 import CustomFabButton from '../../components/Buttons/CustomFabButton';
 import CustomModal from '../../components/Modal/CustomModal';
-import ControlTextInput from '../../components/atoms/controller/ControlTextInput';
-import {useForm} from 'react-hook-form';
 import { Item } from '../../types/types';
 import moment from 'moment';
 
@@ -17,7 +15,6 @@ const HistoricoScreen = () => {
   const [itemsPerPage, onItemsPerPageChange] = useState(
     numberOfItemsPerPageList[0],
   );
-  const {control, handleSubmit} = useForm();
   const [items] = useState<Item[]>([
     {
       id: '1',
@@ -110,22 +107,6 @@ const HistoricoScreen = () => {
             style={[styles.textCenter, {marginBottom: 10}]}>
             Cadastro de Despesa
           </Text>
-          <ControlTextInput
-            name={'nomeItem'}
-            label={'Nome do Item'}
-            control={control}
-            rules={{required: 'Nome do item Obrigatório'}}
-            style={styles.input}
-            secureTextEntry={false}
-          />
-          <ControlTextInput
-            name={'nomeItem'}
-            label={'Nome do Item'}
-            control={control}
-            rules={{required: 'Nome do item Obrigatório'}}
-            style={styles.input}
-            secureTextEntry={false}
-          />
           <Button
             icon="plus"
             mode="contained"

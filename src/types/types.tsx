@@ -1,7 +1,12 @@
+import { StackNavigationProp } from '@react-navigation/stack';
+
 export interface RootState {
   data: DataState;
 }
 
+export interface DateType {
+  date: Date | null;
+}
 export interface DataState {
   data: string | null;
   loading: boolean;
@@ -15,7 +20,7 @@ export interface UserInfo {
   senha: string,
   id: string,
   tipo_usuario: string,
-  criado_em: Date
+  criado_em: Date,
 }
 
 export interface UserInfoResponse {
@@ -31,7 +36,7 @@ export type ColorProps = {
 export type PetInfo = {
   id: string;
   nome: string;
-  tipoAnimal: string;
+  tipo_pet: string;
   idade: number;
   imagem?: string; // Testar o type do dado
   dataNascimento: Date;
@@ -55,3 +60,15 @@ export type SelectOptionEntry = {
   label: string,
   value: string,
 }
+
+export type RootStackParamList = {
+  Login: undefined;
+  Home: undefined;
+  Registro: undefined;
+  RecuperacaoConta: undefined;
+};
+
+export type LoginScreenNavigationProp = StackNavigationProp<RootStackParamList, 'Login'>;
+export type HomeScreenNavigationProp = StackNavigationProp<RootStackParamList, 'Home'>;
+export type RegistroScreenNavigationProp = StackNavigationProp<RootStackParamList, 'Registro'>;
+export type RecuperacaoContaScreenNavigationProp = StackNavigationProp<RootStackParamList, 'RecuperacaoConta'>;

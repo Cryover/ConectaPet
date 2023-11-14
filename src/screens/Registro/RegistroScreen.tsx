@@ -1,21 +1,13 @@
 import React from 'react';
 import {Image, StyleSheet, View} from 'react-native';
 import {Button} from 'react-native-paper';
-import {useForm} from 'react-hook-form';
-import {useNavigation} from '@react-navigation/native';
-import ControlTextInput from '../../components/atoms/controller/ControlTextInput';
+import { RegistroScreenNavigationProp } from '../../types/types';
 
-export function RegistroScreen() {
-  const {control, handleSubmit, watch} = useForm({mode: 'onChange'});
-  const watchSenha = watch('senha');
-  const EMAIL_REGEX: RegExp =
-    /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
-  const navigation: any = useNavigation();
-
+export const RegistroScreen: React.FC<{ navigation: RegistroScreenNavigationProp }> = ({ navigation }) => {
+ 
   const onRegisterPressed = (data: any) => {
     // Validate User
     console.log(data);
-    console.log(watchSenha);
     navigation.navigate('Home');
   };
 
@@ -24,64 +16,6 @@ export function RegistroScreen() {
       <Image
         style={styles.logo}
         source={require('../../assets/images/logo.webp')}
-      />
-      <ControlTextInput
-        control={control}
-        name="username"
-        rules={{
-          required: 'Nome de Usuário Obrigatório',
-          minLength: {
-            value: 6,
-            message: 'Mínimo de 6 caracteres',
-          },
-        }}
-        style={styles.input}
-        label="Nome de Usuário"
-        secureTextEntry={false}
-      />
-
-      <ControlTextInput
-        control={control}
-        name="email"
-        rules={{
-          required: 'Email Obrigatório',
-          pattern: {
-            value: EMAIL_REGEX,
-            message: 'Email Invalido',
-          },
-        }}
-        style={styles.input}
-        label={'Email'}
-        secureTextEntry={false} //label="Email"
-      />
-
-      <ControlTextInput
-        control={control}
-        name="name"
-        rules={{
-          minLength: {
-            value: 0,
-            message: '',
-          },
-        }}
-        style={styles.input}
-        label="Nome Completo (Opcional)"
-        secureTextEntry={false}
-      />
-
-      <ControlTextInput
-        control={control}
-        name="senha"
-        rules={{
-          required: 'Senha Obrigatória',
-          minLength: {
-            value: 8,
-            message: 'Mínimo de oito caracteres',
-          },
-        }}
-        style={styles.input}
-        secureTextEntry={true}
-        label={'Senha'} //label="Senha"
       />
 
       {/* <ControlTextInput
@@ -104,7 +38,7 @@ export function RegistroScreen() {
       </Button>
     </View>
   );
-}
+};
 
 export default RegistroScreen;
 

@@ -8,11 +8,10 @@ import Profile from '../Profile/ProfilePets/ProfilePets';
 import AgendaScreen from '../../components/molecules/Agenda/Agenda';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useAuthContext } from '../../contexts/authContext';
-import { NavigationProp, ParamListBase, useNavigation } from '@react-navigation/native';
 import { RenderAgendaTabBarIcon, RenderDashboardTabBarIcon, RenderHistoricoTabBarIcon, RenderPerfilTabBarIcon } from '../../components/molecules/MaterialCommunityIcons/MaterialCommunityIcons';
-import { PetInfo } from '../../types/types';
+import { HomeScreenNavigationProp, PetInfo } from '../../types/types';
 
-const Home = () => {
+const HomeScreen: React.FC<{ navigation: HomeScreenNavigationProp }> = ({ navigation }) => {
   const Tab = createMaterialBottomTabNavigator();
   const [visibleMenu, setVisibleMenu] = useState(true);
   const [visiblePetMenu, setVisiblePetMenu] = useState(true);
@@ -22,15 +21,14 @@ const Home = () => {
   const closePetOptionsMenu = () => setVisiblePetMenu(false);
   const MORE_ICON = Platform.OS === 'ios' ? 'dots-horizontal' : 'dots-vertical';
   const { logOut } = useAuthContext();
-  const navigation: NavigationProp<ParamListBase> = useNavigation();
+  //const navigation: NavigationProp<ParamListBase> = useNavigation();
   const [chosenPet, setChosenPet] = useState<PetInfo>();
 
   const logout = async () => {
     try {
-      await AsyncStorage.removeItem('userToken');
-      logOut();
-      console.log('userToken removido com sucesso.');
       closeOptionsMenu();
+      logOut();
+      console.info('user & userToken removidos com sucesso.');
       navigation.navigate('Login');
     } catch (err) {
       console.error('Erro ao remover userToken:', err);
@@ -134,7 +132,7 @@ const Home = () => {
   );
 };
 
-export default Home;
+export default HomeScreen;
 
 const styles = StyleSheet.create({
   header: {
