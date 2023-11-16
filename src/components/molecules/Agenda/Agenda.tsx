@@ -94,12 +94,12 @@ export default class AgendaScreen extends Component<State> {
     const color = isFirst ? 'black' : '#43515c';
 
     return (
-      <TouchableOpacity
+      {/* <TouchableOpacity
         testID={testIDs.agenda.ITEM}
         style={[styles.item, {height: reservation.height}]}
         onPress={() => Alert.alert(reservation.name)}>
         <Text style={{fontSize, color}}>{reservation.name}</Text>
-      </TouchableOpacity>
+      </TouchableOpacity> */}
     );
   };
 

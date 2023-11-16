@@ -1,13 +1,13 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import React, { ReactNode, createContext, useContext, useEffect, useState } from 'react';
-import { UserInfo } from '../types/types';
+import { User } from '../types/types';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import axiosInstance from '../utils/axiosIstance';
 import { useLoading } from './loadingContext';
 
 interface AuthContextType {
   userToken: string | null,
-  user: UserInfo | undefined;
+  user: User | undefined;
   logIn: (dataFields: any) => Promise<boolean>;
   logOut: () => void;
 }
@@ -29,16 +29,16 @@ export const useAuthContext = () => {
 };
 
 export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
-  const [user, setUser] = useState<UserInfo>();
+  const [user, setUser] = useState<User>();
   const [userToken, setUserToken] = useState<string | null>(null);
   const { startLoading, stopLoading } = useLoading();
 
   const logIn = async (dataFields:any) => {
     try {
         startLoading();
-        await AsyncStorage.clear();
+        //await AsyncStorage.clear();
         const response = await axiosInstance.post('/login', dataFields);
-        console.log('Response.data', response.data);
+        console.log('Response.data login', response.data);
         console.log('Usuario', response.data.usuario);
         if (response){
           setUser(response.data.usuario);
@@ -84,7 +84,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         const response = await axiosInstance.post('/login/verificartoken', formatedUserToken);
         console.log('response', response.status);
         if (response.status === 200){
-          const formatedUser:UserInfo = JSON.parse(userStored);
+          const formatedUser:User = JSON.parse(userStored);
           setUser(formatedUser);
           setUserToken(userTokenStored);
         } else {

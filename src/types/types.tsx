@@ -13,7 +13,7 @@ export interface DataState {
   error: string | null;
 }
 
-export interface UserInfo {
+export interface User {
   username: string,
   email: string,
   nome: string,
@@ -25,7 +25,7 @@ export interface UserInfo {
 
 export interface UserInfoResponse {
   userToken: string,
-  usuario: UserInfo
+  usuario: User
 }
 
 export type ColorProps = {
@@ -33,7 +33,7 @@ export type ColorProps = {
   focused: boolean;
 };
 
-export type PetInfo = {
+export type Pet = {
   id: string;
   nome: string;
   tipo_pet: string;
@@ -44,12 +44,21 @@ export type PetInfo = {
   infoMedica?: InfoMedica;
 };
 
+export type Compromisso = {
+  id: string;
+  titulo: string;
+  tipo_compromisso: string;
+  petsParticipantes?: Pet[];
+  data: Date;
+  descricao: string;
+}
+
 export type InfoMedica = {
   alergias: string;
   tipoSanguineo: string;
 };
 
-export type Item = {
+export type Despesa = {
   id: string;
   nome: string;
   valor: number;
@@ -66,9 +75,13 @@ export type RootStackParamList = {
   Home: undefined;
   Registro: undefined;
   RecuperacaoConta: undefined;
+  Historico: undefined;
+  Agenda: undefined;
 };
 
 export type LoginScreenNavigationProp = StackNavigationProp<RootStackParamList, 'Login'>;
+export type HistoricoScreenNavigationProp = StackNavigationProp<RootStackParamList, 'Historico'>;
+export type AgendaScreenNavigationProp = StackNavigationProp<RootStackParamList, 'Agenda'>;
 export type HomeScreenNavigationProp = StackNavigationProp<RootStackParamList, 'Home'>;
 export type RegistroScreenNavigationProp = StackNavigationProp<RootStackParamList, 'Registro'>;
 export type RecuperacaoContaScreenNavigationProp = StackNavigationProp<RootStackParamList, 'RecuperacaoConta'>;

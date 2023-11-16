@@ -8,22 +8,29 @@ import {
   View,
   GestureResponderEvent,
   Image,
+  SafeAreaView,
 } from 'react-native';
 import {useAuthContext} from '../../../contexts/authContext';
 import axiosInstance from '../../../utils/axiosIstance';
-import {PetInfo, SelectOptionEntry} from '../../../types/types';
+import {Pet, SelectOptionEntry} from '../../../types/types';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import CustomModal from '../../../components/Modal/CustomModal';
 import moment from 'moment';
 import Collapsible from 'react-native-collapsible';
 import CustomFabButton from '../../../components/Buttons/CustomFabButton';
+import ControlSelectInput from '../../../components/atoms/inputs/ControlSelectInput';
+import ControlTextInput from '../../../components/atoms/inputs/ControlTextInput';
+import {useForm} from 'react-hook-form';
 
 export function ProfilePets() {
-  const [pets, setPets] = useState<PetInfo[]>([]);
+  const [pets, setPets] = useState<Pet[]>([]);
   const [error, setError] = useState('');
   const [visibleModal, setVisibleModal] = useState(false);
   const {user, userToken} = useAuthContext();
   const [isExtended, setIsExtended] = useState(true);
+
+  //const { userInfo } = useAuthContext();
+  const {control, handleSubmit} = useForm();
 
   const showModal = () => setVisibleModal(true);
   const hideModal = () => setVisibleModal(false);
@@ -41,9 +48,11 @@ export function ProfilePets() {
           },
         });
         if (response.status === 200) {
-          const formatedPets: PetInfo[] = response.data;
-          console.log('formatedPets', formatedPets[0].tipo_pet);
+          const formatedPets: Pet[] = response.data;
+          console.log('formatedPets', response.data);
           setPets(formatedPets);
+        } else if (response.status === 401) {
+          //navi
         }
       } else {
         setError('Nenhum pet cadastrado neste perfil.');
@@ -55,13 +64,13 @@ export function ProfilePets() {
   };
 
   const registerPet = async (formData: any) => {
-    try {
+    /*  try {
       //console.log('userInfo', userInfo);
       console.log('formData', formData);
-      const userTeste = await AsyncStorage.getItem('userInfo');
+      //const pet = await AsyncStorage.getItem('petInfo');
       console.log('userTeste', userTeste);
       if (userTeste) {
-        const formattedPet: PetInfo = JSON.parse(userTeste);
+        const formattedPet: Pet = JSON.parse(userTeste);
         console.log('userTeste', formattedPet);
       }
       if (user) {
@@ -75,7 +84,7 @@ export function ProfilePets() {
     } catch (err) {
       setError('Nome do usuário ou senha incorreto.\n Tente novamente.');
       console.log(err);
-    }
+    } */
   };
 
   const toggleModal = () => {
@@ -130,89 +139,119 @@ export function ProfilePets() {
   ];
 
   return (
-    <ScrollView>
-      <View style={styles.cardContainer}>
-        {pets && pets.length > 0 ? (
-          pets.map(pet => (
-            <Card key={pet.id} style={styles.card}>
-              <Card.Cover
-                style={{width: 'auto'}}
-                source={require('../../../assets/images/avatar.webp')}
+    <SafeAreaView>
+      <ScrollView>
+        <View style={styles.cardContainer}>
+          {pets && pets.length > 0 ? (
+            pets.map(pet => (
+              <Card key={pet.id} style={styles.card}>
+                <Card.Cover
+                  style={{width: 'auto'}}
+                  source={require('../../../assets/images/avatar.webp')}
+                />
+                <Card.Title title={pet.nome} subtitle={pet.raca} />
+                <Collapsible collapsed={isCollapsed}>
+                  <Card.Content>
+                    <Text variant="bodyLarge">Tipo: {pet.tipo_pet}</Text>
+                    <Text variant="bodyLarge">Raça: {pet.raca}</Text>
+                    <Text variant="bodyLarge">
+                      Data Nasc.:{' '}
+                      {moment(pet.dataNascimento).format('DD/MM/YYYY')}
+                    </Text>
+                    <Text variant="bodyLarge">
+                      Tipo Sanguíneo: {pet.infoMedica?.tipoSanguineo}
+                    </Text>
+                    <Text variant="bodyLarge">
+                      Alergias: {pet.infoMedica?.alergias}
+                    </Text>
+                  </Card.Content>
+                </Collapsible>
+              </Card>
+            ))
+          ) : (
+            <View style={styles.notFound}>
+              <Image
+                style={styles.sadDoge}
+                source={require('../../../assets/images/sadDoge.webp')}
               />
-              <Card.Title title={pet.nome} subtitle={pet.raca} />
-              <Collapsible collapsed={isCollapsed}>
-                <Card.Content>
-                  <Text variant="bodyLarge">Tipo: {pet.tipo_pet}</Text>
-                  <Text variant="bodyLarge">Raça: {pet.raca}</Text>
-                  <Text variant="bodyLarge">
-                    Data Nasc.:{' '}
-                    {moment(pet.dataNascimento).format('DD/MM/YYYY')}
-                  </Text>
-                  <Text variant="bodyLarge">
-                    Tipo Sanguíneo: {pet.infoMedica?.tipoSanguineo}
-                  </Text>
-                  <Text variant="bodyLarge">
-                    Alergias: {pet.infoMedica?.alergias}
-                  </Text>
-                </Card.Content>
-              </Collapsible>
-            </Card>
-          ))
-        ) : (
-          <View style={styles.notFound}>
-            <Image
-              style={styles.sadDoge}
-              source={require('../../../assets/images/sadDoge.webp')}
+              <Text>{error}</Text>
+              <Button
+                icon="plus"
+                mode="contained"
+                style={styles.button}
+                onPress={toggleModal}>
+                Cadastrar Pet
+              </Button>
+            </View>
+          )}
+
+          <CustomModal
+            visible={visibleModal}
+            onDismiss={hideModal}
+            containerStyle={styles.containerStyle}>
+            <Text
+              variant="titleMedium"
+              style={[styles.textCenter, {marginBottom: 10}]}>
+              Cadastro de Pet
+            </Text>
+            <ControlTextInput
+              name={'nome'}
+              label={'Nome'}
+              mode={'outlined'}
+              control={control}
+              rules={{required: 'Nome de Pet Obrigatório'}}
+              style={styles.input}
+              secureTextEntry={false}
             />
-            <Text>{error}</Text>
-            <Button
-              icon="plus"
-              mode="contained"
-              style={styles.button}
-              onPress={toggleModal}>
-              Cadastrar Pet
-            </Button>
-          </View>
-        )}
-
-        <CustomModal
-          visible={visibleModal}
-          onDismiss={toggleModal}
-          containerStyle={styles.containerStyle}>
-          <Text
-            variant="titleMedium"
-            style={[styles.textCenter, {marginBottom: 10}]}>
-            Cadastro de Pet
-          </Text>
-
-          <View style={styles.divButtons}>
-            <Button
-              icon="plus"
-              mode="outlined"
-              style={styles.button}
-              >
-              Registrar Item
-            </Button>
-            <Button
-              icon="cancel"
-              mode="outlined"
-              style={styles.button}
-              onPress={toggleModal}>
-              Cancelar
-            </Button>
-          </View>
-        </CustomModal>
-
-        <CustomFabButton
-          visible={true}
-          style={styles.fabStyle}
-          isExtended={isExtended}
-          onPress={showModal}
-          label={'Add Despesa'}
-          animateFrom={'right'}
-        />
-      </View>
-    </ScrollView>
+            <ControlSelectInput
+              control={control}
+              name={'tipoPet'}
+              options={tiposAnimais}
+              label={'Tipo de Pet'}
+            />
+            <ControlTextInput
+              name={'raca'}
+              label={'Raça'}
+              mode={'outlined'}
+              control={control}
+              rules={{required: 'Raça de pet Obrigatório'}}
+              style={styles.input}
+              secureTextEntry={false}
+            />
+            <ControlSelectInput
+              control={control}
+              name={'sexo'}
+              options={sexoAnimais}
+              label={'Sexo de Pet'}
+            />
+            <View style={styles.divButtons}>
+              <Button
+                icon="plus"
+                mode="outlined"
+                style={styles.button}
+                onPress={handleSubmit(registerPet)}>
+                Registrar Item
+              </Button>
+              <Button
+                icon="cancel"
+                mode="outlined"
+                style={styles.button}
+                onPress={hideModal}>
+                Cancelar
+              </Button>
+            </View>
+          </CustomModal>
+          <CustomFabButton
+            visible={true}
+            style={styles.fabStyle}
+            isExtended={isExtended}
+            onPress={showModal}
+            label={'Add Despesa'}
+            animateFrom={'right'}
+          />
+        </View>
+      </ScrollView>
+    </SafeAreaView>
   );
 }
 

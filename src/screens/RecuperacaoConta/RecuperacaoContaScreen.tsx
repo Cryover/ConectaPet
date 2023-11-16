@@ -1,10 +1,14 @@
 import React from 'react';
-import {Image, StyleSheet, View} from 'react-native';
+import {Image, SafeAreaView, StyleSheet } from 'react-native';
 import {Button} from 'react-native-paper';
-import { RecuperacaoContaScreenNavigationProp } from '../../types/types';
+import {RecuperacaoContaScreenNavigationProp} from '../../types/types';
+import ControlTextInput from '../../components/atoms/inputs/ControlTextInput';
+import {useForm} from 'react-hook-form';
 
-export const RecuperacaoContaScreen: React.FC<{ navigation: RecuperacaoContaScreenNavigationProp }> = ({ navigation }) => {
-  //const [code, setCode] = React.useState('');
+export const RecuperacaoContaScreen: React.FC<{
+  navigation: RecuperacaoContaScreenNavigationProp;
+}> = ({navigation}) => {
+  const {control, handleSubmit} = useForm();
 
   const onRegisterPressed = (data: any) => {
     // Validate User
@@ -14,7 +18,7 @@ export const RecuperacaoContaScreen: React.FC<{ navigation: RecuperacaoContaScre
   };
 
   return (
-    <View style={styles.centerView}>
+    <SafeAreaView style={styles.centerView}>
       <Image
         style={styles.logo}
         source={require('../../assets/images/logo.webp')}
@@ -48,7 +52,7 @@ export const RecuperacaoContaScreen: React.FC<{ navigation: RecuperacaoContaScre
         onPress={handleSubmit(onRegisterPressed)}>
         Enviar
       </Button>
-    </View>
+    </SafeAreaView>
   );
 };
 

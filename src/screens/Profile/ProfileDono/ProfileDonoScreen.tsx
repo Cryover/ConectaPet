@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import React from 'react';
-import {ScrollView, StyleSheet, View} from 'react-native';
+import {SafeAreaView, ScrollView, StyleSheet, View} from 'react-native';
 import {Card, Text} from 'react-native-paper';
 
 type user = {
@@ -28,7 +28,7 @@ export function ProfileDonoScreen() {
   const [hasAvatar, setHasAvatar] = React.useState();
 
   return (
-    <View style={{marginTop: 20}}>
+    <SafeAreaView style={{marginTop: 20}}>
       <Card key={user.id} style={{marginBottom: 20}}>
         <Card.Cover
           style={{width: 'auto'}}
@@ -36,16 +36,16 @@ export function ProfileDonoScreen() {
         />
         <Card.Title title={user.nome} subtitle={user.sobreNome} />
         <Card.Content>
-          <Text variant="bodyLarge">Nome: {user.nome}</Text>
+          {/* <Text variant="bodyLarge">Nome: {user.nome}</Text>
           <Text variant="bodyLarge">Idade: {user.dataNascimento}</Text>
           <Text variant="bodyLarge">Raça: {user.raca}</Text>
           <Text variant="bodyLarge">
             Tipo Sanguíneo: {user.infoMedica.tipoSanguineo}
           </Text>
-          <Text variant="bodyLarge">Alergias: {user.infoMedica.alergias}</Text>
+          <Text variant="bodyLarge">Alergias: {user.infoMedica.alergias}</Text> */}
         </Card.Content>
       </Card>
-    </View>
+    </SafeAreaView>
   );
 }
 

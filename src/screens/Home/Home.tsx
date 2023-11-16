@@ -1,15 +1,19 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import React, { useEffect, useState } from 'react';
 import {createMaterialBottomTabNavigator} from '@react-navigation/material-bottom-tabs';
-import {Appbar, Avatar, IconButton, Menu} from 'react-native-paper';
-import {Platform, StyleSheet, TouchableOpacity} from 'react-native';
+import {Appbar, Button, Avatar, IconButton, Text, Menu} from 'react-native-paper';
+import {Platform, SafeAreaView, StyleSheet, TouchableOpacity, View} from 'react-native';
 import Dashboard from '../Dashboard/Dashboard';
 import HistoricoScreen from '../Historico/Historico';
 import Profile from '../Profile/ProfilePets/ProfilePets';
-import AgendaScreen from '../../components/molecules/Agenda/Agenda';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useAuthContext } from '../../contexts/authContext';
 import { RenderAgendaTabBarIcon, RenderDashboardTabBarIcon, RenderHistoricoTabBarIcon, RenderPerfilTabBarIcon } from '../../components/molecules/MaterialCommunityIcons/MaterialCommunityIcons';
-import { HomeScreenNavigationProp, PetInfo } from '../../types/types';
+import { HomeScreenNavigationProp, Pet } from '../../types/types';
+import AgendaScreen from '../Agenda/AgendaScreen';
+import CustomModal from '../../components/Modal/CustomModal';
+import ControlTextInput from '../../components/atoms/inputs/ControlTextInput';
+import { useForm } from 'react-hook-form';
 
 const HomeScreen: React.FC<{ navigation: HomeScreenNavigationProp }> = ({ navigation }) => {
   const Tab = createMaterialBottomTabNavigator();
@@ -21,8 +25,11 @@ const HomeScreen: React.FC<{ navigation: HomeScreenNavigationProp }> = ({ naviga
   const closePetOptionsMenu = () => setVisiblePetMenu(false);
   const MORE_ICON = Platform.OS === 'ios' ? 'dots-horizontal' : 'dots-vertical';
   const { logOut } = useAuthContext();
-  //const navigation: NavigationProp<ParamListBase> = useNavigation();
-  const [chosenPet, setChosenPet] = useState<PetInfo>();
+  const [chosenPet, setChosenPet] = useState<Pet>();
+  const {control, handleSubmit} = useForm();
+  const [visibleModal, setVisibleModal] = useState(false);
+  const showModal = () => setVisibleModal(true);
+  const hideModal = () => setVisibleModal(false);
 
   const logout = async () => {
     try {
@@ -40,7 +47,7 @@ const HomeScreen: React.FC<{ navigation: HomeScreenNavigationProp }> = ({ naviga
       const petInfo = await AsyncStorage.getItem('petInfo');
 
       if (petInfo){
-        const petInforFormated: PetInfo = JSON.parse(petInfo);
+        const petInforFormated: Pet = JSON.parse(petInfo);
         setChosenPet(petInforFormated);
       }
     } catch (err) {
@@ -53,7 +60,7 @@ const HomeScreen: React.FC<{ navigation: HomeScreenNavigationProp }> = ({ naviga
   }, []);
 
   return (
-    <>
+    <SafeAreaView>
       <Appbar.Header mode="center-aligned" style={styles.header}>
         <Appbar.Content title={chosenPet?.nome} />
         <Menu
@@ -61,7 +68,7 @@ const HomeScreen: React.FC<{ navigation: HomeScreenNavigationProp }> = ({ naviga
           visible={visibleMenu}
           onDismiss={closeOptionsMenu}
           anchor={<IconButton icon={MORE_ICON} onPress={openOptionsMenu} />}>
-          <Menu.Item title="Reportar Bug" />
+          <Menu.Item title="Reportar Bug" onPress={showModal} />
           <Menu.Item title="Logout" onPress={logout} />
         </Menu>
         <Menu
@@ -76,8 +83,9 @@ const HomeScreen: React.FC<{ navigation: HomeScreenNavigationProp }> = ({ naviga
               />
             </TouchableOpacity>
           }>
-          <Menu.Item title="Trocar de Pet" />
-          <Menu.Item title="Definir como Pet Principal" />
+          <Menu.Item title="Ver perfil de tutor" />
+          <Menu.Item title="Trocar de pet" />
+          <Menu.Item title="Definir como pet principal" />
         </Menu>
       </Appbar.Header>
 
@@ -88,11 +96,11 @@ const HomeScreen: React.FC<{ navigation: HomeScreenNavigationProp }> = ({ naviga
         shifting={true}
         barStyle={{backgroundColor: '#5D6BB0'}}>
         <Tab.Screen
-          name="Histórico"
+          name="Despesas"
           component={HistoricoScreen}
           options={{
-            title: 'Histórico',
-            tabBarLabel: 'Historico',
+            title: 'Despesas',
+            tabBarLabel: 'Despesas',
             tabBarColor: '#EDBA54',
             tabBarIcon: RenderHistoricoTabBarIcon,
           }}
@@ -128,7 +136,52 @@ const HomeScreen: React.FC<{ navigation: HomeScreenNavigationProp }> = ({ naviga
           }}
         />
       </Tab.Navigator>
-    </>
+      <CustomModal
+          visible={visibleModal}
+          onDismiss={hideModal}
+          containerStyle={styles.containerStyle}>
+          <Text
+            variant="titleMedium"
+            style={[styles.textCenter, {marginBottom: 10}]}>
+            Cadastro de Pet
+          </Text>
+          <ControlTextInput
+            name={'nome'}
+            label={'Nome'}
+            mode={'outlined'}
+            control={control}
+            rules={{required: 'Nome de Pet Obrigatório'}}
+            style={styles.input}
+            secureTextEntry={false}
+          />
+          <ControlTextInput
+            name={'raca'}
+            label={'Raça'}
+            mode={'outlined'}
+            control={control}
+            rules={{required: 'Raça de pet Obrigatório'}}
+            style={styles.input}
+            secureTextEntry={false}
+          />
+          <View style={styles.divButtons}>
+            <Button
+              icon="plus"
+              mode="outlined"
+              style={styles.button}
+              //onPress={handleSubmit(registerPet)}
+              >
+              Registrar Item
+            </Button>
+            <Button
+              icon="cancel"
+              mode="outlined"
+              style={styles.button}
+              onPress={hideModal}>
+              Cancelar
+            </Button>
+          </View>
+        </CustomModal>
+    </SafeAreaView>
   );
 };
 
@@ -143,9 +196,26 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     flexGrow: 1,
   },
+  containerStyle: {
+    backgroundColor: 'white',
+    gap: 5,
+    width: '80%',
+    borderRadius: 5,
+    height: 550,
+    alignSelf: 'center',
+    padding: 15,
+  },
+  textCenter: {
+    textAlign: 'center',
+  },
   input: {
     //height: 40,
     width: 300,
+  },
+  divButtons: {
+    flex: 1,
+    gap: 10,
+    marginTop: 10,
   },
   button: {
     marginTop: 20,
