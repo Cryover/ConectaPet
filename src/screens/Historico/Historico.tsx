@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-shadow */
 /* eslint-disable react-hooks/exhaustive-deps */
 import React, {useEffect, useState} from 'react';
-import {Image, SafeAreaView, ScrollView, StyleSheet, View} from 'react-native';
+import {Image, ScrollView, StyleSheet, View} from 'react-native';
 import {Button, DataTable, Text} from 'react-native-paper';
 import Calendario from '../../components/molecules/Calendario/Calendario';
 import CustomFabButton from '../../components/Buttons/CustomFabButton';
@@ -74,7 +74,7 @@ const HistoricoScreen: React.FC<{
   }, []);
 
   return (
-    <SafeAreaView>
+    <View>
       <ScrollView contentContainerStyle={styles.scrollView} onScroll={onScroll}>
         <Text variant="titleMedium" style={{marginBottom: 20}}>
           Historico de Despesas
@@ -174,7 +174,7 @@ const HistoricoScreen: React.FC<{
           animateFrom={'left'}
         />
       </ScrollView>
-    </SafeAreaView>
+    </View>
   );
 };
 

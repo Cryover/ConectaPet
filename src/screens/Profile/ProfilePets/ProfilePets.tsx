@@ -139,7 +139,7 @@ export function ProfilePets() {
   ];
 
   return (
-    <SafeAreaView>
+    <View>
       <ScrollView>
         <View style={styles.cardContainer}>
           {pets && pets.length > 0 ? (
@@ -251,7 +251,7 @@ export function ProfilePets() {
           />
         </View>
       </ScrollView>
-    </SafeAreaView>
+    </View>
   );
 }
 

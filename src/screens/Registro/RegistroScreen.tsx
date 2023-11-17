@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import React, { useState } from 'react';
-import {Image, SafeAreaView, StyleSheet} from 'react-native';
+import {Image, SafeAreaView, StyleSheet, View} from 'react-native';
 import {Button} from 'react-native-paper';
 import {RegistroScreenNavigationProp, User} from '../../types/types';
 import {useForm} from 'react-hook-form';
@@ -34,7 +34,7 @@ export const RegistroScreen: React.FC<{
   };
 
   return (
-    <SafeAreaView style={styles.centerView}>
+    <View style={styles.centerView}>
       <Image
         style={styles.logo}
         source={require('../../assets/images/logo.webp')}
@@ -84,7 +84,7 @@ export const RegistroScreen: React.FC<{
         onPress={handleSubmit(onRegisterPressed)}>
         Registrar
       </Button>
-    </SafeAreaView>
+    </View>
   );
 };
 

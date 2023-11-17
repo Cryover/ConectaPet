@@ -1,7 +1,7 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable @typescript-eslint/no-shadow */
 import React, {useEffect, useState} from 'react';
-import {Image, SafeAreaView, ScrollView, StyleSheet, View} from 'react-native';
+import {Image, ScrollView, StyleSheet, View} from 'react-native';
 import {Button, DataTable, Text} from 'react-native-paper';
 import Calendario from '../../components/molecules/Calendario/Calendario';
 import CustomFabButton from '../../components/Buttons/CustomFabButton';
@@ -75,7 +75,7 @@ const AgendaScreen: React.FC<{navigation: AgendaScreenNavigationProp}> = ({
   }, []);
 
   return (
-    <SafeAreaView>
+    <View>
       <ScrollView contentContainerStyle={styles.scrollView} onScroll={onScroll}>
         <Text variant="titleMedium" style={{marginBottom: 20}}>
           Agenda de compromissos
@@ -183,7 +183,7 @@ const AgendaScreen: React.FC<{navigation: AgendaScreenNavigationProp}> = ({
         label={'Add Compromisso'}
         animateFrom={'left'}
       />
-    </SafeAreaView>
+    </View>
   );
 };
 

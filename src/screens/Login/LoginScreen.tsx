@@ -1,23 +1,31 @@
 /* eslint-disable react/self-closing-comp */
-import React, { useState} from 'react';
-import { Image, SafeAreaView, StyleSheet } from 'react-native';
-import {Button, Text } from 'react-native-paper';
+import React, {useState} from 'react';
+import {Image, StyleSheet, View} from 'react-native';
+import {Button, Text} from 'react-native-paper';
 import {useAuthContext} from '../../contexts/authContext';
 import {LoginScreenNavigationProp, UserInfoResponse} from '../../types/types';
-import { useLoading } from '../../contexts/loadingContext';
+import {useLoading} from '../../contexts/loadingContext';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { useForm } from 'react-hook-form';
+import {useForm} from 'react-hook-form';
 import LoadingOverlay from '../../components/atoms/LoadingOverlay';
 import ControlTextInput from '../../components/atoms/inputs/ControlTextInput';
 import axiosInstance from '../../utils/axiosIstance';
+
+import {API_URL, API_TOKEN} from '@env';
+
+fetch(`${API_URL}/users`, {
+  headers: {
+    Authorization: `Bearer ${API_TOKEN}`,
+  },
+});
 
 const LoginScreen: React.FC<{navigation: LoginScreenNavigationProp}> = ({
   navigation,
 }) => {
   const [error, setError] = useState('');
   const {logIn} = useAuthContext();
-  const { startLoading, stopLoading, isLoading } = useLoading();
-  const { control, handleSubmit } = useForm();
+  const {startLoading, stopLoading, isLoading} = useLoading();
+  const {control, handleSubmit} = useForm();
 
   const onLoginPressed = async (dataFields: any) => {
     try {
@@ -31,7 +39,10 @@ const LoginScreen: React.FC<{navigation: LoginScreenNavigationProp}> = ({
       console.log(teste);
       if (teste) {
         await AsyncStorage.setItem('userToken', newResponde.userToken);
-        await AsyncStorage.setItem('userInfo', JSON.stringify(newResponde.usuario));
+        await AsyncStorage.setItem(
+          'userInfo',
+          JSON.stringify(newResponde.usuario),
+        );
         stopLoading();
         navigation.navigate('Home');
       } else {
@@ -48,8 +59,7 @@ const LoginScreen: React.FC<{navigation: LoginScreenNavigationProp}> = ({
   };
 
   return (
-    <SafeAreaView
-      style={styles.centerView}>
+    <View style={styles.centerView}>
       <Image
         style={styles.logo}
         source={require('../../assets/images/logo.webp')}
@@ -81,7 +91,7 @@ const LoginScreen: React.FC<{navigation: LoginScreenNavigationProp}> = ({
         label="Senha"
       />
       {isLoading ? <LoadingOverlay /> : <Text children={undefined}></Text>}
-      <Text style={{ color: 'red', textAlign: 'center' }}>{error}</Text>
+      <Text style={{color: 'red', textAlign: 'center'}}>{error}</Text>
 
       <Text
         style={styles.links}
@@ -101,8 +111,7 @@ const LoginScreen: React.FC<{navigation: LoginScreenNavigationProp}> = ({
         onPress={handleSubmit(onLoginPressed)}>
         Log In
       </Button>
-
-    </SafeAreaView>
+    </View>
   );
 };
 
@@ -120,7 +129,7 @@ const styles = StyleSheet.create<any>({
     marginBottom: 10,
   },
   button: {
-    marginTop:10,
+    marginTop: 10,
     color: '#5D6BB0',
   },
   links: {
@@ -132,7 +141,5 @@ const styles = StyleSheet.create<any>({
     borderRadius: 100,
     marginBottom: 40,
   },
-  helperText: {
-
-  },
+  helperText: {},
 });

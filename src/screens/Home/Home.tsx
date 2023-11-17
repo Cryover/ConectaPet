@@ -1,21 +1,41 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import React, { useEffect, useState } from 'react';
+import React, {useEffect, useState} from 'react';
 import {createMaterialBottomTabNavigator} from '@react-navigation/material-bottom-tabs';
-import {Appbar, Button, Avatar, IconButton, Text, Menu} from 'react-native-paper';
-import {Platform, SafeAreaView, StyleSheet, TouchableOpacity, View} from 'react-native';
+import {
+  Appbar,
+  Button,
+  Avatar,
+  IconButton,
+  Text,
+  Menu,
+} from 'react-native-paper';
+import {
+  Platform,
+  ScrollView,
+  StyleSheet,
+  TouchableOpacity,
+  View,
+} from 'react-native';
 import Dashboard from '../Dashboard/Dashboard';
 import HistoricoScreen from '../Historico/Historico';
 import Profile from '../Profile/ProfilePets/ProfilePets';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { useAuthContext } from '../../contexts/authContext';
-import { RenderAgendaTabBarIcon, RenderDashboardTabBarIcon, RenderHistoricoTabBarIcon, RenderPerfilTabBarIcon } from '../../components/molecules/MaterialCommunityIcons/MaterialCommunityIcons';
-import { HomeScreenNavigationProp, Pet } from '../../types/types';
+import {useAuthContext} from '../../contexts/authContext';
+import {
+  RenderAgendaTabBarIcon,
+  RenderDashboardTabBarIcon,
+  RenderHistoricoTabBarIcon,
+  RenderPerfilTabBarIcon,
+} from '../../components/molecules/MaterialCommunityIcons/MaterialCommunityIcons';
+import {HomeScreenNavigationProp, Pet} from '../../types/types';
 import AgendaScreen from '../Agenda/AgendaScreen';
 import CustomModal from '../../components/Modal/CustomModal';
 import ControlTextInput from '../../components/atoms/inputs/ControlTextInput';
-import { useForm } from 'react-hook-form';
+import {useForm} from 'react-hook-form';
 
-const HomeScreen: React.FC<{ navigation: HomeScreenNavigationProp }> = ({ navigation }) => {
+const HomeScreen: React.FC<{navigation: HomeScreenNavigationProp}> = ({
+  navigation,
+}) => {
   const Tab = createMaterialBottomTabNavigator();
   const [visibleMenu, setVisibleMenu] = useState(true);
   const [visiblePetMenu, setVisiblePetMenu] = useState(true);
@@ -24,7 +44,7 @@ const HomeScreen: React.FC<{ navigation: HomeScreenNavigationProp }> = ({ naviga
   const openPetOptionsMenu = () => setVisiblePetMenu(true);
   const closePetOptionsMenu = () => setVisiblePetMenu(false);
   const MORE_ICON = Platform.OS === 'ios' ? 'dots-horizontal' : 'dots-vertical';
-  const { logOut } = useAuthContext();
+  const {logOut} = useAuthContext();
   const [chosenPet, setChosenPet] = useState<Pet>();
   const {control, handleSubmit} = useForm();
   const [visibleModal, setVisibleModal] = useState(false);
@@ -46,7 +66,7 @@ const HomeScreen: React.FC<{ navigation: HomeScreenNavigationProp }> = ({ naviga
     try {
       const petInfo = await AsyncStorage.getItem('petInfo');
 
-      if (petInfo){
+      if (petInfo) {
         const petInforFormated: Pet = JSON.parse(petInfo);
         setChosenPet(petInforFormated);
       }
@@ -60,7 +80,7 @@ const HomeScreen: React.FC<{ navigation: HomeScreenNavigationProp }> = ({ naviga
   }, []);
 
   return (
-    <SafeAreaView>
+    <>
       <Appbar.Header mode="center-aligned" style={styles.header}>
         <Appbar.Content title={chosenPet?.nome} />
         <Menu
@@ -88,6 +108,7 @@ const HomeScreen: React.FC<{ navigation: HomeScreenNavigationProp }> = ({ naviga
           <Menu.Item title="Definir como pet principal" />
         </Menu>
       </Appbar.Header>
+      <Text>teste</Text>
 
       <Tab.Navigator
         initialRouteName="Dashboard"
@@ -137,51 +158,51 @@ const HomeScreen: React.FC<{ navigation: HomeScreenNavigationProp }> = ({ naviga
         />
       </Tab.Navigator>
       <CustomModal
-          visible={visibleModal}
-          onDismiss={hideModal}
-          containerStyle={styles.containerStyle}>
-          <Text
-            variant="titleMedium"
-            style={[styles.textCenter, {marginBottom: 10}]}>
-            Cadastro de Pet
-          </Text>
-          <ControlTextInput
-            name={'nome'}
-            label={'Nome'}
-            mode={'outlined'}
-            control={control}
-            rules={{required: 'Nome de Pet Obrigatório'}}
-            style={styles.input}
-            secureTextEntry={false}
-          />
-          <ControlTextInput
-            name={'raca'}
-            label={'Raça'}
-            mode={'outlined'}
-            control={control}
-            rules={{required: 'Raça de pet Obrigatório'}}
-            style={styles.input}
-            secureTextEntry={false}
-          />
-          <View style={styles.divButtons}>
-            <Button
-              icon="plus"
-              mode="outlined"
-              style={styles.button}
-              //onPress={handleSubmit(registerPet)}
-              >
-              Registrar Item
-            </Button>
-            <Button
-              icon="cancel"
-              mode="outlined"
-              style={styles.button}
-              onPress={hideModal}>
-              Cancelar
-            </Button>
-          </View>
-        </CustomModal>
-    </SafeAreaView>
+        visible={visibleModal}
+        onDismiss={hideModal}
+        containerStyle={styles.containerStyle}>
+        <Text
+          variant="titleMedium"
+          style={[styles.textCenter, {marginBottom: 10}]}>
+          Cadastro de Pet
+        </Text>
+        <ControlTextInput
+          name={'nome'}
+          label={'Nome'}
+          mode={'outlined'}
+          control={control}
+          rules={{required: 'Nome de Pet Obrigatório'}}
+          style={styles.input}
+          secureTextEntry={false}
+        />
+        <ControlTextInput
+          name={'raca'}
+          label={'Raça'}
+          mode={'outlined'}
+          control={control}
+          rules={{required: 'Raça de pet Obrigatório'}}
+          style={styles.input}
+          secureTextEntry={false}
+        />
+        <View style={styles.divButtons}>
+          <Button
+            icon="plus"
+            mode="outlined"
+            style={styles.button}
+            //onPress={handleSubmit(registerPet)}
+          >
+            Registrar Item
+          </Button>
+          <Button
+            icon="cancel"
+            mode="outlined"
+            style={styles.button}
+            onPress={hideModal}>
+            Cancelar
+          </Button>
+        </View>
+      </CustomModal>
+    </>
   );
 };
 

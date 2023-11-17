@@ -1,19 +1,25 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import React, { ReactNode, createContext, useContext, useEffect, useState } from 'react';
-import { User } from '../types/types';
+import React, {
+  ReactNode,
+  createContext,
+  useContext,
+  useEffect,
+  useState,
+} from 'react';
+import {User} from '../types/types';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import axiosInstance from '../utils/axiosIstance';
-import { useLoading } from './loadingContext';
+import {useLoading} from './loadingContext';
 
 interface AuthContextType {
-  userToken: string | null,
+  userToken: string | null;
   user: User | undefined;
   logIn: (dataFields: any) => Promise<boolean>;
   logOut: () => void;
 }
 
 interface AuthProviderProps {
-    children: ReactNode;
+  children: ReactNode;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -28,43 +34,46 @@ export const useAuthContext = () => {
   return context;
 };
 
-export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
+export const AuthProvider: React.FC<AuthProviderProps> = ({children}) => {
   const [user, setUser] = useState<User>();
   const [userToken, setUserToken] = useState<string | null>(null);
-  const { startLoading, stopLoading } = useLoading();
+  const {startLoading, stopLoading} = useLoading();
 
-  const logIn = async (dataFields:any) => {
+  const logIn = async (dataFields: any) => {
     try {
-        startLoading();
-        //await AsyncStorage.clear();
-        const response = await axiosInstance.post('/login', dataFields);
-        console.log('Response.data login', response.data);
-        console.log('Usuario', response.data.usuario);
-        if (response){
-          setUser(response.data.usuario);
-          setUserToken(response.data.userToken);
+      startLoading();
+      //await AsyncStorage.clear();
+      const response = await axiosInstance.post('/login', dataFields);
+      console.log('Response.data login', response.data);
+      console.log('Usuario', response.data.usuario);
+      if (response) {
+        setUser(response.data.usuario);
+        setUserToken(response.data.userToken);
 
-          await AsyncStorage.setItem('userToken', response.data.userToken);
-          await AsyncStorage.setItem('userStored', JSON.stringify(response.data.usuario));
-        }
-        return true;
-      } catch (err) {
-        console.error(err);
-        return false;
-      } finally {
-        stopLoading();
+        await AsyncStorage.setItem('userToken', response.data.userToken);
+        await AsyncStorage.setItem(
+          'userStored',
+          JSON.stringify(response.data.usuario),
+        );
       }
+      return true;
+    } catch (err) {
+      console.error(err);
+      return false;
+    } finally {
+      stopLoading();
+    }
   };
 
   const logOut = async () => {
     try {
-        setUser(undefined);
-        setUserToken(null);
-        await AsyncStorage.removeItem('userStored');
-        await AsyncStorage.removeItem('userToken');
-      } catch (err) {
-        console.error('Erro ao remover userStored e UserToken:', err);
-      }
+      setUser(undefined);
+      setUserToken(null);
+      await AsyncStorage.removeItem('userStored');
+      await AsyncStorage.removeItem('userToken');
+    } catch (err) {
+      console.error('Erro ao remover userStored e UserToken:', err);
+    }
   };
 
   const getUserInfo = async () => {
@@ -80,11 +89,14 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       };
       console.log('userStored', userStored);
       console.log('userToken', userTokenStored);
-      if (userStored && userTokenStored){
-        const response = await axiosInstance.post('/login/verificartoken', formatedUserToken);
+      if (userStored && userTokenStored) {
+        const response = await axiosInstance.post(
+          '/login/verificartoken',
+          formatedUserToken,
+        );
         console.log('response', response.status);
-        if (response.status === 200){
-          const formatedUser:User = JSON.parse(userStored);
+        if (response.status === 200) {
+          const formatedUser: User = JSON.parse(userStored);
           setUser(formatedUser);
           setUserToken(userTokenStored);
         } else {
@@ -92,12 +104,12 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         }
       }
       return true;
-    } catch (err){
-        console.log(err);
-        console.error('Token Expirado favor fazer login novamente');
-        return false;
+    } catch (err) {
+      console.log(err);
+      console.error('Token Expirado favor fazer login novamente');
+      return false;
     } finally {
-        stopLoading();
+      stopLoading();
     }
   };
 
@@ -106,7 +118,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   }, []);
 
   return (
-    <AuthContext.Provider value={{ userToken, user, logIn, logOut }}>
+    <AuthContext.Provider value={{userToken, user, logIn, logOut}}>
       {children}
     </AuthContext.Provider>
   );

@@ -1,7 +1,8 @@
 import axios from 'axios';
+import {API_URL} from '@env';
 
 const axiosInstance = axios.create({
-  baseURL: process.env.API_DEV_URL,
+  baseURL: API_URL,
   headers: {
     'Content-Type': 'application/json',
   },
@@ -9,20 +10,23 @@ const axiosInstance = axios.create({
 });
 
 axiosInstance.interceptors.response.use(
-  (response) => {
+  response => {
     return response;
   },
-  (error) => {
+  error => {
+    console.log('API URL:', API_URL);
     if (error.response) {
       console.log('Axios Error response', error.response.data.message);
       const statusMessage = error.response.data.message || 'Ocorreu um erro';
       return Promise.reject(statusMessage);
     } else if (error.request) {
+      //console.log('DEBUG:', DEBUG);
+
       return Promise.reject('Nenhuma resposta recebida');
     } else {
       return Promise.reject('Request falhou');
     }
-  }
+  },
 );
 
 export default axiosInstance;

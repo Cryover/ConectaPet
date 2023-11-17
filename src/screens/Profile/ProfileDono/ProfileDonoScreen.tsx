@@ -28,7 +28,7 @@ export function ProfileDonoScreen() {
   const [hasAvatar, setHasAvatar] = React.useState();
 
   return (
-    <SafeAreaView style={{marginTop: 20}}>
+    <View style={{marginTop: 20}}>
       <Card key={user.id} style={{marginBottom: 20}}>
         <Card.Cover
           style={{width: 'auto'}}
@@ -45,7 +45,7 @@ export function ProfileDonoScreen() {
           <Text variant="bodyLarge">Alergias: {user.infoMedica.alergias}</Text> */}
         </Card.Content>
       </Card>
-    </SafeAreaView>
+    </View>
   );
 }
 

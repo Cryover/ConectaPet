@@ -1,5 +1,5 @@
 import React from 'react';
-import {Image, SafeAreaView, StyleSheet } from 'react-native';
+import {Image, StyleSheet, View } from 'react-native';
 import {Button} from 'react-native-paper';
 import {RecuperacaoContaScreenNavigationProp} from '../../types/types';
 import ControlTextInput from '../../components/atoms/inputs/ControlTextInput';
@@ -18,7 +18,7 @@ export const RecuperacaoContaScreen: React.FC<{
   };
 
   return (
-    <SafeAreaView style={styles.centerView}>
+    <View style={styles.centerView}>
       <Image
         style={styles.logo}
         source={require('../../assets/images/logo.webp')}
@@ -52,7 +52,7 @@ export const RecuperacaoContaScreen: React.FC<{
         onPress={handleSubmit(onRegisterPressed)}>
         Enviar
       </Button>
-    </SafeAreaView>
+    </View>
   );
 };
 
