@@ -65,3 +65,7 @@ yarn-error.log
 # testing
 /coverage
 node_modules
+
+# enviroments
+.env
+.env.*
