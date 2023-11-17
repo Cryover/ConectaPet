@@ -2,10 +2,6 @@
 #
 .DS_Store
 
-# enviroment variables
-.env
-.env.*
-
 # Xcode
 #
 build/
@@ -68,5 +64,4 @@ yarn-error.log
 
 # testing
 /coverage
-#Gradle
-android/gradle.properties
+node_modules
