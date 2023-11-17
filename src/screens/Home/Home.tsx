@@ -108,7 +108,6 @@ const HomeScreen: React.FC<{navigation: HomeScreenNavigationProp}> = ({
           <Menu.Item title="Definir como pet principal" />
         </Menu>
       </Appbar.Header>
-      <Text>teste</Text>
 
       <Tab.Navigator
         initialRouteName="Dashboard"
