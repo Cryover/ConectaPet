@@ -8,19 +8,19 @@ import {
   View,
   GestureResponderEvent,
   Image,
-  SafeAreaView,
 } from 'react-native';
 import {useAuthContext} from '../../../contexts/authContext';
 import axiosInstance from '../../../utils/axiosIstance';
 import {Pet, SelectOptionEntry} from '../../../types/types';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import CustomModal from '../../../components/Modal/CustomModal';
 import moment from 'moment';
 import Collapsible from 'react-native-collapsible';
 import CustomFabButton from '../../../components/Buttons/CustomFabButton';
 import ControlSelectInput from '../../../components/atoms/inputs/ControlSelectInput';
 import ControlTextInput from '../../../components/atoms/inputs/ControlTextInput';
+import ControlDateInput from '../../../components/atoms/inputs/ControlDateInput';
 import {useForm} from 'react-hook-form';
+import {useLoading} from '../../../contexts/loadingContext';
 
 export function ProfilePets() {
   const [pets, setPets] = useState<Pet[]>([]);
@@ -28,6 +28,7 @@ export function ProfilePets() {
   const [visibleModal, setVisibleModal] = useState(false);
   const {user, userToken} = useAuthContext();
   const [isExtended, setIsExtended] = useState(true);
+  const {startLoading, stopLoading} = useLoading();
 
   //const { userInfo } = useAuthContext();
   const {control, handleSubmit} = useForm();
@@ -39,7 +40,7 @@ export function ProfilePets() {
 
   const getPetsByOwner = async () => {
     try {
-      //console.log('user in pets', user);
+      startLoading();
 
       if (user) {
         const response = await axiosInstance.get(`/pets/byOwner/${user.id}`, {
@@ -50,9 +51,12 @@ export function ProfilePets() {
         if (response.status === 200) {
           const formatedPets: Pet[] = response.data;
           console.log('formatedPets', response.data);
+          formatedPets.forEach(pet => {
+            console.log(pet);
+          });
+
           setPets(formatedPets);
         } else if (response.status === 401) {
-          //navi
         }
       } else {
         setError('Nenhum pet cadastrado neste perfil.');
@@ -60,31 +64,30 @@ export function ProfilePets() {
     } catch (err) {
       setError('Erro ao buscar pets de dono.');
       console.log(err);
+    } finally {
+      stopLoading();
     }
   };
 
   const registerPet = async (formData: any) => {
-    /*  try {
-      //console.log('userInfo', userInfo);
+    try {
       console.log('formData', formData);
-      //const pet = await AsyncStorage.getItem('petInfo');
-      console.log('userTeste', userTeste);
-      if (userTeste) {
-        const formattedPet: Pet = JSON.parse(userTeste);
-        console.log('userTeste', formattedPet);
-      }
-      if (user) {
-        const response = await axiosInstance.post(`/pets/${user.id}`);
-        console.log('pet response', response);
-        //setPets(response);
-        //const petInfo = await AsyncStorage.setItem('petInfo', response.data);
-      } else {
-        throw new Error('ID de dono nao encontrado');
-      }
+      //console.log('user', user);
+      console.log('userToken', userToken);
+
+      const response = await axiosInstance.post(`/pets/${user?.id}`, formData, {
+        headers: {
+          Authorization: `Bearer ${userToken}`,
+        },
+      });
+
+      console.log('pet response', response);
+
+      hideModal();
     } catch (err) {
-      setError('Nome do usuário ou senha incorreto.\n Tente novamente.');
-      console.log(err);
-    } */
+      hideModal();
+      console.error(err);
+    }
   };
 
   const toggleModal = () => {
@@ -107,23 +110,23 @@ export function ProfilePets() {
   const tiposAnimais: SelectOptionEntry[] = [
     {
       label: 'Cachorro',
-      value: 'cachorro',
+      value: 'Cachorro',
     },
     {
       label: 'Gato',
-      value: 'gato',
+      value: 'Gato',
     },
     {
       label: 'Ave',
-      value: 'ave',
+      value: 'Ave',
     },
     {
       label: 'Roedor',
-      value: 'roedor',
+      value: 'Roedor',
     },
     {
       label: 'Outro',
-      value: 'outro',
+      value: 'Outro',
     },
   ];
 
@@ -134,7 +137,7 @@ export function ProfilePets() {
     },
     {
       label: 'Fêmea',
-      value: 'femea',
+      value: 'Fêmea',
     },
   ];
 
@@ -155,8 +158,10 @@ export function ProfilePets() {
                     <Text variant="bodyLarge">Tipo: {pet.tipo_pet}</Text>
                     <Text variant="bodyLarge">Raça: {pet.raca}</Text>
                     <Text variant="bodyLarge">
-                      Data Nasc.:{' '}
-                      {moment(pet.dataNascimento).format('DD/MM/YYYY')}
+                      Data Nasc.:
+                      {moment(new Date(pet.dataNascimento)).format(
+                        'DD/MM/YYYY',
+                      )}
                     </Text>
                     <Text variant="bodyLarge">
                       Tipo Sanguíneo: {pet.infoMedica?.tipoSanguineo}
@@ -205,7 +210,7 @@ export function ProfilePets() {
             />
             <ControlSelectInput
               control={control}
-              name={'tipoPet'}
+              name={'tipo_pet'}
               options={tiposAnimais}
               label={'Tipo de Pet'}
             />
@@ -218,6 +223,22 @@ export function ProfilePets() {
               style={styles.input}
               secureTextEntry={false}
             />
+            <ControlTextInput
+              name={'cor'}
+              label={'Cor'}
+              mode={'outlined'}
+              control={control}
+              rules={{required: 'Cor de pet Obrigatório'}}
+              style={styles.input}
+              secureTextEntry={false}
+            />
+            <ControlDateInput
+              control={control}
+              label={'Data de Nasc.'}
+              name={'data_nascimento'}
+              mode={'outlined'}
+            />
+
             <ControlSelectInput
               control={control}
               name={'sexo'}
@@ -232,25 +253,18 @@ export function ProfilePets() {
                 onPress={handleSubmit(registerPet)}>
                 Registrar Item
               </Button>
-              <Button
-                icon="cancel"
-                mode="outlined"
-                style={styles.button}
-                onPress={hideModal}>
-                Cancelar
-              </Button>
             </View>
           </CustomModal>
-          <CustomFabButton
-            visible={true}
-            style={styles.fabStyle}
-            isExtended={isExtended}
-            onPress={showModal}
-            label={'Add Despesa'}
-            animateFrom={'right'}
-          />
         </View>
       </ScrollView>
+      <CustomFabButton
+        visible={true}
+        style={styles.fabStyle}
+        isExtended={isExtended}
+        onPress={showModal}
+        label={'Add Despesa'}
+        animateFrom={'right'}
+      />
     </View>
   );
 }

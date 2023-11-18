@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import React, {Component} from 'react';
 import {Alert, StyleSheet, Text, View, TouchableOpacity} from 'react-native';
 import {
@@ -11,7 +12,7 @@ interface State {
   items?: AgendaSchedule;
 }
 
-export default class AgendaScreen extends Component<State> {
+/* export default class Agenda extends Component<State> {
   state: State = {
     items: undefined,
   };
@@ -48,7 +49,7 @@ export default class AgendaScreen extends Component<State> {
         // reservationsKeyExtractor={this.reservationsKeyExtractor}
       />
     );
-  }
+  } */
 
   loadItems = (day: DateData) => {
     const items = this.state.items || {};

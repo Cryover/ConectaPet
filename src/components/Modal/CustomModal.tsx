@@ -4,7 +4,6 @@ import {Portal, Modal} from 'react-native-paper';
 
 interface CustomModalProps {
   visible: boolean;
-  //hideModal: boolean;
   children: any;
   onDismiss: () => void;
   containerStyle: StyleProp<TextStyle | ViewStyle>;

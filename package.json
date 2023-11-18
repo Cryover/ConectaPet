@@ -25,6 +25,8 @@
     "react-native-calendars": "^1.1302.0",
     "react-native-chart-kit": "^6.12.0",
     "react-native-collapsible": "^1.6.1",
+    "react-native-currency-input": "^1.1.1",
+    "react-native-mask-input": "^1.2.3",
     "react-native-paper": "^5.11.1",
     "react-native-paper-dates": "^0.20.4",
     "react-native-rename": "^3.2.13",

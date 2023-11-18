@@ -74,107 +74,105 @@ const HistoricoScreen: React.FC<{
   }, []);
 
   return (
-    <View>
-      <ScrollView contentContainerStyle={styles.scrollView} onScroll={onScroll}>
-        <Text variant="titleMedium" style={{marginBottom: 20}}>
-          Historico de Despesas
-        </Text>
-        <Calendario />
-        {despesas.length > 0 ? (
-          <DataTable style={{marginBottom: 70}}>
-            <DataTable.Header>
-              <DataTable.Title style={{flex: 3}}>Nome do Item</DataTable.Title>
-              <DataTable.Title style={{flex: 1}}>Valor</DataTable.Title>
-              <DataTable.Title style={{flex: 1}}>Data</DataTable.Title>
-            </DataTable.Header>
+    <ScrollView contentContainerStyle={styles.scrollView} onScroll={onScroll}>
+      <Text variant="titleMedium" style={{marginBottom: 20}}>
+        Historico de Despesas
+      </Text>
+      <Calendario />
+      {despesas.length > 0 ? (
+        <DataTable style={{marginBottom: 70}}>
+          <DataTable.Header>
+            <DataTable.Title style={{flex: 3}}>Nome do Item</DataTable.Title>
+            <DataTable.Title style={{flex: 1}}>Valor</DataTable.Title>
+            <DataTable.Title style={{flex: 1}}>Data</DataTable.Title>
+          </DataTable.Header>
 
-            {despesas.slice(from, to).map(despesa => (
-              <DataTable.Row key={despesa.id}>
-                <Text numberOfLines={3} style={{flex: 2}}>
-                  {despesa.nome}
-                </Text>
-                <DataTable.Cell style={{flex: 1}} numeric>
-                  R$ {despesa.valor}
-                </DataTable.Cell>
-                <DataTable.Cell style={{flex: 1}}>
-                  {moment(despesa.dataDespesa).format('DD/MM/YYYY')}
-                </DataTable.Cell>
-              </DataTable.Row>
-            ))}
+          {despesas.slice(from, to).map(despesa => (
+            <DataTable.Row key={despesa.id}>
+              <Text numberOfLines={3} style={{flex: 2}}>
+                {despesa.nome}
+              </Text>
+              <DataTable.Cell style={{flex: 1}} numeric>
+                R$ {despesa.valor}
+              </DataTable.Cell>
+              <DataTable.Cell style={{flex: 1}}>
+                {moment(despesa.dataDespesa).format('DD/MM/YYYY')}
+              </DataTable.Cell>
+            </DataTable.Row>
+          ))}
 
-            <DataTable.Pagination
-              page={page}
-              numberOfPages={Math.ceil(despesas.length / despesasPerPage)}
-              onPageChange={page => setPage(page)}
-              label={`Pag. ${from + 1} de ${to} de ${despesas.length}`}
-              numberOfItemsPerPageList={numberOfItemsPerPageList}
-              numberOfItemsPerPage={despesasPerPage}
-              onItemsPerPageChange={onItemsPerPageChange}
-              showFastPaginationControls
-              selectPageDropdownLabel={'Itens por Pagina'}
-            />
-          </DataTable>
-        ) : (
-          <View style={styles.notFound}>
-            <Image
-              style={styles.sadDoge}
-              source={require('../../assets/images/sadDoge.webp')}
-            />
-            <Text>{error}</Text>
-            <Button
-              icon="plus"
-              mode="contained"
-              style={styles.button}
-              onPress={showModal}>
-              Cadastrar Despesa
-            </Button>
-          </View>
-        )}
-        <CustomModal
-          visible={visibleModal}
-          onDismiss={hideModal}
-          containerStyle={styles.containerStyle}>
-          <Text
-            variant="titleMedium"
-            style={[styles.textCenter, {marginBottom: 10}]}>
-            Cadastro de Despesa
-          </Text>
-          <ControlTextInput
-            name={'nome'}
-            label={'Nome'}
-            multiline={true}
-            numberOfLines={4}
-            control={control}
-            rules={{required: 'Nome de despesa Obrigatório'}}
-            style={styles.input}
-            secureTextEntry={false}
+          <DataTable.Pagination
+            page={page}
+            numberOfPages={Math.ceil(despesas.length / despesasPerPage)}
+            onPageChange={page => setPage(page)}
+            label={`Pag. ${from + 1} de ${to} de ${despesas.length}`}
+            numberOfItemsPerPageList={numberOfItemsPerPageList}
+            numberOfItemsPerPage={despesasPerPage}
+            onItemsPerPageChange={onItemsPerPageChange}
+            showFastPaginationControls
+            selectPageDropdownLabel={'Itens por Pagina'}
           />
-          <ControlTextInput
-            name={'valor'}
-            label={'Valor'}
-            control={control}
-            rules={{required: 'Nome do despesa Obrigatório'}}
-            style={styles.input}
-            secureTextEntry={false}
+        </DataTable>
+      ) : (
+        <View style={styles.notFound}>
+          <Image
+            style={styles.sadDoge}
+            source={require('../../assets/images/sadDoge.webp')}
           />
+          <Text>{error}</Text>
           <Button
             icon="plus"
             mode="contained"
             style={styles.button}
-            onPress={handleSubmit(registerDespesa)}>
-            Registrar Despesa
+            onPress={showModal}>
+            Cadastrar Despesa
           </Button>
-        </CustomModal>
-        <CustomFabButton
-          visible={true}
-          style={styles.fabStyle}
-          isExtended={isExtended}
-          onPress={showModal}
-          label={'Add Despesa'}
-          animateFrom={'left'}
+        </View>
+      )}
+      <CustomModal
+        visible={visibleModal}
+        onDismiss={hideModal}
+        containerStyle={styles.containerStyle}>
+        <Text
+          variant="titleMedium"
+          style={[styles.textCenter, {marginBottom: 10}]}>
+          Cadastro de Despesa
+        </Text>
+        <ControlTextInput
+          name={'nome'}
+          label={'Nome'}
+          multiline={true}
+          numberOfLines={4}
+          control={control}
+          rules={{required: 'Nome de despesa Obrigatório'}}
+          style={styles.input}
+          secureTextEntry={false}
         />
-      </ScrollView>
-    </View>
+        <ControlTextInput
+          name={'valor'}
+          label={'Valor'}
+          control={control}
+          rules={{required: 'Nome do despesa Obrigatório'}}
+          style={styles.input}
+          secureTextEntry={false}
+        />
+        <Button
+          icon="plus"
+          mode="contained"
+          style={styles.button}
+          onPress={handleSubmit(registerDespesa)}>
+          Registrar Despesa
+        </Button>
+      </CustomModal>
+      <CustomFabButton
+        visible={true}
+        style={styles.fabStyle}
+        isExtended={isExtended}
+        onPress={showModal}
+        label={'Add Despesa'}
+        animateFrom={'left'}
+      />
+    </ScrollView>
   );
 };
 

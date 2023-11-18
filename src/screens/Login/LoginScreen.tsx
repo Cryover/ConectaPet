@@ -11,14 +11,6 @@ import LoadingOverlay from '../../components/atoms/LoadingOverlay';
 import ControlTextInput from '../../components/atoms/inputs/ControlTextInput';
 import axiosInstance from '../../utils/axiosIstance';
 
-import {API_URL, API_TOKEN} from '@env';
-
-fetch(`${API_URL}/users`, {
-  headers: {
-    Authorization: `Bearer ${API_TOKEN}`,
-  },
-});
-
 const LoginScreen: React.FC<{navigation: LoginScreenNavigationProp}> = ({
   navigation,
 }) => {

@@ -14,10 +14,10 @@ axiosInstance.interceptors.response.use(
     return response;
   },
   error => {
-    console.log('API URL:', API_URL);
+    //console.log('API URL:', API_URL);
     if (error.response) {
-      console.log('Axios Error response', error.response.data.message);
-      const statusMessage = error.response.data.message || 'Ocorreu um erro';
+      const statusMessage =
+        error.response.data.message || 'ERRO ' + error.response.status;
       return Promise.reject(statusMessage);
     } else if (error.request) {
       //console.log('DEBUG:', DEBUG);

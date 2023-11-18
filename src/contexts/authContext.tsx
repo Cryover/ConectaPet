@@ -84,30 +84,39 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({children}) => {
         AsyncStorage.getItem('userStored'),
         AsyncStorage.getItem('userToken'),
       ]);
-      const formatedUserToken = {
-        token: userTokenStored,
-      };
-      console.log('userStored', userStored);
-      console.log('userToken', userTokenStored);
+
+      //console.log('userStored', userStored);
+      //console.log('userToken', userTokenStored);
       if (userStored && userTokenStored) {
-        const response = await axiosInstance.post(
-          '/login/verificartoken',
-          formatedUserToken,
-        );
-        console.log('response', response.status);
-        if (response.status === 200) {
-          const formatedUser: User = JSON.parse(userStored);
-          setUser(formatedUser);
-          setUserToken(userTokenStored);
-        } else {
-          throw Error('Token Expirado');
-        }
+        console.log('AQUI', userTokenStored);
+
+        await axiosInstance
+          .post('/login/verificartoken', undefined, {
+            headers: {
+              Authorization: `Bearer ${userTokenStored}`,
+            },
+          })
+          .then(response => {
+            if (response.status === 200) {
+              console.log('Deu certo');
+              const formatedUser: User = JSON.parse(userStored);
+              console.log(formatedUser);
+              setUser(formatedUser);
+              setUserToken(userTokenStored);
+              //navigationService.navigate('Home');
+            }
+          })
+          .catch(err => {
+            console.log('ERRO', err);
+            stopLoading();
+            /*  if (err.response && err.response.status === 401) {
+              navigationService.navigate('Login');
+            } */
+          });
       }
-      return true;
     } catch (err) {
       console.log(err);
       console.error('Token Expirado favor fazer login novamente');
-      return false;
     } finally {
       stopLoading();
     }

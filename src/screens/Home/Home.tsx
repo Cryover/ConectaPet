@@ -32,6 +32,7 @@ import AgendaScreen from '../Agenda/AgendaScreen';
 import CustomModal from '../../components/Modal/CustomModal';
 import ControlTextInput from '../../components/atoms/inputs/ControlTextInput';
 import {useForm} from 'react-hook-form';
+import navigationService from '../../services/navigationService';
 
 const HomeScreen: React.FC<{navigation: HomeScreenNavigationProp}> = ({
   navigation,
@@ -56,7 +57,7 @@ const HomeScreen: React.FC<{navigation: HomeScreenNavigationProp}> = ({
       closeOptionsMenu();
       logOut();
       console.info('user & userToken removidos com sucesso.');
-      navigation.navigate('Login');
+      //navigation.navigate('Login');
     } catch (err) {
       console.error('Erro ao remover userToken:', err);
     }

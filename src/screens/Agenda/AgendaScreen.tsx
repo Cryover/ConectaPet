@@ -75,7 +75,7 @@ const AgendaScreen: React.FC<{navigation: AgendaScreenNavigationProp}> = ({
   }, []);
 
   return (
-    <View>
+    <>
       <ScrollView contentContainerStyle={styles.scrollView} onScroll={onScroll}>
         <Text variant="titleMedium" style={{marginBottom: 20}}>
           Agenda de compromissos
@@ -183,7 +183,7 @@ const AgendaScreen: React.FC<{navigation: AgendaScreenNavigationProp}> = ({
         label={'Add Compromisso'}
         animateFrom={'left'}
       />
-    </View>
+    </>
   );
 };
 

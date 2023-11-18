@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import React, { useState } from 'react';
+import React, {useState} from 'react';
 import {Image, SafeAreaView, StyleSheet, View} from 'react-native';
 import {Button} from 'react-native-paper';
 import {RegistroScreenNavigationProp, User} from '../../types/types';
@@ -41,11 +41,19 @@ export const RegistroScreen: React.FC<{
       />
       <ControlTextInput
         name={'username'}
-        label={'Username'}
+        label={'Nome de usuário'}
         mode={'flat'}
         control={control}
         rules={{
-          required: 'Nome de Pet Obrigatório',
+          required: 'Nome de usuário Obrigatório',
+          maxLength: {
+            value: 20,
+            message: 'Nome de usuário deve ter no máximo 20 caracteres',
+          },
+          minLength: {
+            value: 6,
+            message: 'Nome de usuário deve ter no mínimo 6 caracteres',
+          },
         }}
         style={styles.input}
         secureTextEntry={false}
@@ -56,7 +64,17 @@ export const RegistroScreen: React.FC<{
         label={'Senha'}
         mode={'flat'}
         control={control}
-        rules={{required: 'Senha de pet Obrigatório'}}
+        rules={{
+          required: 'Senha Obrigatória',
+          maxLength: {
+            value: 20,
+            message: 'A senha deve ter no máximo 20 caracteres',
+          },
+          minLength: {
+            value: 6,
+            message: 'A senha deve ter no mínimo 6 caracteres',
+          },
+        }}
         style={styles.input}
         secureTextEntry={false}
       />
@@ -65,16 +83,23 @@ export const RegistroScreen: React.FC<{
         label={'Email'}
         mode={'flat'}
         control={control}
-        rules={{required: 'Raça de pet Obrigatório'}}
+        rules={{
+          required: 'Email Obrigatório',
+          pattern: {
+            value:
+              /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/,
+            message: 'Endereço de email inválido',
+          },
+        }}
         style={styles.input}
         secureTextEntry={false}
       />
       <ControlTextInput
         name={'nome'}
-        label={'Nome'}
+        label={'Nome (Opcional)'}
         mode={'flat'}
         control={control}
-        rules={{required: 'Raça de pet Obrigatório'}}
+        rules={undefined}
         style={styles.input}
         secureTextEntry={false}
       />
