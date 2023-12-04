@@ -117,16 +117,6 @@ const HomeScreen: React.FC<{navigation: HomeScreenNavigationProp}> = ({
         shifting={true}
         barStyle={{backgroundColor: '#5D6BB0'}}>
         <Tab.Screen
-          name="Despesas"
-          component={HistoricoScreen}
-          options={{
-            title: 'Despesas',
-            tabBarLabel: 'Despesas',
-            tabBarColor: '#EDBA54',
-            tabBarIcon: RenderHistoricoTabBarIcon,
-          }}
-        />
-        <Tab.Screen
           name="Agenda"
           component={AgendaScreen}
           options={{
@@ -134,6 +124,16 @@ const HomeScreen: React.FC<{navigation: HomeScreenNavigationProp}> = ({
             tabBarLabel: 'Agenda',
             tabBarColor: '#EDBA54',
             tabBarIcon: RenderAgendaTabBarIcon,
+          }}
+        />
+        <Tab.Screen
+          name="Despesas"
+          component={HistoricoScreen}
+          options={{
+            title: 'Despesas',
+            tabBarLabel: 'Despesas',
+            tabBarColor: '#EDBA54',
+            tabBarIcon: RenderHistoricoTabBarIcon,
           }}
         />
         <Tab.Screen

@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable @typescript-eslint/no-shadow */
 import React, {useEffect, useState} from 'react';
@@ -12,6 +13,7 @@ import moment from 'moment';
 import {useAuthContext} from '../../contexts/authContext';
 import axiosInstance from '../../utils/axiosIstance';
 import {AgendaScreenNavigationProp, Compromisso} from '../../types/types';
+import ControlDateInput from '../../components/atoms/inputs/ControlDateInput';
 
 const AgendaScreen: React.FC<{navigation: AgendaScreenNavigationProp}> = ({
   navigation,
@@ -24,12 +26,14 @@ const AgendaScreen: React.FC<{navigation: AgendaScreenNavigationProp}> = ({
   const {control, handleSubmit} = useForm();
   const [error, setError] = useState<string>();
   const [compromissos, setCompromissos] = useState<Compromisso[]>([]);
+  const [dateFromCalendar, setDateFromCalendar] = useState<Date>();
 
   const from = page * compromissosPerPage;
   const to = Math.min((page + 1) * compromissosPerPage, compromissos.length);
   const [visibleModal, setVisibleModal] = useState(false);
   const [isExtended, setIsExtended] = useState(true);
   const {user, userToken} = useAuthContext();
+  const [currentMonth, setCurrentMonth] = useState<string>();
 
   const showModal = () => setVisibleModal(true);
   const hideModal = () => setVisibleModal(false);
@@ -67,7 +71,45 @@ const AgendaScreen: React.FC<{navigation: AgendaScreenNavigationProp}> = ({
     }
   };
 
-  const registerCompromisso = async () => {};
+  const getCompromissosByMonth = async () => {
+    try {
+      await axiosInstance
+        .get(`/compromisso/byowner/${user?.id}/${currentMonth}`, {
+          headers: {
+            Authorization: `Bearer ${userToken}`,
+          },
+        })
+        .then(response => {
+          const formatedCompromisso: Compromisso[] = response.data;
+          console.log(formatedCompromisso);
+          setCompromissos(formatedCompromisso);
+        })
+        .catch(err => {
+          console.log(err);
+          if (err.status === 401) {
+            navigation.navigate('Login');
+          } else {
+            setError('Nenhum compromisso cadastrado.');
+          }
+        });
+    } catch (err) {
+      console.log(err);
+    }
+  };
+
+  const handleDayPressed = (data: string) => {
+    console.log('DataString: ', data);
+    setDateFromCalendar(new Date(data));
+  };
+
+  const handleMonthChange = (month: string) => {
+    console.log('DataString Month: ', month);
+    setDateFromCalendar(new Date(month));
+  };
+
+  const registerCompromisso = async () => {
+    getCompromissos();
+  };
 
   useEffect(() => {
     setPage(0);
@@ -80,7 +122,10 @@ const AgendaScreen: React.FC<{navigation: AgendaScreenNavigationProp}> = ({
         <Text variant="titleMedium" style={{marginBottom: 20}}>
           Agenda de compromissos
         </Text>
-        <Calendario />
+        <Calendario
+          onDayPress={handleDayPressed}
+          onMonthChange={handleMonthChange}
+        />
 
         {compromissos.length > 0 ? (
           <DataTable style={{marginBottom: 70}}>
@@ -130,7 +175,7 @@ const AgendaScreen: React.FC<{navigation: AgendaScreenNavigationProp}> = ({
               mode="contained"
               style={styles.button}
               onPress={showModal}>
-              Cadastrar Despesa
+              Cadastrar Compromisso
             </Button>
           </View>
         )}
@@ -152,6 +197,13 @@ const AgendaScreen: React.FC<{navigation: AgendaScreenNavigationProp}> = ({
           rules={{required: 'Título de compromisso é Obrigatório'}}
           style={styles.input}
           secureTextEntry={false}
+        />
+        <ControlDateInput
+          control={control}
+          label={'Data'}
+          name={'data'}
+          mode={'outlined'}
+          initialValue={dateFromCalendar ? dateFromCalendar : undefined}
         />
         <ControlTextInput
           name={'descricao'}

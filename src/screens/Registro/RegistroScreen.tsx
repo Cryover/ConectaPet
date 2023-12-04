@@ -76,7 +76,7 @@ export const RegistroScreen: React.FC<{
           },
         }}
         style={styles.input}
-        secureTextEntry={false}
+        secureTextEntry={true}
       />
       <ControlTextInput
         name={'email'}

@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable @typescript-eslint/no-shadow */
 /* eslint-disable react-hooks/exhaustive-deps */
 import React, {useEffect, useState} from 'react';
@@ -32,6 +33,8 @@ const HistoricoScreen: React.FC<{
   const {control, handleSubmit} = useForm();
   const {user, userToken} = useAuthContext();
   const [error, setError] = useState<string>();
+  const [currentMonth, setCurrentMonth] = useState<string>();
+  const [dateFromCalendar, setDateFromCalendar] = useState<Date>();
 
   const onScroll = ({nativeEvent}: any) => {
     const currentScrollPosition =
@@ -43,7 +46,7 @@ const HistoricoScreen: React.FC<{
   const getDespesas = async () => {
     try {
       await axiosInstance
-        .get(`/compromisso/${user?.id}`, {
+        .get(`/despesa/${user?.id}`, {
           headers: {
             Authorization: `Bearer ${userToken}`,
           },
@@ -66,6 +69,42 @@ const HistoricoScreen: React.FC<{
     }
   };
 
+  const getDespesasByMonth = async () => {
+    try {
+      await axiosInstance
+        .get(`/despesa/byowner/${user?.id}/${currentMonth}`, {
+          headers: {
+            Authorization: `Bearer ${userToken}`,
+          },
+        })
+        .then(response => {
+          const formatedDespesa: Despesa[] = response.data;
+          console.log(formatedDespesa);
+          setDespesas(formatedDespesa);
+        })
+        .catch(err => {
+          console.log(err);
+          if (err.status === 401) {
+            navigation.navigate('Login');
+          } else {
+            setError('Nenhuma despesa cadastrada.');
+          }
+        });
+    } catch (err) {
+      console.log(err);
+    }
+  };
+
+  const handleDayPressed = (data: string) => {
+    console.log('DataString: ', data);
+    setDateFromCalendar(new Date(data));
+  };
+
+  const handleMonthChange = (month: string) => {
+    console.log('DataString Month: ', month);
+    setDateFromCalendar(new Date(month));
+  };
+
   const registerDespesa = async () => {};
 
   useEffect(() => {
@@ -78,7 +117,18 @@ const HistoricoScreen: React.FC<{
       <Text variant="titleMedium" style={{marginBottom: 20}}>
         Historico de Despesas
       </Text>
-      <Calendario />
+      <Calendario
+        onDayPress={handleDayPressed}
+        onMonthChange={handleMonthChange}
+      />
+      <Button
+        icon="plus"
+        mode="contained"
+        style={styles.button}
+        onPress={getDespesas}>
+        Resetar Lista
+      </Button>
+
       {despesas.length > 0 ? (
         <DataTable style={{marginBottom: 70}}>
           <DataTable.Header>

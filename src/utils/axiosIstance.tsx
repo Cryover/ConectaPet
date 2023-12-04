@@ -11,6 +11,7 @@ const axiosInstance = axios.create({
 
 axiosInstance.interceptors.response.use(
   response => {
+    console.info(response.status);
     return response;
   },
   error => {

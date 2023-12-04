@@ -18,6 +18,7 @@ interface CustomTextInputProps {
   rules: RegisterOptions<FieldValues, string> | undefined; // Define the 'rules' property
   style: StyleProp<TextStyle | ViewStyle>;
   secureTextEntry?: boolean;
+  initialValue?: string;
 }
 
 const ControlTextInput: React.FC<CustomTextInputProps> = ({
@@ -30,6 +31,7 @@ const ControlTextInput: React.FC<CustomTextInputProps> = ({
   style,
   rules,
   secureTextEntry,
+  initialValue,
 }) => {
   return (
     <Controller
@@ -43,7 +45,7 @@ const ControlTextInput: React.FC<CustomTextInputProps> = ({
             mode={mode ? mode : 'flat'}
             multiline={multiline}
             numberOfLines={numberOfLines}
-            value={field.value}
+            value={field.value || initialValue}
             onChangeText={field.onChange}
             onBlur={field.onBlur}
             secureTextEntry={secureTextEntry}

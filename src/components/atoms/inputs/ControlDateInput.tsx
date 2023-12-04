@@ -10,6 +10,7 @@ interface ControlDateInputProps {
   name: string;
   mode: 'flat' | 'outlined';
   inputMode?: 'start' | 'end';
+  initialValue?: Date;
 }
 
 const ControlDateInput: React.FC<ControlDateInputProps> = ({
@@ -18,6 +19,7 @@ const ControlDateInput: React.FC<ControlDateInputProps> = ({
   name,
   mode,
   inputMode,
+  initialValue,
 }) => {
   return (
     <View style={{justifyContent: 'center', flex: 1, alignItems: 'center'}}>
@@ -30,7 +32,7 @@ const ControlDateInput: React.FC<ControlDateInputProps> = ({
               locale="pt"
               label={label}
               mode={mode}
-              value={field.value}
+              value={field.value || initialValue}
               onChange={field.onChange}
               inputMode={inputMode ? inputMode : 'start'}
               error={fieldState.error ? true : false}

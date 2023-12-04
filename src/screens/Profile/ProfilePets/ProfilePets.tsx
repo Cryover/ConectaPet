@@ -74,6 +74,7 @@ export function ProfilePets() {
       console.log('formData', formData);
       //console.log('user', user);
       console.log('userToken', userToken);
+      console.log('user', user?.id);
 
       const response = await axiosInstance.post(`/pets/${user?.id}`, formData, {
         headers: {
@@ -84,6 +85,7 @@ export function ProfilePets() {
       console.log('pet response', response);
 
       hideModal();
+      getPetsByOwner();
     } catch (err) {
       hideModal();
       console.error(err);
@@ -103,9 +105,16 @@ export function ProfilePets() {
     } */
   };
 
+  const onScroll = ({nativeEvent}: any) => {
+    const currentScrollPosition =
+      Math.floor(nativeEvent?.contentOffset?.y) ?? 0;
+
+    setIsExtended(currentScrollPosition <= 0);
+  };
+
   useEffect(() => {
     getPetsByOwner();
-  }, [setPets]);
+  }, []);
 
   const tiposAnimais: SelectOptionEntry[] = [
     {
@@ -143,7 +152,7 @@ export function ProfilePets() {
 
   return (
     <View>
-      <ScrollView>
+      <ScrollView onScroll={onScroll}>
         <View style={styles.cardContainer}>
           {pets && pets.length > 0 ? (
             pets.map(pet => (
@@ -262,7 +271,7 @@ export function ProfilePets() {
         style={styles.fabStyle}
         isExtended={isExtended}
         onPress={showModal}
-        label={'Add Despesa'}
+        label={'Add Pet'}
         animateFrom={'right'}
       />
     </View>

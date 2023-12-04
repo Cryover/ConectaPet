@@ -1,7 +1,9 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import * as React from 'react';
-import {Calendar, LocaleConfig} from 'react-native-calendars';
+import {Calendar, DateData, LocaleConfig} from 'react-native-calendars';
 import {windowWidth} from '../../../styles/Style';
 import moment from 'moment';
+import {MarkedDates} from 'react-native-calendars/src/types';
 
 LocaleConfig.locales['pt-br'] = {
   monthNames: [
@@ -47,27 +49,46 @@ LocaleConfig.locales['pt-br'] = {
 
 LocaleConfig.defaultLocale = 'pt-br';
 
-const Calendario = () => {
-  const [selected, setSelected] = React.useState('');
+interface CalendarioProps {
+  onDayPress: (selectedDay: string) => void;
+  onMonthChange: (selectedMonth: string) => void;
+  markedDates?: MarkedDates | undefined;
+}
 
-  const showSelected = (day: any) => {
-    const formatedDay = moment(day.dateString).format('MM/DD/YYYY');
-    setSelected(formatedDay);
-    console.log(formatedDay);
+const Calendario: React.FC<CalendarioProps> = ({
+  onDayPress,
+  onMonthChange,
+  markedDates,
+}) => {
+  const [selectedDay, setSelectedDay] = React.useState('');
+
+  const showDaySelected = (day: DateData) => {
+    const formatedDay = moment(day.dateString).format('DD/MM/YYYY');
+    setSelectedDay(formatedDay);
+    onDayPress(day.dateString);
+    //console.log(day);
+  };
+  // MarkedDates
+  // [selectedDay]: {
+  //  selected: true,
+  //  disableTouchEvent: false,
+  // },
+
+  const showMonthSelected = (month: DateData) => {
+    onMonthChange(month.dateString);
+    //console.log(month);
   };
 
   return (
     <>
       <Calendar
         onDayPress={day => {
-          showSelected(day);
+          showDaySelected(day);
         }}
-        markedDates={{
-          [selected]: {
-            selected: true,
-            disableTouchEvent: false,
-          },
+        onMonthChange={month => {
+          showMonthSelected(month);
         }}
+        markedDates={markedDates}
         firstDay={6}
         enableSwipeMonths={true}
         style={{
@@ -76,17 +97,11 @@ const Calendario = () => {
           width: windowWidth - 40,
           height: 'auto',
         }}
-        theme={{
-          backgroundColor: '#ffffff',
-          calendarBackground: '#ffffff',
-          textSectionTitleColor: '#0f0f0f',
-          selectedDayBackgroundColor: '#5D6BB0',
-          selectedDayTextColor: '#5D6BB0',
-          todayTextColor: '#5D6BB0',
-          dayTextColor: '#2d4150',
-          arrowColor: '#5D6BB0',
-          textDisabledColor: '#c4c4c47b',
-        }}
+        theme={
+          {
+            //
+          }
+        }
       />
     </>
   );
