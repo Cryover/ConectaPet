@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable @typescript-eslint/no-shadow */
 import React, {useEffect, useState} from 'react';
@@ -33,7 +32,9 @@ const AgendaScreen: React.FC<{navigation: AgendaScreenNavigationProp}> = ({
   const [visibleModal, setVisibleModal] = useState(false);
   const [isExtended, setIsExtended] = useState(true);
   const {user, userToken} = useAuthContext();
-  const [currentMonth, setCurrentMonth] = useState<string>();
+  const [currentMonth, setCurrentMonth] = useState<number>(
+    new Date().getMonth() + 1,
+  );
 
   const showModal = () => setVisibleModal(true);
   const hideModal = () => setVisibleModal(false);
@@ -45,7 +46,7 @@ const AgendaScreen: React.FC<{navigation: AgendaScreenNavigationProp}> = ({
     setIsExtended(currentScrollPosition <= 0);
   };
 
-  const getCompromissos = async () => {
+  /* const getAllCompromissos = async () => {
     try {
       await axiosInstance
         .get(`/compromisso/byowner/${user?.id}`, {
@@ -69,12 +70,14 @@ const AgendaScreen: React.FC<{navigation: AgendaScreenNavigationProp}> = ({
     } catch (err) {
       console.log(err);
     }
-  };
+  }; */
 
   const getCompromissosByMonth = async () => {
+    console.log('currentMonth', currentMonth);
+
     try {
       await axiosInstance
-        .get(`/compromisso/byowner/${user?.id}/${currentMonth}`, {
+        .get(`/compromisso/byowner/${user?.id}/mes?month=${currentMonth}`, {
           headers: {
             Authorization: `Bearer ${userToken}`,
           },
@@ -98,22 +101,55 @@ const AgendaScreen: React.FC<{navigation: AgendaScreenNavigationProp}> = ({
   };
 
   const handleDayPressed = (data: string) => {
+    showModal();
     console.log('DataString: ', data);
+    console.log('DataString new Date: ', new Date(data));
     setDateFromCalendar(new Date(data));
   };
 
-  const handleMonthChange = (month: string) => {
-    console.log('DataString Month: ', month);
-    setDateFromCalendar(new Date(month));
+  const handleMonthChange = (data: string) => {
+    console.log('DataString Month: ', data);
+    const splitedMonth = data.split('-')[1];
+    const monthNumber = parseInt(splitedMonth, 10);
+    console.log('monthNumber: ', monthNumber);
+    setCurrentMonth(monthNumber);
+    getCompromissosByMonth();
   };
 
-  const registerCompromisso = async () => {
-    getCompromissos();
+  const registerCompromisso = async (formData: any) => {
+    console.log('Teste');
+    console.log(formData);
+    try {
+      console.log('formData', formData);
+      //console.log('user', user);
+      //console.log('userToken', userToken);
+      //console.log('user', user?.id);
+
+      const response = await axiosInstance.post(
+        `/compromisso?id=${user?.id}`,
+        formData,
+        {
+          headers: {
+            Authorization: `Bearer ${userToken}`,
+          },
+        },
+      );
+
+      console.log('compromisso response', response);
+
+      hideModal();
+      getCompromissosByMonth();
+    } catch (err) {
+      hideModal();
+      console.error(err);
+    }
   };
 
   useEffect(() => {
     setPage(0);
-    getCompromissos();
+    //getCompromissos();
+    //console.log(new Date().getMonth);
+    getCompromissosByMonth();
   }, []);
 
   return (
@@ -126,6 +162,13 @@ const AgendaScreen: React.FC<{navigation: AgendaScreenNavigationProp}> = ({
           onDayPress={handleDayPressed}
           onMonthChange={handleMonthChange}
         />
+
+        <Button
+          mode="contained"
+          style={styles.button}
+          onPress={getCompromissosByMonth}>
+          Resetar Lista
+        </Button>
 
         {compromissos.length > 0 ? (
           <DataTable style={{marginBottom: 70}}>
@@ -170,13 +213,6 @@ const AgendaScreen: React.FC<{navigation: AgendaScreenNavigationProp}> = ({
               source={require('../../assets/images/sadDoge.webp')}
             />
             <Text>{error}</Text>
-            <Button
-              icon="plus"
-              mode="contained"
-              style={styles.button}
-              onPress={showModal}>
-              Cadastrar Compromisso
-            </Button>
           </View>
         )}
       </ScrollView>
@@ -219,11 +255,8 @@ const AgendaScreen: React.FC<{navigation: AgendaScreenNavigationProp}> = ({
           icon="plus"
           mode="contained"
           style={styles.button}
-          onPress={() => {
-            handleSubmit(registerCompromisso);
-            hideModal();
-          }}>
-          Registrar Item
+          onPress={handleSubmit(registerCompromisso)}>
+          Registrar Compromisso
         </Button>
       </CustomModal>
 

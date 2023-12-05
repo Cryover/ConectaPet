@@ -10,6 +10,7 @@ interface ControlSelectInputProps {
   label: string;
   options: SelectOptionEntry[];
   style?: StyleProp<TextStyle | ViewStyle>;
+  onValueChange?: (value: any) => void;
 }
 
 const ControlSelectInput: React.FC<ControlSelectInputProps> = ({
@@ -18,6 +19,7 @@ const ControlSelectInput: React.FC<ControlSelectInputProps> = ({
   label,
   options,
   style,
+  onValueChange,
 }) => {
   return (
     <View style={style}>
@@ -27,7 +29,10 @@ const ControlSelectInput: React.FC<ControlSelectInputProps> = ({
         render={({field}) => (
           <Picker
             selectedValue={field.value}
-            onValueChange={itemValue => field.onChange(itemValue)}>
+            onValueChange={itemValue => {
+              field.onChange(itemValue);
+              onValueChange && onValueChange(itemValue);
+            }}>
             {options.map(option => (
               <Picker.Item
                 key={option.value}

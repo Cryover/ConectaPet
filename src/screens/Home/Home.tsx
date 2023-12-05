@@ -9,16 +9,9 @@ import {
   Text,
   Menu,
 } from 'react-native-paper';
-import {
-  Platform,
-  ScrollView,
-  StyleSheet,
-  TouchableOpacity,
-  View,
-} from 'react-native';
+import {Platform, StyleSheet, TouchableOpacity, View} from 'react-native';
 import Dashboard from '../Dashboard/Dashboard';
 import HistoricoScreen from '../Historico/Historico';
-import Profile from '../Profile/ProfilePets/ProfilePets';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import {useAuthContext} from '../../contexts/authContext';
 import {
@@ -32,7 +25,7 @@ import AgendaScreen from '../Agenda/AgendaScreen';
 import CustomModal from '../../components/Modal/CustomModal';
 import ControlTextInput from '../../components/atoms/inputs/ControlTextInput';
 import {useForm} from 'react-hook-form';
-import navigationService from '../../services/navigationService';
+import ProfilePetsScreen from '../Profile/ProfilePets/ProfilePets';
 
 const HomeScreen: React.FC<{navigation: HomeScreenNavigationProp}> = ({
   navigation,
@@ -148,7 +141,7 @@ const HomeScreen: React.FC<{navigation: HomeScreenNavigationProp}> = ({
         />
         <Tab.Screen
           name="Perfil"
-          component={Profile}
+          component={ProfilePetsScreen}
           options={{
             title: 'Pets',
             tabBarLabel: 'Pets',

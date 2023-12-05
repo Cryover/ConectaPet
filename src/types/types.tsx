@@ -1,4 +1,4 @@
-import {StackNavigationProp} from '@react-navigation/stack';
+import {NativeStackNavigationProp} from '@react-navigation/native-stack';
 
 export interface RootState {
   data: DataState;
@@ -77,29 +77,41 @@ export type RootStackParamList = {
   RecuperacaoConta: undefined;
   Historico: undefined;
   Agenda: undefined;
+  ProfileDono: undefined;
+  ProfilePets: undefined;
 };
 
-export type LoginScreenNavigationProp = StackNavigationProp<
+export type LoginScreenNavigationProp = NativeStackNavigationProp<
   RootStackParamList,
   'Login'
 >;
-export type HistoricoScreenNavigationProp = StackNavigationProp<
+export type HistoricoScreenNavigationProp = NativeStackNavigationProp<
   RootStackParamList,
   'Historico'
 >;
-export type AgendaScreenNavigationProp = StackNavigationProp<
+export type AgendaScreenNavigationProp = NativeStackNavigationProp<
   RootStackParamList,
   'Agenda'
 >;
-export type HomeScreenNavigationProp = StackNavigationProp<
+export type HomeScreenNavigationProp = NativeStackNavigationProp<
   RootStackParamList,
   'Home'
 >;
-export type RegistroScreenNavigationProp = StackNavigationProp<
+export type RegistroScreenNavigationProp = NativeStackNavigationProp<
   RootStackParamList,
   'Registro'
 >;
-export type RecuperacaoContaScreenNavigationProp = StackNavigationProp<
+export type RecuperacaoContaScreenNavigationProp = NativeStackNavigationProp<
   RootStackParamList,
   'RecuperacaoConta'
+>;
+
+export type ProfileDonoScreenNavigationProp = NativeStackNavigationProp<
+  RootStackParamList,
+  'ProfileDono'
+>;
+
+export type ProfilePetsScreenNavigationProp = NativeStackNavigationProp<
+  RootStackParamList,
+  'ProfilePets'
 >;

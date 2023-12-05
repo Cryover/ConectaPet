@@ -13,6 +13,7 @@ import moment from 'moment';
 import ControlTextInput from '../../components/atoms/inputs/ControlTextInput';
 import axiosInstance from '../../utils/axiosIstance';
 import {useAuthContext} from '../../contexts/authContext';
+import ControlDateInput from '../../components/atoms/inputs/ControlDateInput';
 
 const HistoricoScreen: React.FC<{
   navigation: HistoricoScreenNavigationProp;
@@ -33,7 +34,9 @@ const HistoricoScreen: React.FC<{
   const {control, handleSubmit} = useForm();
   const {user, userToken} = useAuthContext();
   const [error, setError] = useState<string>();
-  const [currentMonth, setCurrentMonth] = useState<string>();
+  const [currentMonth, setCurrentMonth] = useState<number>(
+    new Date().getMonth() + 1,
+  );
   const [dateFromCalendar, setDateFromCalendar] = useState<Date>();
 
   const onScroll = ({nativeEvent}: any) => {
@@ -96,20 +99,27 @@ const HistoricoScreen: React.FC<{
   };
 
   const handleDayPressed = (data: string) => {
+    showModal();
     console.log('DataString: ', data);
+    console.log('DataString new Date: ', new Date(data));
     setDateFromCalendar(new Date(data));
   };
 
-  const handleMonthChange = (month: string) => {
-    console.log('DataString Month: ', month);
-    setDateFromCalendar(new Date(month));
+  const handleMonthChange = (data: string) => {
+    console.log('DataString Month: ', data);
+    const splitedMonth = data.split('-')[1];
+    const monthNumber = parseInt(splitedMonth, 10);
+    console.log('monthNumber: ', monthNumber);
+    setCurrentMonth(monthNumber);
+    getDespesasByMonth();
   };
 
   const registerDespesa = async () => {};
 
   useEffect(() => {
     setPage(0);
-    getDespesas();
+    //getDespesas();
+    getDespesasByMonth();
   }, []);
 
   return (
@@ -122,10 +132,9 @@ const HistoricoScreen: React.FC<{
         onMonthChange={handleMonthChange}
       />
       <Button
-        icon="plus"
         mode="contained"
         style={styles.button}
-        onPress={getDespesas}>
+        onPress={getDespesasByMonth}>
         Resetar Lista
       </Button>
 
@@ -170,13 +179,6 @@ const HistoricoScreen: React.FC<{
             source={require('../../assets/images/sadDoge.webp')}
           />
           <Text>{error}</Text>
-          <Button
-            icon="plus"
-            mode="contained"
-            style={styles.button}
-            onPress={showModal}>
-            Cadastrar Despesa
-          </Button>
         </View>
       )}
       <CustomModal
@@ -197,6 +199,13 @@ const HistoricoScreen: React.FC<{
           rules={{required: 'Nome de despesa Obrigatório'}}
           style={styles.input}
           secureTextEntry={false}
+        />
+        <ControlDateInput
+          control={control}
+          label={'Data'}
+          name={'data'}
+          mode={'outlined'}
+          initialValue={dateFromCalendar ? dateFromCalendar : undefined}
         />
         <ControlTextInput
           name={'valor'}

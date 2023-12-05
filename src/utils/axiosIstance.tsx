@@ -19,10 +19,26 @@ axiosInstance.interceptors.response.use(
     if (error.response) {
       const statusMessage =
         error.response.data.message || 'ERRO ' + error.response.status;
+      if (error.response.status !== 404 && error.response.status !== 400) {
+        console.warn(
+          `${
+            error.response.data.message
+              ? error.response.data.message
+              : 'Erro: ' + error.response.status
+          }`,
+        );
+      }
+
       return Promise.reject(statusMessage);
     } else if (error.request) {
       //console.log('DEBUG:', DEBUG);
-
+      console.error(
+        `Erro: ${
+          error.response.data.message
+            ? error.response.data.message
+            : error.response.status
+        }`,
+      );
       return Promise.reject('Nenhuma resposta recebida');
     } else {
       return Promise.reject('Request falhou');

@@ -109,9 +109,6 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({children}) => {
           .catch(err => {
             console.log('ERRO', err);
             stopLoading();
-            /*  if (err.response && err.response.status === 401) {
-              navigationService.navigate('Login');
-            } */
           });
       }
     } catch (err) {

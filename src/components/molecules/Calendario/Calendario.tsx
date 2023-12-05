@@ -75,6 +75,7 @@ const Calendario: React.FC<CalendarioProps> = ({
   // },
 
   const showMonthSelected = (month: DateData) => {
+    console.log(month.month);
     onMonthChange(month.dateString);
     //console.log(month);
   };

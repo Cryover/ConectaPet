@@ -38,15 +38,13 @@ const LoginScreen: React.FC<{navigation: LoginScreenNavigationProp}> = ({
         stopLoading();
         navigation.navigate('Home');
       } else {
-        stopLoading();
         setError('Nome do usuário ou senha incorreto.\n Tente novamente.');
       }
-
-      //console.log('Passou');
     } catch (err) {
-      stopLoading();
       console.log(err);
       setError('ERRO 500 - Erro interno no servidor.');
+    } finally {
+      stopLoading();
     }
   };
 

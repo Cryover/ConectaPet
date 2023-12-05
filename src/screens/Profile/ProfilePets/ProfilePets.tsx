@@ -2,48 +2,56 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import React, {useEffect, useState} from 'react';
 import {Button, Card, Text} from 'react-native-paper';
-import {
-  ScrollView,
-  StyleSheet,
-  View,
-  GestureResponderEvent,
-  Image,
-} from 'react-native';
+import {ScrollView, StyleSheet, View, Image} from 'react-native';
 import {useAuthContext} from '../../../contexts/authContext';
 import axiosInstance from '../../../utils/axiosIstance';
-import {Pet, SelectOptionEntry} from '../../../types/types';
+import {
+  Pet,
+  ProfilePetsScreenNavigationProp,
+  SelectOptionEntry,
+} from '../../../types/types';
 import CustomModal from '../../../components/Modal/CustomModal';
 import moment from 'moment';
 import Collapsible from 'react-native-collapsible';
 import CustomFabButton from '../../../components/Buttons/CustomFabButton';
-import ControlSelectInput from '../../../components/atoms/inputs/ControlSelectInput';
 import ControlTextInput from '../../../components/atoms/inputs/ControlTextInput';
 import ControlDateInput from '../../../components/atoms/inputs/ControlDateInput';
 import {useForm} from 'react-hook-form';
 import {useLoading} from '../../../contexts/loadingContext';
+import Toast from 'react-native-toast-message';
+import ControlSelectInput from '../../../components/atoms/inputs/ControlSelectInput';
 
-export function ProfilePets() {
+const ProfilePetsScreen: React.FC<{
+  navigation: ProfilePetsScreenNavigationProp;
+}> = ({navigation}) => {
   const [pets, setPets] = useState<Pet[]>([]);
   const [error, setError] = useState('');
   const [visibleModal, setVisibleModal] = useState(false);
+  const [visibleConfirmModal, setVisibleConfirmModal] = useState(false);
   const {user, userToken} = useAuthContext();
   const [isExtended, setIsExtended] = useState(true);
   const {startLoading, stopLoading} = useLoading();
-
-  //const { userInfo } = useAuthContext();
-  const {control, handleSubmit} = useForm();
+  const [petSelected, setPetSelected] = useState<string>();
+  const {control, handleSubmit, getValues} = useForm();
 
   const showModal = () => setVisibleModal(true);
   const hideModal = () => setVisibleModal(false);
 
+  const showConfirmModal = (petId: string) => {
+    setPetSelected(petId);
+    setVisibleConfirmModal(true);
+  };
+  const hideConfirmModal = () => setVisibleConfirmModal(false);
+
   const [isCollapsed, setIsCollapsed] = useState(false);
+  const [tipoPet, setTipoPet] = useState<any>(getValues('tipo_pet'));
 
   const getPetsByOwner = async () => {
     try {
       startLoading();
 
       if (user) {
-        const response = await axiosInstance.get(`/pets/byOwner/${user.id}`, {
+        const response = await axiosInstance.get(`/pets?id=${user.id}`, {
           headers: {
             Authorization: `Bearer ${userToken}`,
           },
@@ -76,11 +84,15 @@ export function ProfilePets() {
       console.log('userToken', userToken);
       console.log('user', user?.id);
 
-      const response = await axiosInstance.post(`/pets/${user?.id}`, formData, {
-        headers: {
-          Authorization: `Bearer ${userToken}`,
+      const response = await axiosInstance.post(
+        `/pets?id=${user?.id}`,
+        formData,
+        {
+          headers: {
+            Authorization: `Bearer ${userToken}`,
+          },
         },
-      });
+      );
 
       console.log('pet response', response);
 
@@ -92,17 +104,42 @@ export function ProfilePets() {
     }
   };
 
+  const deletePet = async () => {
+    try {
+      startLoading();
+
+      const response = await axiosInstance.delete(`/pets?id=${petSelected}`, {
+        headers: {
+          Authorization: `Bearer ${userToken}`,
+        },
+      });
+      if (response.status === 200) {
+        Toast.show({
+          type: 'success',
+          text1: 'Pet Deletado com sucesso',
+          visibilityTime: 4000,
+          onPress() {
+            Toast.hide();
+          },
+        });
+
+        hideConfirmModal();
+        getPetsByOwner();
+      }
+    } catch (err) {
+      setError('Erro ao buscar pets de dono.');
+      console.log(err);
+    } finally {
+      stopLoading();
+    }
+  };
+
   const toggleModal = () => {
     setVisibleModal(!visibleModal);
   };
 
-  const handleClick = (event: GestureResponderEvent): void => {
-    // Some logic here
-    console.log('Button pressed');
-    setIsCollapsed(!isCollapsed);
-    /* if (event) {
-      onPress(event);
-    } */
+  const toggleConfirmModal = () => {
+    setVisibleModal(!visibleConfirmModal);
   };
 
   const onScroll = ({nativeEvent}: any) => {
@@ -110,6 +147,11 @@ export function ProfilePets() {
       Math.floor(nativeEvent?.contentOffset?.y) ?? 0;
 
     setIsExtended(currentScrollPosition <= 0);
+  };
+
+  const handleTipoPetChange = (value: string) => {
+    console.log('Tipo de Pet changed to:', value);
+    setTipoPet(getValues('tipo_pet'));
   };
 
   useEffect(() => {
@@ -150,6 +192,151 @@ export function ProfilePets() {
     },
   ];
 
+  const racasCachorro = [
+    'Akita',
+    'Basset hound',
+    'Beagle',
+    'Bichon frisé',
+    'Boiadeiro australiano',
+    'Border collie',
+    'Boston terrier',
+    'Boxer Alto',
+    'Buldogue francês',
+    'Buldogue inglês',
+    'Bull terrier',
+    'Cane corso',
+    'Cavalier king',
+    'Chihuahua',
+    'Chow chow',
+    'Cocker spaniel',
+    'Dachshund',
+    'Dálmata',
+    'Doberman',
+    'Dogo argentino',
+    'Dogue alemão',
+    'Fila brasileiro',
+    'Golden retriever',
+    'Husky siberiano',
+    'Jack russell terrier',
+    'Labrador retriever',
+    'Lhasa apso',
+    'Lulu da pomerânia',
+    'Maltês',
+    'Mastiff',
+    'Mastim tibetano',
+    'Pastor alemão',
+    'Pastor australiano',
+    'Pastor de Shetland',
+    'Pequinês',
+    'Pinscher',
+    'Pit bull',
+    'Poodle',
+    'Pug',
+    'Rottweiler',
+    'Schnauzer',
+    'Shar-pei',
+    'Shiba',
+    'Shih tzu',
+    'Staffordshire bull terrier',
+    'Weimaraner',
+    'Yorkshire',
+  ];
+
+  const optionsRacasCachorro = racasCachorro.map(raca => ({
+    label: raca,
+    value: raca,
+  }));
+
+  const racasGato = [
+    'Abissínio',
+    'Angorá turco',
+    'Asiático de Pelo Semi-Longo',
+    'Azul Russo',
+    'Balinês Balinese',
+    'Bambino',
+    'Bicolor Oriental',
+    'Bobtail americano',
+    'Bobtail japonês',
+    'Bombaim',
+    'Burmês',
+    'Burmila',
+    'California Spangled',
+    'Cingapura',
+    'Chartreux',
+    'Chausie',
+    'Colorpoint de pelo curto',
+    'Cornish Rex',
+    'Curl Americano',
+    'Devon Rex',
+    'Donskoy Donskoy',
+    'Dragon Li',
+    'Egeu',
+    'Gato-de-Bengala',
+    'Gato do Chipre',
+    'Exótico',
+    'Gato asiático',
+    'Gato Siberiano',
+    'Havana marrom',
+    'Himalaio',
+    'Javanês',
+    'Korat',
+    'Khao Manee',
+    'Kurilian Bobtail',
+    'LaPerml LaPerm',
+    'Levkoy ucraniano',
+    'Lykoi',
+    'Maine Coon',
+    'Manx',
+    'Manx de pelo longo',
+    'Mau Árabe',
+    'Mau egípcio',
+    'Minskin',
+    'Mist Australiano',
+    'Munchkin',
+    'Nebelung',
+    'Norueguês da Floresta',
+    'Ocicat',
+    'Ojos Azules',
+    'Oregon Rex',
+    'Pelo curto americano',
+    'Pelo curto brasileiro',
+    'Pelo curto Europeu',
+    'Pelo curto inglês',
+    'Pelo longo Inglês',
+    'Pelo curto Oriental',
+    'Pelo longo Oriental',
+    'Persa',
+    'Peterbald',
+    'Pixie-bob',
+    'Raas',
+    'Ragamuffin',
+    'Ragdoll',
+    'Rex Alemão',
+    'Sagrado da Birmânia',
+    'Savannah',
+    'Scottish Fold',
+    'Selkirk Rex',
+    'Serengeti',
+    'Siamês',
+    'Singapura',
+    'Snowshoe',
+    'Sokoke',
+    'Somali',
+    'Sphynx',
+    'Suphalak',
+    'Thai',
+    'Tiffany-Chantilly',
+    'Tonquinês',
+    'Toyger',
+    'Van Turco',
+    'Wirehair Americano',
+  ];
+
+  const optionsRacasGato = racasGato.map(raca => ({
+    label: raca,
+    value: raca,
+  }));
+
   return (
     <View>
       <ScrollView onScroll={onScroll}>
@@ -178,6 +365,18 @@ export function ProfilePets() {
                     <Text variant="bodyLarge">
                       Alergias: {pet.infoMedica?.alergias}
                     </Text>
+                    <View style={{marginTop: 20, marginBottom: 10}}>
+                      <Button icon="pencil" mode="text">
+                        Editar
+                      </Button>
+                      <Button
+                        icon="close-circle-outline"
+                        mode="text"
+                        style={styles.buttonRemover}
+                        onPress={() => showConfirmModal(pet.id)}>
+                        Remover
+                      </Button>
+                    </View>
                   </Card.Content>
                 </Collapsible>
               </Card>
@@ -222,16 +421,34 @@ export function ProfilePets() {
               name={'tipo_pet'}
               options={tiposAnimais}
               label={'Tipo de Pet'}
+              onValueChange={handleTipoPetChange}
             />
-            <ControlTextInput
-              name={'raca'}
-              label={'Raça'}
-              mode={'outlined'}
-              control={control}
-              rules={{required: 'Raça de pet Obrigatório'}}
-              style={styles.input}
-              secureTextEntry={false}
-            />
+            {tipoPet === 'Cachorro' ? (
+              <ControlSelectInput
+                control={control}
+                name={'raca'}
+                options={optionsRacasCachorro}
+                label={'Raça de Cachorro'}
+              />
+            ) : tipoPet === 'Gato' ? (
+              <ControlSelectInput
+                control={control}
+                name={'raca'}
+                options={optionsRacasGato}
+                label={'Raça de Gato'}
+              />
+            ) : (
+              <ControlTextInput
+                name={'raca'}
+                label={'Raça'}
+                mode={'outlined'}
+                control={control}
+                rules={{required: 'Raça de pet Obrigatório'}}
+                style={styles.input}
+                secureTextEntry={false}
+              />
+            )}
+
             <ControlTextInput
               name={'cor'}
               label={'Cor'}
@@ -264,6 +481,28 @@ export function ProfilePets() {
               </Button>
             </View>
           </CustomModal>
+
+          <CustomModal
+            visible={visibleConfirmModal}
+            onDismiss={hideConfirmModal}
+            containerStyle={styles.containerConfirmStyle}>
+            <Text
+              variant="titleMedium"
+              style={[styles.textCenter, {marginBottom: 10}]}>
+              Tem certeza que quer remover este Pet?
+            </Text>
+            <View style={styles.divButtons}>
+              <Button mode="outlined" style={styles.button} onPress={deletePet}>
+                Sim
+              </Button>
+              <Button
+                mode="outlined"
+                style={styles.button}
+                onPress={hideConfirmModal}>
+                Não
+              </Button>
+            </View>
+          </CustomModal>
         </View>
       </ScrollView>
       <CustomFabButton
@@ -276,9 +515,9 @@ export function ProfilePets() {
       />
     </View>
   );
-}
+};
 
-export default ProfilePets;
+export default ProfilePetsScreen;
 
 const styles = StyleSheet.create<any>({
   cardContainer: {
@@ -298,7 +537,7 @@ const styles = StyleSheet.create<any>({
   },
   fabStyle: {
     bottom: 16,
-    right: 16,
+    right: 30,
     position: 'absolute',
     textColor: 'white',
     backgroundColor: '#5D6BB0',
@@ -324,6 +563,15 @@ const styles = StyleSheet.create<any>({
     alignSelf: 'center',
     padding: 15,
   },
+  containerConfirmStyle: {
+    backgroundColor: 'white',
+    gap: 5,
+    width: '80%',
+    borderRadius: 5,
+    height: 200,
+    alignSelf: 'center',
+    padding: 15,
+  },
   textCenter: {
     textAlign: 'center',
   },
@@ -334,6 +582,9 @@ const styles = StyleSheet.create<any>({
   },
   button: {
     color: '#5D6BB0',
+  },
+  buttonRemover: {
+    color: '#e03a10',
   },
   input: {
     width: '100%',
