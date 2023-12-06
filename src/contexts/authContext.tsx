@@ -13,6 +13,7 @@ import {useLoading} from './loadingContext';
 
 interface AuthContextType {
   userToken: string | null;
+  setUserToken: (token: string | null) => void;
   user: User | undefined;
   logIn: (dataFields: any) => Promise<boolean>;
   logOut: () => void;
@@ -27,7 +28,7 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 export const useAuthContext = () => {
   const context = useContext(AuthContext);
   if (context === undefined) {
-    throw new Error('useMyContext must be used within a MyProvider');
+    throw new Error('useAuthContext must be used within a MyProvider');
   }
 
   //console.log(context);
@@ -103,7 +104,6 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({children}) => {
               console.log(formatedUser);
               setUser(formatedUser);
               setUserToken(userTokenStored);
-              //navigationService.navigate('Home');
             }
           })
           .catch(err => {
@@ -114,6 +114,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({children}) => {
     } catch (err) {
       console.log(err);
       console.error('Token Expirado favor fazer login novamente');
+      stopLoading();
     } finally {
       stopLoading();
     }
@@ -124,7 +125,8 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({children}) => {
   }, []);
 
   return (
-    <AuthContext.Provider value={{userToken, user, logIn, logOut}}>
+    <AuthContext.Provider
+      value={{userToken, setUserToken, user, logIn, logOut}}>
       {children}
     </AuthContext.Provider>
   );

@@ -4,7 +4,6 @@ import React, {useEffect, useState} from 'react';
 import {Button, Card, Text} from 'react-native-paper';
 import {ScrollView, StyleSheet, View, Image} from 'react-native';
 import {useAuthContext} from '../../../contexts/authContext';
-import axiosInstance from '../../../utils/axiosIstance';
 import {
   Pet,
   ProfilePetsScreenNavigationProp,
@@ -17,20 +16,23 @@ import CustomFabButton from '../../../components/Buttons/CustomFabButton';
 import ControlTextInput from '../../../components/atoms/inputs/ControlTextInput';
 import ControlDateInput from '../../../components/atoms/inputs/ControlDateInput';
 import {useForm} from 'react-hook-form';
-import {useLoading} from '../../../contexts/loadingContext';
-import Toast from 'react-native-toast-message';
 import ControlSelectInput from '../../../components/atoms/inputs/ControlSelectInput';
+import {useLoading} from '../../../contexts/loadingContext';
+import axiosInstance from '../../../utils/axiosIstance';
+import LoadingOverlay from '../../../components/atoms/LoadingOverlay';
+import {useToast} from '../../../contexts/toastContext';
+import Toast from 'react-native-toast-message';
 
 const ProfilePetsScreen: React.FC<{
   navigation: ProfilePetsScreenNavigationProp;
 }> = ({navigation}) => {
-  const [pets, setPets] = useState<Pet[]>([]);
-  const [error, setError] = useState('');
+  let [pets, setPets] = useState<Pet[]>([]);
   const [visibleModal, setVisibleModal] = useState(false);
   const [visibleConfirmModal, setVisibleConfirmModal] = useState(false);
-  const {user, userToken} = useAuthContext();
+  const {user, userToken, setUserToken} = useAuthContext();
+  const {startLoading, stopLoading, isLoading} = useLoading();
+  const {showToast} = useToast();
   const [isExtended, setIsExtended] = useState(true);
-  const {startLoading, stopLoading} = useLoading();
   const [petSelected, setPetSelected] = useState<string>();
   const {control, handleSubmit, getValues} = useForm();
 
@@ -44,7 +46,7 @@ const ProfilePetsScreen: React.FC<{
   const hideConfirmModal = () => setVisibleConfirmModal(false);
 
   const [isCollapsed, setIsCollapsed] = useState(false);
-  const [tipoPet, setTipoPet] = useState<any>(getValues('tipo_pet'));
+  const [tipoPet, setTipoPet] = useState<string>('Cachorro');
 
   const getPetsByOwner = async () => {
     try {
@@ -59,30 +61,46 @@ const ProfilePetsScreen: React.FC<{
         if (response.status === 200) {
           const formatedPets: Pet[] = response.data;
           console.log('formatedPets', response.data);
-          formatedPets.forEach(pet => {
-            console.log(pet);
-          });
 
           setPets(formatedPets);
         } else if (response.status === 401) {
+          setUserToken(null);
         }
       } else {
-        setError('Nenhum pet cadastrado neste perfil.');
+        showToast('info', 'Nenhum pet cadastrado neste perfil.');
       }
     } catch (err) {
-      setError('Erro ao buscar pets de dono.');
-      console.log(err);
+      showToast('error', `Erro ${err} ao buscar pets de dono.`);
     } finally {
       stopLoading();
     }
   };
 
+  const formatAsyncDate = async (date: any) => {
+    if (!date) {
+      console.log('Undefined');
+      return 'Indefinido';
+    }
+
+    try {
+      // Attempt to format the date using moment
+      const formattedDate = moment(date).format('YYYY-MM-DD'); // Adjust the format as needed
+      console.log('Error formatting date:', formattedDate);
+      return formattedDate;
+    } catch (error) {
+      console.log('Error formatting date:', error);
+      console.error('Error formatting date:', error);
+      return 'Indefinido';
+    }
+  };
+
   const registerPet = async (formData: any) => {
     try {
+      startLoading();
       console.log('formData', formData);
       //console.log('user', user);
-      console.log('userToken', userToken);
-      console.log('user', user?.id);
+      //console.log('userToken', userToken);
+      //console.log('user', user?.id);
 
       const response = await axiosInstance.post(
         `/pets?id=${user?.id}`,
@@ -94,13 +112,13 @@ const ProfilePetsScreen: React.FC<{
         },
       );
 
-      console.log('pet response', response);
-
       hideModal();
       getPetsByOwner();
     } catch (err) {
       hideModal();
-      console.error(err);
+      showToast('error', `Erro ${err} ao Registrar novo Pet`);
+    } finally {
+      stopLoading();
     }
   };
 
@@ -114,20 +132,15 @@ const ProfilePetsScreen: React.FC<{
         },
       });
       if (response.status === 200) {
-        Toast.show({
-          type: 'success',
-          text1: 'Pet Deletado com sucesso',
-          visibilityTime: 4000,
-          onPress() {
-            Toast.hide();
-          },
-        });
-
+        showToast('success', 'Pet Deletado com sucesso');
         hideConfirmModal();
         getPetsByOwner();
+      } else if (response.status === 401) {
+        showToast('error', 'Token Expirado, favor facer Login novamente');
+        setUserToken(null);
       }
     } catch (err) {
-      setError('Erro ao buscar pets de dono.');
+      showToast('error', 'Erro ao buscar pets de dono.');
       console.log(err);
     } finally {
       stopLoading();
@@ -136,10 +149,6 @@ const ProfilePetsScreen: React.FC<{
 
   const toggleModal = () => {
     setVisibleModal(!visibleModal);
-  };
-
-  const toggleConfirmModal = () => {
-    setVisibleModal(!visibleConfirmModal);
   };
 
   const onScroll = ({nativeEvent}: any) => {
@@ -354,10 +363,7 @@ const ProfilePetsScreen: React.FC<{
                     <Text variant="bodyLarge">Tipo: {pet.tipo_pet}</Text>
                     <Text variant="bodyLarge">Raça: {pet.raca}</Text>
                     <Text variant="bodyLarge">
-                      Data Nasc.:
-                      {moment(new Date(pet.dataNascimento)).format(
-                        'DD/MM/YYYY',
-                      )}
+                      Data Nasc.: {pet.dataNascimento}
                     </Text>
                     <Text variant="bodyLarge">
                       Tipo Sanguíneo: {pet.infoMedica?.tipoSanguineo}
@@ -387,7 +393,7 @@ const ProfilePetsScreen: React.FC<{
                 style={styles.sadDoge}
                 source={require('../../../assets/images/sadDoge.webp')}
               />
-              <Text>{error}</Text>
+              <Text>Nenhum Pet Cadastrado</Text>
               <Button
                 icon="plus"
                 mode="contained"
@@ -460,6 +466,93 @@ const ProfilePetsScreen: React.FC<{
             />
             <ControlDateInput
               control={control}
+              rules={{required: 'Data de Nascimento Obrigatória'}}
+              label={'Data de Nasc.'}
+              name={'data_nascimento'}
+              mode={'outlined'}
+            />
+
+            <ControlSelectInput
+              control={control}
+              name={'sexo'}
+              options={sexoAnimais}
+              label={'Sexo de Pet'}
+              style={{borderWidth: 2, borderColor: 'black'}}
+            />
+            <View style={styles.divButtons}>
+              <Button
+                icon="plus"
+                mode="outlined"
+                style={styles.button}
+                onPress={handleSubmit(registerPet)}>
+                Registrar Item
+              </Button>
+            </View>
+          </CustomModal>
+
+          <CustomModal
+            visible={visibleModal}
+            onDismiss={hideModal}
+            containerStyle={styles.containerStyle}>
+            <Text
+              variant="titleMedium"
+              style={[styles.textCenter, {marginBottom: 10}]}>
+              Cadastro de Pet
+            </Text>
+            <ControlTextInput
+              name={'nome'}
+              label={'Nome'}
+              mode={'outlined'}
+              control={control}
+              rules={{required: 'Nome de Pet Obrigatório'}}
+              style={styles.input}
+              secureTextEntry={false}
+            />
+            <ControlSelectInput
+              control={control}
+              name={'tipo_pet'}
+              options={tiposAnimais}
+              label={'Tipo de Pet'}
+              onValueChange={handleTipoPetChange}
+            />
+            {tipoPet === 'Cachorro' ? (
+              <ControlSelectInput
+                control={control}
+                name={'raca'}
+                options={optionsRacasCachorro}
+                label={'Raça de Cachorro'}
+              />
+            ) : tipoPet === 'Gato' ? (
+              <ControlSelectInput
+                control={control}
+                name={'raca'}
+                options={optionsRacasGato}
+                label={'Raça de Gato'}
+              />
+            ) : (
+              <ControlTextInput
+                name={'raca'}
+                label={'Raça'}
+                mode={'outlined'}
+                control={control}
+                rules={{required: 'Raça de pet Obrigatório'}}
+                style={styles.input}
+                secureTextEntry={false}
+              />
+            )}
+
+            <ControlTextInput
+              name={'cor'}
+              label={'Cor'}
+              mode={'outlined'}
+              control={control}
+              rules={{required: 'Cor de pet Obrigatório'}}
+              style={styles.input}
+              secureTextEntry={false}
+            />
+            <ControlDateInput
+              control={control}
+              rules={{required: 'Data de Nascimento Obrigatória'}}
               label={'Data de Nasc.'}
               name={'data_nascimento'}
               mode={'outlined'}
@@ -513,6 +606,9 @@ const ProfilePetsScreen: React.FC<{
         label={'Add Pet'}
         animateFrom={'right'}
       />
+      {isLoading ? <LoadingOverlay /> : <Text children={undefined} />}
+      <Text style={{color: 'red', textAlign: 'center'}}>{}</Text>
+      <Toast />
     </View>
   );
 };

@@ -14,6 +14,9 @@ import ControlTextInput from '../../components/atoms/inputs/ControlTextInput';
 import axiosInstance from '../../utils/axiosIstance';
 import {useAuthContext} from '../../contexts/authContext';
 import ControlDateInput from '../../components/atoms/inputs/ControlDateInput';
+import Toast from 'react-native-toast-message';
+import LoadingOverlay from '../../components/atoms/LoadingOverlay';
+import {useLoading} from '../../contexts/loadingContext';
 
 const HistoricoScreen: React.FC<{
   navigation: HistoricoScreenNavigationProp;
@@ -38,6 +41,7 @@ const HistoricoScreen: React.FC<{
     new Date().getMonth() + 1,
   );
   const [dateFromCalendar, setDateFromCalendar] = useState<Date>();
+  const {startLoading, stopLoading, isLoading} = useLoading();
 
   const onScroll = ({nativeEvent}: any) => {
     const currentScrollPosition =
@@ -46,7 +50,7 @@ const HistoricoScreen: React.FC<{
     setIsExtended(currentScrollPosition <= 0);
   };
 
-  const getDespesas = async () => {
+  /* const getDespesas = async () => {
     try {
       await axiosInstance
         .get(`/despesa/${user?.id}`, {
@@ -70,7 +74,7 @@ const HistoricoScreen: React.FC<{
     } catch (err) {
       console.log(err);
     }
-  };
+  }; */
 
   const getDespesasByMonth = async () => {
     try {
@@ -114,7 +118,35 @@ const HistoricoScreen: React.FC<{
     getDespesasByMonth();
   };
 
-  const registerDespesa = async () => {};
+  const registerDespesa = async () => {
+    Toast.show({
+      type: 'success',
+      text1: 'Despesa cadastrada com sucesso',
+      onPress() {
+        Toast.hide();
+      },
+    });
+  };
+
+  const deleteDespesa = async () => {
+    Toast.show({
+      type: 'success',
+      text1: 'Despesa deletada com sucesso',
+      onPress() {
+        Toast.hide();
+      },
+    });
+  };
+
+  const editDespesa = async () => {
+    Toast.show({
+      type: 'success',
+      text1: 'Despesa alterada com sucesso',
+      onPress() {
+        Toast.hide();
+      },
+    });
+  };
 
   useEffect(() => {
     setPage(0);
@@ -155,7 +187,7 @@ const HistoricoScreen: React.FC<{
                 R$ {despesa.valor}
               </DataTable.Cell>
               <DataTable.Cell style={{flex: 1}}>
-                {moment(despesa.dataDespesa).format('DD/MM/YYYY')}
+                {/* {moment(despesa.dataDespesa).format('DD/MM/YYYY')} */}
               </DataTable.Cell>
             </DataTable.Row>
           ))}
@@ -178,7 +210,7 @@ const HistoricoScreen: React.FC<{
             style={styles.sadDoge}
             source={require('../../assets/images/sadDoge.webp')}
           />
-          <Text>{error}</Text>
+          <Text>Nenhuma despesa cadastrada.</Text>
         </View>
       )}
       <CustomModal
@@ -231,6 +263,10 @@ const HistoricoScreen: React.FC<{
         label={'Add Despesa'}
         animateFrom={'left'}
       />
+
+      {isLoading ? <LoadingOverlay /> : <Text children={undefined} />}
+      <Text style={{color: 'red', textAlign: 'center'}}>{}</Text>
+      <Toast />
     </ScrollView>
   );
 };

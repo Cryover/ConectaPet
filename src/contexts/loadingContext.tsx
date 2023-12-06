@@ -24,10 +24,12 @@ export const LoadingProvider: React.FC<LoadingProviderProps> = ({children}) => {
   const [isLoading, setLoading] = useState(false);
 
   const startLoading = () => {
+    console.log('isLoading', isLoading);
     setLoading(true);
   };
 
   const stopLoading = () => {
+    console.log('isLoading', isLoading);
     setLoading(false);
   };
 

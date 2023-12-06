@@ -6,6 +6,7 @@ import {LoadingProvider} from './src/contexts/loadingContext';
 import {NavigationContainer} from '@react-navigation/native';
 import {registerTranslation} from 'react-native-paper-dates';
 import navigationService from './src/services/navigationService';
+import {ToastProvider} from './src/contexts/toastContext';
 //import {Provider} from 'react-redux';
 //import store from './store/store';
 
@@ -41,11 +42,13 @@ export default function App() {
         navigationService.setTopLevelNavigator(navigatorRef);
       }}>
       <PaperProvider>
-        <LoadingProvider>
-          <AuthProvider>
-            <Navigation />
-          </AuthProvider>
-        </LoadingProvider>
+        <ToastProvider>
+          <LoadingProvider>
+            <AuthProvider>
+              <Navigation />
+            </AuthProvider>
+          </LoadingProvider>
+        </ToastProvider>
       </PaperProvider>
     </NavigationContainer>
   );

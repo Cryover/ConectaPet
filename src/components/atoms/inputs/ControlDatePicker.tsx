@@ -3,11 +3,18 @@ import React, {useState, useCallback} from 'react';
 import {View} from 'react-native';
 import {Button} from 'react-native-paper';
 import {DatePickerModal} from 'react-native-paper-dates';
-import {Control, Controller, FieldValues, useForm} from 'react-hook-form';
+import {
+  Control,
+  Controller,
+  FieldValues,
+  RegisterOptions,
+  useForm,
+} from 'react-hook-form';
 
 interface CustomControlDatePickerProps {
   mode: 'single' | 'range' | 'multiple';
   control: Control<FieldValues>;
+  rules?: RegisterOptions<FieldValues, string> | undefined;
   name: string;
   defaultValue?: string;
   //style: StyleProp<TextStyle | ViewStyle>;
@@ -15,6 +22,7 @@ interface CustomControlDatePickerProps {
 
 const ControlDatePicker: React.FC<CustomControlDatePickerProps> = ({
   control,
+  rules,
   mode,
   name,
   defaultValue,
@@ -52,6 +60,7 @@ const ControlDatePicker: React.FC<CustomControlDatePickerProps> = ({
       {mode === 'single' && (
         <Controller
           control={control}
+          rules={rules}
           render={({field}) => (
             <DatePickerModal
               locale="pt"

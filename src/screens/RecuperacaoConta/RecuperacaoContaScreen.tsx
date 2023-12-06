@@ -1,5 +1,5 @@
 import React from 'react';
-import {Image, StyleSheet, View } from 'react-native';
+import {Image, StyleSheet, View} from 'react-native';
 import {Button} from 'react-native-paper';
 import {RecuperacaoContaScreenNavigationProp} from '../../types/types';
 import ControlTextInput from '../../components/atoms/inputs/ControlTextInput';

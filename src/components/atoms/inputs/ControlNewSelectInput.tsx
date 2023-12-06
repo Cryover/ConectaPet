@@ -1,17 +1,11 @@
 import React from 'react';
 import {View, Text, StyleProp, TextStyle, ViewStyle} from 'react-native';
 import {Picker} from '@react-native-picker/picker';
-import {
-  Control,
-  Controller,
-  FieldValues,
-  RegisterOptions,
-} from 'react-hook-form';
+import {Control, Controller, FieldValues} from 'react-hook-form';
 import {SelectOptionEntry} from '../../../types/types';
 
-interface ControlSelectInputProps {
+interface ControlNewSelectInputProps {
   control: Control<FieldValues>;
-  rules?: RegisterOptions<FieldValues, string> | undefined;
   name: string;
   label: string;
   options: SelectOptionEntry[];
@@ -19,9 +13,8 @@ interface ControlSelectInputProps {
   onValueChange?: (value: any) => void;
 }
 
-const ControlSelectInput: React.FC<ControlSelectInputProps> = ({
+const ControlNewSelectInput: React.FC<ControlNewSelectInputProps> = ({
   control,
-  rules,
   name,
   label,
   options,
@@ -33,7 +26,6 @@ const ControlSelectInput: React.FC<ControlSelectInputProps> = ({
       <Text>{label}</Text>
       <Controller
         control={control}
-        rules={rules}
         render={({field}) => (
           <Picker
             selectedValue={field.value}
@@ -57,4 +49,4 @@ const ControlSelectInput: React.FC<ControlSelectInputProps> = ({
   );
 };
 
-export default ControlSelectInput;
+export default ControlNewSelectInput;

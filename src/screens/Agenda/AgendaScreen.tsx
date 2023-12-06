@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable @typescript-eslint/no-shadow */
 import React, {useEffect, useState} from 'react';
@@ -10,9 +11,13 @@ import {useForm} from 'react-hook-form';
 import ControlTextInput from '../../components/atoms/inputs/ControlTextInput';
 import moment from 'moment';
 import {useAuthContext} from '../../contexts/authContext';
-import axiosInstance from '../../utils/axiosIstance';
 import {AgendaScreenNavigationProp, Compromisso} from '../../types/types';
 import ControlDateInput from '../../components/atoms/inputs/ControlDateInput';
+import axiosInstance from '../../utils/axiosIstance';
+import Toast from 'react-native-toast-message';
+import LoadingOverlay from '../../components/atoms/LoadingOverlay';
+import {useLoading} from '../../contexts/loadingContext';
+//import Toast from 'react-native-toast-message';
 
 const AgendaScreen: React.FC<{navigation: AgendaScreenNavigationProp}> = ({
   navigation,
@@ -23,7 +28,6 @@ const AgendaScreen: React.FC<{navigation: AgendaScreenNavigationProp}> = ({
     numberOfItemsPerPageList[0],
   );
   const {control, handleSubmit} = useForm();
-  const [error, setError] = useState<string>();
   const [compromissos, setCompromissos] = useState<Compromisso[]>([]);
   const [dateFromCalendar, setDateFromCalendar] = useState<Date>();
 
@@ -35,6 +39,7 @@ const AgendaScreen: React.FC<{navigation: AgendaScreenNavigationProp}> = ({
   const [currentMonth, setCurrentMonth] = useState<number>(
     new Date().getMonth() + 1,
   );
+  const {startLoading, stopLoading, isLoading} = useLoading();
 
   const showModal = () => setVisibleModal(true);
   const hideModal = () => setVisibleModal(false);
@@ -91,8 +96,6 @@ const AgendaScreen: React.FC<{navigation: AgendaScreenNavigationProp}> = ({
           console.log(err);
           if (err.status === 401) {
             navigation.navigate('Login');
-          } else {
-            setError('Nenhum compromisso cadastrado.');
           }
         });
     } catch (err) {
@@ -212,7 +215,7 @@ const AgendaScreen: React.FC<{navigation: AgendaScreenNavigationProp}> = ({
               style={styles.sadDoge}
               source={require('../../assets/images/sadDoge.webp')}
             />
-            <Text>{error}</Text>
+            <Text>Nenhum compromisso cadastrado</Text>
           </View>
         )}
       </ScrollView>
@@ -241,6 +244,14 @@ const AgendaScreen: React.FC<{navigation: AgendaScreenNavigationProp}> = ({
           mode={'outlined'}
           initialValue={dateFromCalendar ? dateFromCalendar : undefined}
         />
+        {/* <ControlTextInput
+          name={'ids_pets'}
+          label={'Nome'}
+          control={control}
+          rules={{required: 'Título de compromisso é Obrigatório'}}
+          style={styles.input}
+          secureTextEntry={false}
+        /> */}
         <ControlTextInput
           name={'descricao'}
           label={'Descrição'}
@@ -268,6 +279,9 @@ const AgendaScreen: React.FC<{navigation: AgendaScreenNavigationProp}> = ({
         label={'Add Compromisso'}
         animateFrom={'left'}
       />
+      {isLoading ? <LoadingOverlay /> : <Text children={undefined} />}
+      <Text style={{color: 'red', textAlign: 'center'}}>{}</Text>
+      <Toast />
     </>
   );
 };

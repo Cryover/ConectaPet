@@ -39,7 +39,7 @@ export type Pet = {
   tipo_pet: string;
   idade: number;
   imagem?: string; // Testar o type do dado
-  dataNascimento: Date;
+  dataNascimento: any;
   raca: string;
   infoMedica?: InfoMedica;
 };
@@ -49,7 +49,7 @@ export type Compromisso = {
   titulo: string;
   tipo_compromisso: string;
   petsParticipantes?: Pet[];
-  data: Date;
+  data: Date | string;
   descricao: string;
 };
 
@@ -62,7 +62,7 @@ export type Despesa = {
   id: string;
   nome: string;
   valor: number;
-  dataDespesa: string;
+  data: Date | string;
 };
 
 export type SelectOptionEntry = {

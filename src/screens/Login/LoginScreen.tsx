@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable react/self-closing-comp */
 import React, {useState} from 'react';
 import {Image, StyleSheet, View} from 'react-native';
@@ -10,6 +11,7 @@ import {useForm} from 'react-hook-form';
 import LoadingOverlay from '../../components/atoms/LoadingOverlay';
 import ControlTextInput from '../../components/atoms/inputs/ControlTextInput';
 import axiosInstance from '../../utils/axiosIstance';
+import {useToast} from '../../contexts/toastContext';
 
 const LoginScreen: React.FC<{navigation: LoginScreenNavigationProp}> = ({
   navigation,
@@ -17,6 +19,7 @@ const LoginScreen: React.FC<{navigation: LoginScreenNavigationProp}> = ({
   const [error, setError] = useState('');
   const {logIn} = useAuthContext();
   const {startLoading, stopLoading, isLoading} = useLoading();
+  const {showToast} = useToast();
   const {control, handleSubmit} = useForm();
 
   const onLoginPressed = async (dataFields: any) => {
@@ -27,6 +30,10 @@ const LoginScreen: React.FC<{navigation: LoginScreenNavigationProp}> = ({
       //console.log('response', response.statusText);
       const newResponde: UserInfoResponse = response.data;
 
+      const formattedName =
+        newResponde.usuario.nome.charAt(0).toUpperCase() +
+        newResponde.usuario.nome.slice(1);
+
       const teste = await logIn(dataFields);
       console.log(teste);
       if (teste) {
@@ -36,6 +43,12 @@ const LoginScreen: React.FC<{navigation: LoginScreenNavigationProp}> = ({
           JSON.stringify(newResponde.usuario),
         );
         stopLoading();
+        showToast(
+          'info',
+          `Bem-vindo(a) Tutor(a) ${
+            formattedName ? formattedName : newResponde.usuario.username
+          }`,
+        );
         navigation.navigate('Home');
       } else {
         setError('Nome do usuário ou senha incorreto.\n Tente novamente.');
@@ -81,7 +94,7 @@ const LoginScreen: React.FC<{navigation: LoginScreenNavigationProp}> = ({
         label="Senha"
       />
       {isLoading ? <LoadingOverlay /> : <Text children={undefined}></Text>}
-      <Text style={{color: 'red', textAlign: 'center'}}>{error}</Text>
+      <Text style={{color: 'red', textAlign: 'center'}}>{}</Text>
 
       <Text
         style={styles.links}

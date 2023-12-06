@@ -33,7 +33,7 @@ const GlobalStyles = StyleSheet.create({
   },
   textCenter: {
     textAlign: 'center',
-  }
+  },
 });
 
 export default GlobalStyles;

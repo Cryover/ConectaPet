@@ -52,7 +52,7 @@ const ControlAutoCompleteInput: React.FC<ControlAutoCompleteInputProps> = ({
               placeholder={placeholder}
               flatListProps={{
                 keyboardShouldPersistTaps: 'always',
-                keyExtractor: item => item.value,
+                keyExtractor: item => item.id,
                 renderItem: ({item}) => (
                   <TouchableOpacity onPress={() => setQuery(item.label)}>
                     <Text style={styles.itemText}>{item.label}</Text>
