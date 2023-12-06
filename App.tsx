@@ -7,10 +7,19 @@ import {NavigationContainer} from '@react-navigation/native';
 import {registerTranslation} from 'react-native-paper-dates';
 import navigationService from './src/services/navigationService';
 import {ToastProvider} from './src/contexts/toastContext';
+import {light_theme, dark_theme} from './src/themes/Theme';
+import {useColorScheme} from 'react-native';
 //import {Provider} from 'react-redux';
 //import store from './store/store';
 
 export default function App() {
+  const colorScheme = useColorScheme();
+
+  const paperTheme =
+    colorScheme === 'dark'
+      ? {dark_theme, colors: dark_theme.colors}
+      : {light_theme, colors: light_theme.colors};
+
   const setTranslationRegistration = () => {
     registerTranslation('pt', {
       save: 'Salvar',
@@ -41,7 +50,7 @@ export default function App() {
       ref={navigatorRef => {
         navigationService.setTopLevelNavigator(navigatorRef);
       }}>
-      <PaperProvider>
+      <PaperProvider theme={paperTheme}>
         <ToastProvider>
           <LoadingProvider>
             <AuthProvider>

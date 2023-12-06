@@ -2,7 +2,7 @@ import {MD3LightTheme as LightTheme} from 'react-native-paper';
 import {MD3DarkTheme as DarkTheme} from 'react-native-paper';
 import {transparent} from 'react-native-paper/lib/typescript/styles/themes/v2/colors';
 
-const light_theme = {
+export const light_theme = {
   ...LightTheme,
   colors: {
     primary: 'rgb(82, 86, 169)',
@@ -56,7 +56,7 @@ const light_theme = {
   },
 };
 
-const dark_theme = {
+export const dark_theme = {
   ...DarkTheme,
   colors: {
     primary: 'rgb(192, 193, 255)',
@@ -109,5 +109,3 @@ const dark_theme = {
     onQuinaryContainer: 'rgb(173, 236, 255)',
   },
 };
-
-export default {light_theme, dark_theme};
