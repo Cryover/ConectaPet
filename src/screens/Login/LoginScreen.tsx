@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable react/self-closing-comp */
 import React, {useState} from 'react';
 import {Image, StyleSheet, View} from 'react-native';
@@ -51,11 +50,15 @@ const LoginScreen: React.FC<{navigation: LoginScreenNavigationProp}> = ({
         );
         navigation.navigate('Home');
       } else {
+        showToast(
+          'error',
+          'Nome do usuário ou senha incorreto. Tente novamente.',
+        );
         setError('Nome do usuário ou senha incorreto.\n Tente novamente.');
       }
     } catch (err) {
-      console.log(err);
-      setError('ERRO 500 - Erro interno no servidor.');
+      showToast('error', `${err}`);
+      setError('Usuário não cadastrado.');
     } finally {
       stopLoading();
     }
@@ -93,8 +96,8 @@ const LoginScreen: React.FC<{navigation: LoginScreenNavigationProp}> = ({
         secureTextEntry={true}
         label="Senha"
       />
+      <Text style={{color: 'red', textAlign: 'center'}}>{error}</Text>
       {isLoading ? <LoadingOverlay /> : <Text children={undefined}></Text>}
-      <Text style={{color: 'red', textAlign: 'center'}}>{}</Text>
 
       <Text
         style={styles.links}

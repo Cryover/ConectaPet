@@ -25,3 +25,7 @@ export const RenderDashboardTabBarIcon = ({color}: ColorProps) => (
 export const RenderPerfilTabBarIcon = ({color}: ColorProps) => (
   <MaterialCommunityIcons name="dog" color={color} size={26} />
 );
+
+export const RenderPerfilTutorTabBarIcon = ({color}: ColorProps) => (
+  <MaterialCommunityIcons name="account-circle" color={color} size={26} />
+);

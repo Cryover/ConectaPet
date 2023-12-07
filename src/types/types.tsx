@@ -20,7 +20,7 @@ export interface User {
   senha: string;
   id: string;
   tipo_usuario: string;
-  criado_em: Date;
+  criado_em: string;
 }
 
 export interface UserInfoResponse {
@@ -37,10 +37,12 @@ export type Pet = {
   id: string;
   nome: string;
   tipo_pet: string;
+  raca: string;
+  sexo: string;
+  cor: string;
   idade: number;
   imagem?: string; // Testar o type do dado
-  dataNascimento: any;
-  raca: string;
+  data_nascimento: string;
   infoMedica?: InfoMedica;
 };
 
@@ -79,6 +81,7 @@ export type RootStackParamList = {
   Agenda: undefined;
   ProfileDono: undefined;
   ProfilePets: undefined;
+  Dashboard: undefined;
 };
 
 export type LoginScreenNavigationProp = NativeStackNavigationProp<
@@ -114,4 +117,9 @@ export type ProfileDonoScreenNavigationProp = NativeStackNavigationProp<
 export type ProfilePetsScreenNavigationProp = NativeStackNavigationProp<
   RootStackParamList,
   'ProfilePets'
+>;
+
+export type DashboardScreenNavigationProp = NativeStackNavigationProp<
+  RootStackParamList,
+  'Dashboard'
 >;

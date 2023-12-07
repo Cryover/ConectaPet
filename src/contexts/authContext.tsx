@@ -10,11 +10,13 @@ import {User} from '../types/types';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import axiosInstance from '../utils/axiosIstance';
 import {useLoading} from './loadingContext';
+import {useToast} from './toastContext';
 
 interface AuthContextType {
   userToken: string | null;
   setUserToken: (token: string | null) => void;
   user: User | undefined;
+  setUser: (user: User | undefined) => void;
   logIn: (dataFields: any) => Promise<boolean>;
   logOut: () => void;
 }
@@ -39,6 +41,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({children}) => {
   const [user, setUser] = useState<User>();
   const [userToken, setUserToken] = useState<string | null>(null);
   const {startLoading, stopLoading} = useLoading();
+  const {showToast} = useToast();
 
   const logIn = async (dataFields: any) => {
     try {
@@ -72,6 +75,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({children}) => {
       setUserToken(null);
       await AsyncStorage.removeItem('userStored');
       await AsyncStorage.removeItem('userToken');
+      showToast('success', 'Deslogado com sucesso');
     } catch (err) {
       console.error('Erro ao remover userStored e UserToken:', err);
     }
@@ -113,7 +117,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({children}) => {
       }
     } catch (err) {
       console.log(err);
-      console.error('Token Expirado favor fazer login novamente');
+      showToast('error', 'Token Expirado, favor fazer login novamente');
       stopLoading();
     } finally {
       stopLoading();
@@ -126,7 +130,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({children}) => {
 
   return (
     <AuthContext.Provider
-      value={{userToken, setUserToken, user, logIn, logOut}}>
+      value={{userToken, setUserToken, user, setUser, logIn, logOut}}>
       {children}
     </AuthContext.Provider>
   );

@@ -19,6 +19,7 @@ import {
   RenderDashboardTabBarIcon,
   RenderHistoricoTabBarIcon,
   RenderPerfilTabBarIcon,
+  RenderPerfilTutorTabBarIcon,
 } from '../../components/molecules/MaterialCommunityIcons/MaterialCommunityIcons';
 import {HomeScreenNavigationProp, Pet} from '../../types/types';
 import AgendaScreen from '../Agenda/AgendaScreen';
@@ -26,6 +27,10 @@ import CustomModal from '../../components/Modal/CustomModal';
 import ControlTextInput from '../../components/atoms/inputs/ControlTextInput';
 import {useForm} from 'react-hook-form';
 import ProfilePetsScreen from '../Profile/ProfilePets/ProfilePets';
+import {useToast} from '../../contexts/toastContext';
+import ProfileDonoScreen from '../Profile/ProfileDono/ProfileDonoScreen';
+import navigationService from '../../services/navigationService';
+import DashboardScreen from '../Dashboard/Dashboard';
 
 const HomeScreen: React.FC<{navigation: HomeScreenNavigationProp}> = ({
   navigation,
@@ -44,13 +49,15 @@ const HomeScreen: React.FC<{navigation: HomeScreenNavigationProp}> = ({
   const [visibleModal, setVisibleModal] = useState(false);
   const showModal = () => setVisibleModal(true);
   const hideModal = () => setVisibleModal(false);
+  const {user, userToken, setUserToken} = useAuthContext();
+  const {showToast} = useToast();
 
   const logout = async () => {
     try {
       closeOptionsMenu();
       logOut();
+      showToast('success', 'Deslogado com sucesso');
       console.info('user & userToken removidos com sucesso.');
-      //navigation.navigate('Login');
     } catch (err) {
       console.error('Erro ao remover userToken:', err);
     }
@@ -69,6 +76,10 @@ const HomeScreen: React.FC<{navigation: HomeScreenNavigationProp}> = ({
     }
   };
 
+  const handleProfileDonoScreen = () => {
+    navigationService.navigate(ProfileDonoScreen);
+  };
+
   useEffect(() => {
     getChosenPet();
   }, []);
@@ -82,7 +93,7 @@ const HomeScreen: React.FC<{navigation: HomeScreenNavigationProp}> = ({
           visible={visibleMenu}
           onDismiss={closeOptionsMenu}
           anchor={<IconButton icon={MORE_ICON} onPress={openOptionsMenu} />}>
-          <Menu.Item title="Reportar Bug" onPress={showModal} />
+          {/* <Menu.Item title="Reportar Bug" /> */}
           <Menu.Item title="Logout" onPress={logout} />
         </Menu>
         <Menu
@@ -93,13 +104,17 @@ const HomeScreen: React.FC<{navigation: HomeScreenNavigationProp}> = ({
             <TouchableOpacity onPress={openPetOptionsMenu}>
               <Avatar.Image
                 size={40}
-                source={require('../../assets/images/avatar.webp')}
+                source={require('../../assets/images/default_profile_avatar.webp')}
               />
             </TouchableOpacity>
           }>
-          <Menu.Item title="Ver perfil de tutor" />
-          <Menu.Item title="Trocar de pet" />
-          <Menu.Item title="Definir como pet principal" />
+          <Menu.Item title={'Username: ' + user?.username} />
+          {/* <Menu.Item
+            title="Ver perfil de tutor"
+            onPress={handleProfileDonoScreen}
+          /> */}
+          {/* <Menu.Item title="Trocar de pet" /> */}
+          {/* <Menu.Item title="Definir como pet principal" /> */}
         </Menu>
       </Appbar.Header>
 
@@ -131,7 +146,7 @@ const HomeScreen: React.FC<{navigation: HomeScreenNavigationProp}> = ({
         />
         <Tab.Screen
           name="Dashboard"
-          component={Dashboard}
+          component={DashboardScreen}
           options={{
             title: 'Dashboard',
             tabBarLabel: 'Dasboard',
@@ -149,52 +164,17 @@ const HomeScreen: React.FC<{navigation: HomeScreenNavigationProp}> = ({
             tabBarIcon: RenderPerfilTabBarIcon,
           }}
         />
+        <Tab.Screen
+          name="PerfilTutor"
+          component={ProfileDonoScreen}
+          options={{
+            title: 'Tutor',
+            tabBarLabel: 'Tutor',
+            tabBarColor: '#54d6ed',
+            tabBarIcon: RenderPerfilTutorTabBarIcon,
+          }}
+        />
       </Tab.Navigator>
-      <CustomModal
-        visible={visibleModal}
-        onDismiss={hideModal}
-        containerStyle={styles.containerStyle}>
-        <Text
-          variant="titleMedium"
-          style={[styles.textCenter, {marginBottom: 10}]}>
-          Cadastro de Pet
-        </Text>
-        <ControlTextInput
-          name={'nome'}
-          label={'Nome'}
-          mode={'outlined'}
-          control={control}
-          rules={{required: 'Nome de Pet Obrigatório'}}
-          style={styles.input}
-          secureTextEntry={false}
-        />
-        <ControlTextInput
-          name={'raca'}
-          label={'Raça'}
-          mode={'outlined'}
-          control={control}
-          rules={{required: 'Raça de pet Obrigatório'}}
-          style={styles.input}
-          secureTextEntry={false}
-        />
-        <View style={styles.divButtons}>
-          <Button
-            icon="plus"
-            mode="outlined"
-            style={styles.button}
-            //onPress={handleSubmit(registerPet)}
-          >
-            Registrar Item
-          </Button>
-          <Button
-            icon="cancel"
-            mode="outlined"
-            style={styles.button}
-            onPress={hideModal}>
-            Cancelar
-          </Button>
-        </View>
-      </CustomModal>
     </>
   );
 };

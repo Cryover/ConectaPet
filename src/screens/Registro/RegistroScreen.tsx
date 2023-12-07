@@ -1,17 +1,17 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
-import React, {useState} from 'react';
-import {Image, SafeAreaView, StyleSheet, View} from 'react-native';
+import React from 'react';
+import {Image, StyleSheet, View} from 'react-native';
 import {Button} from 'react-native-paper';
 import {RegistroScreenNavigationProp, User} from '../../types/types';
 import {useForm} from 'react-hook-form';
 import ControlTextInput from '../../components/atoms/inputs/ControlTextInput';
 import axiosInstance from '../../utils/axiosIstance';
+import {useToast} from '../../contexts/toastContext';
 
 export const RegistroScreen: React.FC<{
   navigation: RegistroScreenNavigationProp;
 }> = ({navigation}) => {
   const {control, handleSubmit} = useForm();
-  const [error, setError] = useState('');
+  const {showToast} = useToast();
 
   const onRegisterPressed = async (dataFields: any) => {
     try {
@@ -21,14 +21,18 @@ export const RegistroScreen: React.FC<{
         .then(response => {
           const newUser: User = response.data;
           console.log('newUser', newUser);
-          console.info('Conta criada! Faça Login para poder acessar o app');
+          showToast(
+            'success',
+            'Conta criada! Faça Login para poder acessar o app',
+          );
           navigation.goBack();
         })
         .catch(err => {
           console.log(err);
-          setError('Erro ao cadastrar nova conta.');
+          showToast('error', `Erro ao cadastrar novo usuario - ${err}`);
         });
     } catch (err) {
+      showToast('error', `Erro ao cadastrar novo usuario - ${err}`);
       console.log(err);
     }
   };

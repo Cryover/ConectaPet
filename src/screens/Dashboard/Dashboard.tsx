@@ -7,6 +7,7 @@ import LoadingOverlay from '../../components/atoms/LoadingOverlay';
 import {useLoading} from '../../contexts/loadingContext';
 import axiosInstance from '../../utils/axiosIstance';
 import {useAuthContext} from '../../contexts/authContext';
+import {DashboardScreenNavigationProp} from '../../types/types';
 
 const dataLineChartPre = {
   labels: [
@@ -109,7 +110,9 @@ const pieChartConfig = {
   color: (opacity = 1) => `rgba(0, 0, 0, ${opacity})`,
 };
 
-const Dashboard = () => {
+const DashboardScreen: React.FC<{
+  navigation: DashboardScreenNavigationProp;
+}> = ({navigation}) => {
   const {startLoading, stopLoading, isLoading} = useLoading();
   const {user, userToken, setUserToken} = useAuthContext();
   const [dataLineChart, setDataLineChart] = useState();
@@ -129,6 +132,7 @@ const Dashboard = () => {
         if (response.status === 200) {
         } else if (response.status === 401) {
           setUserToken(null);
+          navigation.navigate('Login');
         }
       } else {
       }
@@ -193,7 +197,7 @@ const Dashboard = () => {
   );
 };
 
-export default Dashboard;
+export default DashboardScreen;
 
 export const screenWidth = Dimensions.get('window').width;
 export const screenHeight = Dimensions.get('window').height;
