@@ -1,12 +1,13 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import axios from 'axios';
-import {API_URL} from '@env';
+import {API_PROD_URL} from '@env';
 
 const axiosInstance = axios.create({
-  baseURL: API_URL,
+  baseURL: API_PROD_URL,
   headers: {
     'Content-Type': 'application/json',
   },
-  timeout: 5000, // 5 segundos
+  timeout: 20000, // 5 segundos
 });
 
 axiosInstance.interceptors.response.use(
@@ -26,11 +27,13 @@ axiosInstance.interceptors.response.use(
             : error.response.status,
         );
       }
-
+      console.log(`${statusMessage}`);
       return Promise.reject(statusMessage);
     } else if (error.request) {
+      console.log('Nenhuma resposta recebida');
       return Promise.reject('Nenhuma resposta recebida');
     } else {
+      console.log('Request falhou');
       return Promise.reject('Request falhou');
     }
   },

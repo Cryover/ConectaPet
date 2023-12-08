@@ -3,11 +3,7 @@ import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityI
 import {ColorProps} from '../../../types/types';
 
 export const RenderHistoricoTabBarIcon = ({color}: ColorProps) => (
-  <MaterialCommunityIcons
-    name="credit-card-clock-outline"
-    color={color}
-    size={26}
-  />
+  <MaterialCommunityIcons name="cash-fast" color={color} size={26} />
 );
 
 export const RenderAgendaTabBarIcon = ({color}: ColorProps) => (

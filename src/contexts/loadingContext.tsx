@@ -22,10 +22,16 @@ interface LoadingProviderProps {
 
 export const LoadingProvider: React.FC<LoadingProviderProps> = ({children}) => {
   const [isLoading, setLoading] = useState(false);
+  const timeoutMilliseconds = 50000;
 
   const startLoading = () => {
     //console.log('isLoading', isLoading);
     setLoading(true);
+    setTimeout(() => {
+      if (isLoading === true) {
+        setLoading(false);
+      }
+    }, timeoutMilliseconds);
   };
 
   const stopLoading = () => {

@@ -1,4 +1,5 @@
 import {NativeStackNavigationProp} from '@react-navigation/native-stack';
+import {ViewStyle, TextStyle} from 'react-native';
 
 export interface RootState {
   data: DataState;
@@ -11,6 +12,18 @@ export interface DataState {
   data: string | null;
   loading: boolean;
   error: string | null;
+}
+
+export interface MyStyles {
+  container: ViewStyle;
+  text: TextStyle;
+  textCenter: TextStyle;
+  scrollView: ViewStyle;
+  input: ViewStyle;
+  button: ViewStyle;
+  links: ViewStyle;
+  buttonRemover: ViewStyle;
+  // ... other styles
 }
 
 export interface User {
@@ -62,9 +75,12 @@ export type InfoMedica = {
 
 export type Despesa = {
   id: string;
+  id_dono: string;
   nome: string;
+  observacao: string;
+  id_pet: string;
   valor: number;
-  data: Date | string;
+  data: string;
 };
 
 export type SelectOptionEntry = {

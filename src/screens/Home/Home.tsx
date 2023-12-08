@@ -31,6 +31,7 @@ import {useToast} from '../../contexts/toastContext';
 import ProfileDonoScreen from '../Profile/ProfileDono/ProfileDonoScreen';
 import navigationService from '../../services/navigationService';
 import DashboardScreen from '../Dashboard/Dashboard';
+import Toast from 'react-native-toast-message';
 
 const HomeScreen: React.FC<{navigation: HomeScreenNavigationProp}> = ({
   navigation,
@@ -175,6 +176,7 @@ const HomeScreen: React.FC<{navigation: HomeScreenNavigationProp}> = ({
           }}
         />
       </Tab.Navigator>
+      <Toast />
     </>
   );
 };

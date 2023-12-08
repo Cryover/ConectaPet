@@ -1,3 +1,4 @@
+/* eslint-disable dot-notation */
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import * as React from 'react';
 import {Calendar, DateData, LocaleConfig} from 'react-native-calendars';
@@ -5,7 +6,7 @@ import {windowWidth} from '../../../styles/Style';
 import moment from 'moment';
 import {MarkedDates} from 'react-native-calendars/src/types';
 
-LocaleConfig.locales['pt-br'] = {
+LocaleConfig.locales['pt'] = {
   monthNames: [
     'Janeiro',
     'Fevereiro',
@@ -35,19 +36,19 @@ LocaleConfig.locales['pt-br'] = {
     'Dez',
   ],
   dayNames: [
+    'Domingo',
     'Segunda',
     'Terça',
     'Quarta',
     'Quinta',
     'Sexta',
     'Sábado',
-    'Domingo',
   ],
-  dayNamesShort: ['Seg.', 'Ter.', 'Qua.', 'Qui.', 'Sex.', 'Sab.', 'Dom.'],
+  dayNamesShort: ['Dom.', 'Seg.', 'Ter.', 'Qua.', 'Qui.', 'Sex.', 'Sab.'],
   today: 'Hoje',
 };
 
-LocaleConfig.defaultLocale = 'pt-br';
+LocaleConfig.defaultLocale = 'pt';
 
 interface CalendarioProps {
   onDayPress: (selectedDay: string) => void;
@@ -90,7 +91,8 @@ const Calendario: React.FC<CalendarioProps> = ({
           showMonthSelected(month);
         }}
         markedDates={markedDates}
-        firstDay={6}
+        firstDay={7}
+        //displayLoadingIndicator={true}
         enableSwipeMonths={true}
         style={{
           borderWidth: 1,
@@ -103,6 +105,7 @@ const Calendario: React.FC<CalendarioProps> = ({
             //
           }
         }
+        //current={new Date().toLocaleDateString()}
       />
     </>
   );

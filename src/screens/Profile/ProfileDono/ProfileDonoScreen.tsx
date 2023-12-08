@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import React, {useState} from 'react';
 import {StyleSheet, View} from 'react-native';
-import {Button, Card, Text} from 'react-native-paper';
+import {Button, Card, FAB, Text} from 'react-native-paper';
 import {useAuthContext} from '../../../contexts/authContext';
 import {useToast} from '../../../contexts/toastContext';
 import CustomModal from '../../../components/Modal/CustomModal';
@@ -134,7 +134,7 @@ export const ProfileDonoScreen: React.FC<{
     <View style={styles.cardContainer}>
       <Card key={user?.id} style={styles.card}>
         <Card.Cover
-          style={{width: 'auto'}}
+          style={{width: 'auto', height: 250}}
           source={require('../../../assets/images/default_profile_avatar.webp')}
         />
         <Card.Title
@@ -255,6 +255,7 @@ export const ProfileDonoScreen: React.FC<{
           </Button>
         </View>
       </CustomModal>
+      <FAB icon="refresh" style={styles.fab} onPress={() => getUserById()} />
       {isLoading ? <LoadingOverlay /> : <Text children={undefined} />}
       <Text style={{color: 'red', textAlign: 'center'}}>{}</Text>
       <Toast />
@@ -280,10 +281,11 @@ const styles = StyleSheet.create<any>({
     width: '90%',
     height: 'auto',
   },
-  fabStyle: {
-    bottom: 16,
-    right: 30,
+  fab: {
     position: 'absolute',
+    margin: 16,
+    right: 0,
+    bottom: 0,
     textColor: 'white',
     backgroundColor: '#5D6BB0',
   },

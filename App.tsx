@@ -7,6 +7,7 @@ import {NavigationContainer} from '@react-navigation/native';
 import {registerTranslation} from 'react-native-paper-dates';
 import navigationService from './src/services/navigationService';
 import {ToastProvider} from './src/contexts/toastContext';
+import {LocaleConfig} from 'react-native-calendars';
 /* import {light_theme, dark_theme} from './src/themes/Theme';
 import {useColorScheme} from 'react-native'; */
 //import {Provider} from 'react-redux';
@@ -39,6 +40,7 @@ export default function App() {
       pickDateFromCalendar: 'Selecione uma data do calendário',
       close: 'Fechar',
     });
+    LocaleConfig.defaultLocale = 'pt';
   };
 
   useEffect(() => {

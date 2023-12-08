@@ -109,3 +109,13 @@ export const dark_theme = {
     onQuinaryContainer: 'rgb(173, 236, 255)',
   },
 };
+
+export const agendaTheme = {
+  calendarBackground: 'white',
+  agendaKnobColor: '#5D6BB0',
+  dotColor: '#5D6BB0',
+  indicatorColor: '#5D6BB0',
+  selectedDayBackgroundColor: '#5D6BB0',
+  todayTextColor: '#5D6BB0',
+  agendaTodayColor: '#5D6BB0',
+};

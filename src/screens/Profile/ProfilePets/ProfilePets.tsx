@@ -1,8 +1,15 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import React, {useEffect, useState} from 'react';
-import {Button, Card, Text} from 'react-native-paper';
-import {ScrollView, StyleSheet, View, Image} from 'react-native';
+import {Button, Card, FAB, Portal, Text} from 'react-native-paper';
+import {
+  ScrollView,
+  StyleSheet,
+  View,
+  Image,
+  RefreshControl,
+  ViewStyle,
+} from 'react-native';
 import {useAuthContext} from '../../../contexts/authContext';
 import {
   Pet,
@@ -208,6 +215,7 @@ const ProfilePetsScreen: React.FC<{
   let [pets, setPets] = useState<Pet[]>([]);
   const [visibleModal, setVisibleModal] = useState(false);
   const [visibleConfirmModal, setVisibleConfirmModal] = useState(false);
+  const [refreshing, setRefreshing] = React.useState(false);
   const [visibleEditModal, setVisibleEditModal] = useState(false);
   const {user, userToken, setUserToken} = useAuthContext();
   const {startLoading, stopLoading, isLoading} = useLoading();
@@ -215,6 +223,9 @@ const ProfilePetsScreen: React.FC<{
   const [isExtended, setIsExtended] = useState(true);
   const [petSelected, setPetSelected] = useState<string>();
   const {control, handleSubmit, getValues} = useForm();
+  const [state, setState] = React.useState({open: false});
+  const onStateChange = ({open}: any) => setState({open});
+  const {open} = state;
 
   const showModal = () => setVisibleModal(true);
   const hideModal = () => setVisibleModal(false);
@@ -338,13 +349,6 @@ const ProfilePetsScreen: React.FC<{
     }
   };
 
-  const onScroll = ({nativeEvent}: any) => {
-    const currentScrollPosition =
-      Math.floor(nativeEvent?.contentOffset?.y) ?? 0;
-
-    setIsExtended(currentScrollPosition <= 0);
-  };
-
   const handleTipoPetChange = (value: string) => {
     console.log('Tipo de Pet changed to:', value);
     setTipoPet(getValues('tipo_pet'));
@@ -380,6 +384,10 @@ const ProfilePetsScreen: React.FC<{
     }
   };
 
+  const onRefresh = React.useCallback(() => {
+    getPetsByOwner();
+  }, []);
+
   useEffect(() => {
     getPetsByOwner();
   }, []);
@@ -411,268 +419,276 @@ const ProfilePetsScreen: React.FC<{
   };
 
   return (
-    <View>
-      <ScrollView onScroll={onScroll}>
-        <View style={styles.cardContainer}>
-          {pets && pets.length > 0 ? (
-            pets?.map(pet => (
-              <Card key={pet.id} style={styles.card}>
-                <Card.Cover
-                  style={{width: 'auto'}}
-                  source={setPetImagePlaceHolder(pet.tipo_pet)}
-                />
-                <Card.Title title={pet.nome} />
-                <Collapsible collapsed={isCollapsed}>
-                  <Card.Content>
-                    <Text variant="titleMedium">Tipo:</Text>
-                    <Text variant="bodyLarge">{pet.tipo_pet}</Text>
-                    <Text variant="titleMedium">Raça:</Text>
-                    <Text variant="bodyLarge">{pet.raca}</Text>
-                    <Text variant="titleMedium">Sexo:</Text>
-                    <Text variant="bodyLarge">{pet.sexo}</Text>
-                    <Text variant="titleMedium">Cor:</Text>
-                    <Text variant="bodyLarge">{pet.cor}</Text>
-                    <Text variant="titleMedium">Idade:</Text>
-                    <Text variant="bodyLarge">
-                      {getDiffIdade(pet.data_nascimento)}
-                    </Text>
-                    <Text variant="titleMedium">Data Nasc.:</Text>
-                    <Text variant="bodyLarge">
-                      {moment(
-                        pet.data_nascimento.split(' ')[0],
-                        'YYYY-MM-DD',
-                      ).format('DD/MM/YYYY')}
-                    </Text>
+    <>
+      <View>
+        <ScrollView
+          contentContainerStyle={styles.scrollView}
+          refreshControl={
+            <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+          }>
+          <View style={styles.cardContainer}>
+            {pets && pets.length > 0 ? (
+              pets?.map(pet => (
+                <Card key={pet.id} style={styles.card}>
+                  <Card.Cover
+                    style={{width: 'auto'}}
+                    source={setPetImagePlaceHolder(pet.tipo_pet)}
+                  />
+                  <Card.Title title={pet.nome} />
+                  <Collapsible collapsed={isCollapsed}>
+                    <Card.Content>
+                      <Text variant="titleMedium">Tipo:</Text>
+                      <Text variant="bodyLarge">{pet.tipo_pet}</Text>
+                      <Text variant="titleMedium">Raça:</Text>
+                      <Text variant="bodyLarge">{pet.raca}</Text>
+                      <Text variant="titleMedium">Sexo:</Text>
+                      <Text variant="bodyLarge">{pet.sexo}</Text>
+                      <Text variant="titleMedium">Cor:</Text>
+                      <Text variant="bodyLarge">{pet.cor}</Text>
+                      <Text variant="titleMedium">Idade:</Text>
+                      <Text variant="bodyLarge">
+                        {getDiffIdade(pet.data_nascimento)}
+                      </Text>
+                      <Text variant="titleMedium">Data Nasc.:</Text>
+                      <Text variant="bodyLarge">
+                        {moment(
+                          pet.data_nascimento.split(' ')[0],
+                          'YYYY-MM-DD',
+                        ).format('DD/MM/YYYY')}
+                      </Text>
 
-                    {/*  <Text variant="bodyLarge">
-                      Tipo Sanguíneo: {pet.infoMedica?.tipoSanguineo}
-                    </Text>
-                    <Text variant="bodyLarge">
-                      Alergias: {pet.infoMedica?.alergias}
-                    </Text> */}
-                    <View style={{marginTop: 20, marginBottom: 10}}>
-                      <Button
-                        icon="pencil"
-                        mode="text"
-                        onPress={() => showEditModal(pet.id)}>
-                        Editar
-                      </Button>
-                      <Button
-                        icon="close-circle-outline"
-                        mode="text"
-                        style={styles.buttonRemover}
-                        onPress={() => showConfirmModal(pet.id)}>
-                        Remover
-                      </Button>
-                    </View>
-                  </Card.Content>
-                </Collapsible>
-              </Card>
-            ))
-          ) : (
-            <View style={styles.notFound}>
-              <Image
-                style={styles.sadDoge}
-                source={require('../../../assets/images/sadDoge.webp')}
-              />
-              <Text>Nenhum Pet Cadastrado</Text>
-            </View>
-          )}
-
-          <CustomModal
-            visible={visibleModal}
-            onDismiss={hideModal}
-            containerStyle={styles.containerStyle}>
-            <Text
-              variant="titleMedium"
-              style={[styles.textCenter, {marginBottom: 10}]}>
-              Cadastro de Pet
-            </Text>
-            <ControlTextInput
-              name={'nome'}
-              label={'Nome'}
-              mode={'outlined'}
-              control={control}
-              rules={{required: 'Nome de Pet Obrigatório'}}
-              style={styles.input}
-              secureTextEntry={false}
-            />
-            <ControlSelectInput
-              control={control}
-              name={'tipo_pet'}
-              options={tiposAnimais}
-              label={'Tipo de Pet'}
-              onValueChange={handleTipoPetChange}
-            />
-            {tipoPet === 'Cachorro' ? (
-              <ControlSelectInput
-                control={control}
-                name={'raca'}
-                options={optionsRacasCachorro}
-                label={'Raça de Cachorro'}
-              />
-            ) : tipoPet === 'Gato' ? (
-              <ControlSelectInput
-                control={control}
-                name={'raca'}
-                options={optionsRacasGato}
-                label={'Raça de Gato'}
-              />
+                      {/*  <Text variant="bodyLarge">
+                    Tipo Sanguíneo: {pet.infoMedica?.tipoSanguineo}
+                  </Text>
+                  <Text variant="bodyLarge">
+                    Alergias: {pet.infoMedica?.alergias}
+                  </Text> */}
+                      <View style={{marginTop: 20, marginBottom: 10}}>
+                        <Button
+                          icon="pencil"
+                          mode="text"
+                          onPress={() => showEditModal(pet.id)}>
+                          Editar
+                        </Button>
+                        <Button
+                          icon="close-circle-outline"
+                          mode="text"
+                          style={styles.buttonRemover as ViewStyle}
+                          onPress={() => showConfirmModal(pet.id)}>
+                          Remover
+                        </Button>
+                      </View>
+                    </Card.Content>
+                  </Collapsible>
+                </Card>
+              ))
             ) : (
+              <View style={styles.notFound}>
+                <Image
+                  style={styles.sadDoge}
+                  source={require('../../../assets/images/sadDoge.webp')}
+                />
+                <Text>Nenhum Pet Cadastrado</Text>
+              </View>
+            )}
+
+            <CustomModal
+              visible={visibleModal}
+              onDismiss={hideModal}
+              containerStyle={styles.containerStyle}>
+              <Text
+                variant="titleMedium"
+                style={[styles.textCenter, {marginBottom: 10}]}>
+                Cadastro de Pet
+              </Text>
+              <ControlTextInput
+                name={'nome'}
+                label={'Nome'}
+                mode={'outlined'}
+                control={control}
+                rules={{required: 'Nome de Pet Obrigatório'}}
+                style={styles.input}
+                secureTextEntry={false}
+              />
+              <ControlSelectInput
+                control={control}
+                name={'tipo_pet'}
+                options={tiposAnimais}
+                label={'Tipo de Pet'}
+                onValueChange={handleTipoPetChange}
+              />
+              {tipoPet === 'Cachorro' ? (
+                <ControlSelectInput
+                  control={control}
+                  name={'raca'}
+                  options={optionsRacasCachorro}
+                  label={'Raça de Cachorro'}
+                />
+              ) : tipoPet === 'Gato' ? (
+                <ControlSelectInput
+                  control={control}
+                  name={'raca'}
+                  options={optionsRacasGato}
+                  label={'Raça de Gato'}
+                />
+              ) : (
+                <ControlTextInput
+                  name={'raca'}
+                  label={'Raça'}
+                  mode={'outlined'}
+                  control={control}
+                  rules={{required: 'Raça de pet Obrigatório'}}
+                  style={styles.input}
+                  secureTextEntry={false}
+                />
+              )}
+
+              <ControlTextInput
+                name={'cor'}
+                label={'Cor'}
+                mode={'outlined'}
+                control={control}
+                rules={{required: 'Cor de pet Obrigatório'}}
+                style={styles.input}
+                secureTextEntry={false}
+              />
+              <ControlDateInput
+                control={control}
+                rules={{required: 'Data de Nascimento Obrigatória'}}
+                label={'Data de Nasc.'}
+                name={'data_nascimento'}
+                mode={'outlined'}
+              />
+
+              <ControlSelectInput
+                control={control}
+                name={'sexo'}
+                options={sexoAnimais}
+                label={'Sexo de Pet'}
+                style={styles.selectInput}
+              />
+              <View style={styles.divButtons}>
+                <Button
+                  icon="plus"
+                  mode="outlined"
+                  style={styles.button as ViewStyle}
+                  onPress={handleSubmit(registerPet)}>
+                  Registrar Item
+                </Button>
+              </View>
+            </CustomModal>
+
+            <CustomModal
+              visible={visibleEditModal}
+              onDismiss={hideEditModal}
+              containerStyle={styles.containerStyle}>
+              <Text
+                variant="titleMedium"
+                style={[styles.textCenter, {marginBottom: 10}]}>
+                Alterar Pet
+              </Text>
+              <ControlTextInput
+                name={'nome'}
+                label={'Nome'}
+                mode={'outlined'}
+                control={control}
+                style={styles.input}
+                secureTextEntry={false}
+              />
+
+              <ControlSelectInput
+                control={control}
+                name={'tipo_pet'}
+                options={tiposAnimais}
+                label={'Tipo de Pet'}
+                onValueChange={handleTipoPetChange}
+              />
+
               <ControlTextInput
                 name={'raca'}
                 label={'Raça'}
                 mode={'outlined'}
                 control={control}
-                rules={{required: 'Raça de pet Obrigatório'}}
                 style={styles.input}
                 secureTextEntry={false}
               />
-            )}
+              <ControlDateInput
+                control={control}
+                label={'Data de Nasc.'}
+                name={'data_nascimento'}
+                mode={'outlined'}
+              />
 
-            <ControlTextInput
-              name={'cor'}
-              label={'Cor'}
-              mode={'outlined'}
-              control={control}
-              rules={{required: 'Cor de pet Obrigatório'}}
-              style={styles.input}
-              secureTextEntry={false}
-            />
-            <ControlDateInput
-              control={control}
-              rules={{required: 'Data de Nascimento Obrigatória'}}
-              label={'Data de Nasc.'}
-              name={'data_nascimento'}
-              mode={'outlined'}
-            />
+              <ControlSelectInput
+                control={control}
+                name={'sexo'}
+                options={sexoAnimais}
+                label={'Sexo de Pet'}
+              />
 
-            <ControlSelectInput
-              control={control}
-              name={'sexo'}
-              options={sexoAnimais}
-              label={'Sexo de Pet'}
-              style={{borderWidth: 2, borderColor: 'black'}}
-            />
-            <View style={styles.divButtons}>
-              <Button
-                icon="plus"
-                mode="outlined"
-                style={styles.button}
-                onPress={handleSubmit(registerPet)}>
-                Registrar Item
-              </Button>
-            </View>
-          </CustomModal>
+              <ControlTextInput
+                name={'cor'}
+                label={'Cor'}
+                mode={'outlined'}
+                control={control}
+                style={styles.input}
+              />
 
-          <CustomModal
-            visible={visibleEditModal}
-            onDismiss={hideEditModal}
-            containerStyle={styles.containerStyle}>
-            <Text
-              variant="titleMedium"
-              style={[styles.textCenter, {marginBottom: 10}]}>
-              Alterar Pet
-            </Text>
-            <ControlTextInput
-              name={'nome'}
-              label={'Nome'}
-              mode={'outlined'}
-              control={control}
-              style={styles.input}
-              secureTextEntry={false}
-            />
+              <View style={styles.divButtons}>
+                <Button
+                  icon="plus"
+                  mode="outlined"
+                  style={styles.button as ViewStyle}
+                  onPress={handleSubmit(editPet)}>
+                  Enviar
+                </Button>
+              </View>
+            </CustomModal>
 
-            <ControlSelectInput
-              control={control}
-              name={'tipo_pet'}
-              options={tiposAnimais}
-              label={'Tipo de Pet'}
-              onValueChange={handleTipoPetChange}
-            />
-
-            <ControlTextInput
-              name={'raca'}
-              label={'Raça'}
-              mode={'outlined'}
-              control={control}
-              style={styles.input}
-              secureTextEntry={false}
-            />
-            <ControlDateInput
-              control={control}
-              label={'Data de Nasc.'}
-              name={'data_nascimento'}
-              mode={'outlined'}
-            />
-
-            <ControlSelectInput
-              control={control}
-              name={'sexo'}
-              options={sexoAnimais}
-              label={'Sexo de Pet'}
-            />
-
-            <ControlTextInput
-              name={'cor'}
-              label={'Cor'}
-              mode={'outlined'}
-              control={control}
-              style={styles.input}
-            />
-
-            <View style={styles.divButtons}>
-              <Button
-                icon="plus"
-                mode="outlined"
-                style={styles.button}
-                onPress={handleSubmit(editPet)}>
-                Enviar
-              </Button>
-            </View>
-          </CustomModal>
-
-          <CustomModal
-            visible={visibleConfirmModal}
-            onDismiss={hideConfirmModal}
-            containerStyle={styles.containerConfirmStyle}>
-            <Text
-              variant="titleMedium"
-              style={[styles.textCenter, {marginBottom: 10}]}>
-              Tem certeza que quer remover este Pet?
-            </Text>
-            <View style={styles.divButtons}>
-              <Button mode="outlined" style={styles.button} onPress={deletePet}>
-                Sim
-              </Button>
-              <Button
-                mode="outlined"
-                style={styles.button}
-                onPress={hideConfirmModal}>
-                Não
-              </Button>
-            </View>
-          </CustomModal>
-        </View>
-      </ScrollView>
-      <CustomFabButton
-        visible={true}
-        style={styles.fabStyle}
-        isExtended={isExtended}
-        onPress={showModal}
-        label={'Add Pet'}
-        animateFrom={'right'}
-      />
-      {isLoading ? <LoadingOverlay /> : <Text children={undefined} />}
-      <Text style={{color: 'red', textAlign: 'center'}}>{}</Text>
-      <Toast />
-    </View>
+            <CustomModal
+              visible={visibleConfirmModal}
+              onDismiss={hideConfirmModal}
+              containerStyle={styles.containerConfirmStyle}>
+              <Text
+                variant="titleMedium"
+                style={[styles.textCenter, {marginBottom: 10}]}>
+                Tem certeza que quer remover este Pet?
+              </Text>
+              <View style={styles.divButtons}>
+                <Button
+                  mode="outlined"
+                  style={styles.button as ViewStyle}
+                  onPress={deletePet}>
+                  Sim
+                </Button>
+                <Button
+                  mode="outlined"
+                  style={styles.button as ViewStyle}
+                  onPress={hideConfirmModal}>
+                  Não
+                </Button>
+              </View>
+            </CustomModal>
+          </View>
+        </ScrollView>
+        <FAB icon="plus" style={styles.fab} onPress={showModal} />
+        {isLoading ? <LoadingOverlay /> : <Text children={undefined} />}
+        <Text style={{color: 'red', textAlign: 'center'}}>{}</Text>
+        <Toast />
+      </View>
+    </>
   );
 };
-
 export default ProfilePetsScreen;
 
-const styles = StyleSheet.create<any>({
+const styles = StyleSheet.create({
+  scrollView: {
+    borderRadius: 10,
+    justifyContent: 'center',
+    padding: 10,
+    gap: 10,
+    flex: 1,
+  },
   cardContainer: {
     borderRadius: 10,
     justifyContent: 'center',
@@ -688,10 +704,11 @@ const styles = StyleSheet.create<any>({
     width: '90%',
     height: 'auto',
   },
-  fabStyle: {
-    bottom: 16,
-    right: 30,
+  fab: {
     position: 'absolute',
+    margin: 16,
+    right: 0,
+    bottom: 0,
     textColor: 'white',
     backgroundColor: '#5D6BB0',
   },
@@ -712,7 +729,7 @@ const styles = StyleSheet.create<any>({
     gap: 5,
     width: '80%',
     borderRadius: 5,
-    height: 550,
+    height: 'auto',
     alignSelf: 'center',
     padding: 15,
   },
@@ -721,7 +738,7 @@ const styles = StyleSheet.create<any>({
     gap: 5,
     width: '80%',
     borderRadius: 5,
-    height: 200,
+    height: 'auto',
     alignSelf: 'center',
     padding: 15,
   },
@@ -742,5 +759,11 @@ const styles = StyleSheet.create<any>({
   input: {
     width: '100%',
     height: 50,
+  },
+  selectInput: {
+    borderWidth: 1,
+    borderColor: 'gray',
+    borderRadius: 5,
+    padding: 10,
   },
 });

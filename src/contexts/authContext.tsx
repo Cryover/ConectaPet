@@ -11,6 +11,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import axiosInstance from '../utils/axiosIstance';
 import {useLoading} from './loadingContext';
 import {useToast} from './toastContext';
+import {API_PROD_URL} from '@env';
 
 interface AuthContextType {
   userToken: string | null;
@@ -53,7 +54,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({children}) => {
       if (response) {
         setUser(response.data.usuario);
         setUserToken(response.data.userToken);
-
+        console.log(API_PROD_URL);
         await AsyncStorage.setItem('userToken', response.data.userToken);
         await AsyncStorage.setItem(
           'userStored',
@@ -62,7 +63,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({children}) => {
       }
       return true;
     } catch (err) {
-      console.error(err);
+      console.log(err);
       return false;
     } finally {
       stopLoading();
@@ -112,7 +113,6 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({children}) => {
           })
           .catch(err => {
             console.log('ERRO', err);
-            stopLoading();
           });
       }
     } catch (err) {

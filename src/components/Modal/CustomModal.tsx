@@ -1,5 +1,5 @@
 import React from 'react';
-import {StyleProp, TextStyle, ViewStyle} from 'react-native';
+import {StyleProp, TextStyle, ViewStyle, ScrollView} from 'react-native';
 import {Portal, Modal} from 'react-native-paper';
 
 interface CustomModalProps {
@@ -21,7 +21,7 @@ const CustomModal: React.FC<CustomModalProps> = ({
         visible={visible}
         onDismiss={onDismiss}
         contentContainerStyle={containerStyle}>
-        {children}
+        <ScrollView>{children}</ScrollView>
       </Modal>
     </Portal>
   );

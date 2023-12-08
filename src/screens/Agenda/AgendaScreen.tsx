@@ -1,11 +1,7 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
-/* eslint-disable react-hooks/exhaustive-deps */
-/* eslint-disable @typescript-eslint/no-shadow */
 import React, {useEffect, useState} from 'react';
-import {Image, ScrollView, StyleSheet, View} from 'react-native';
-import {Button, DataTable, Text} from 'react-native-paper';
-import Calendario from '../../components/molecules/Calendario/Calendario';
-import CustomFabButton from '../../components/Buttons/CustomFabButton';
+import {StyleSheet} from 'react-native';
+import {Button, FAB, Text} from 'react-native-paper';
 import CustomModal from '../../components/Modal/CustomModal';
 import {useForm} from 'react-hook-form';
 import ControlTextInput from '../../components/atoms/inputs/ControlTextInput';
@@ -17,72 +13,39 @@ import axiosInstance from '../../utils/axiosIstance';
 import Toast from 'react-native-toast-message';
 import LoadingOverlay from '../../components/atoms/LoadingOverlay';
 import {useLoading} from '../../contexts/loadingContext';
-//import Toast from 'react-native-toast-message';
+import {useToast} from '../../contexts/toastContext';
+import AgendaComponent from '../../components/molecules/Agenda/Agenda';
 
 const AgendaScreen: React.FC<{navigation: AgendaScreenNavigationProp}> = ({
   navigation,
 }) => {
-  const [page, setPage] = useState<number>(0);
-  const [numberOfItemsPerPageList] = useState([5, 10, 24]);
-  const [compromissosPerPage, onItemsPerPageChange] = useState(
-    numberOfItemsPerPageList[0],
-  );
   const {control, handleSubmit} = useForm();
   const [compromissos, setCompromissos] = useState<Compromisso[]>([]);
   const [dateFromCalendar, setDateFromCalendar] = useState<Date>();
-
-  const from = page * compromissosPerPage;
-  const to = Math.min((page + 1) * compromissosPerPage, compromissos.length);
   const [visibleModal, setVisibleModal] = useState(false);
-  const [isExtended, setIsExtended] = useState(true);
-  const {user, userToken} = useAuthContext();
-  const [currentMonth, setCurrentMonth] = useState<number>(
-    new Date().getMonth() + 1,
-  );
+  const [visibleConfirmModal, setVisibleConfirmModal] = useState(false);
+  const [visibleTimeModal, setVisibleTimeModal] = useState(false);
+  const {user, userToken, setUser, setUserToken} = useAuthContext();
   const {startLoading, stopLoading, isLoading} = useLoading();
+  const {showToast} = useToast();
 
   const showModal = () => setVisibleModal(true);
   const hideModal = () => setVisibleModal(false);
 
-  const onScroll = ({nativeEvent}: any) => {
-    const currentScrollPosition =
-      Math.floor(nativeEvent?.contentOffset?.y) ?? 0;
+  const showConfirmModal = () => setVisibleConfirmModal(true);
+  const hideConfirmModal = () => setVisibleConfirmModal(false);
 
-    setIsExtended(currentScrollPosition <= 0);
-  };
-
-  /* const getAllCompromissos = async () => {
-    try {
-      await axiosInstance
-        .get(`/compromisso/byowner/${user?.id}`, {
-          headers: {
-            Authorization: `Bearer ${userToken}`,
-          },
-        })
-        .then(response => {
-          const formatedCompromisso: Compromisso[] = response.data;
-          console.log(formatedCompromisso);
-          setCompromissos(formatedCompromisso);
-        })
-        .catch(err => {
-          console.log(err);
-          if (err.status === 401) {
-            navigation.navigate('Login');
-          } else {
-            setError('Nenhum compromisso cadastrado.');
-          }
-        });
-    } catch (err) {
-      console.log(err);
-    }
-  }; */
+  const showTimeModal = () => setVisibleTimeModal(true);
+  const hideTimeModal = () => setVisibleTimeModal(false);
 
   const getCompromissosByMonth = async () => {
-    console.log('currentMonth', currentMonth);
+    //console.log('currentMonth', currentMonth);
+    const currentMonth = 0;
 
     try {
+      startLoading();
       await axiosInstance
-        .get(`/compromisso/byowner/${user?.id}/mes?month=${currentMonth}`, {
+        .get(`/compromisso/byowner/${user?.id}/mes/${currentMonth}`, {
           headers: {
             Authorization: `Bearer ${userToken}`,
           },
@@ -100,6 +63,44 @@ const AgendaScreen: React.FC<{navigation: AgendaScreenNavigationProp}> = ({
         });
     } catch (err) {
       console.log(err);
+    } finally {
+      stopLoading();
+    }
+  };
+
+  const getCompromissosByDay = async (date: string) => {
+    console.log('currentMonth', date);
+    const momentDate = moment(date);
+    const day = momentDate.format('D');
+    console.log('Day', day);
+    try {
+      startLoading();
+      await axiosInstance
+        .get(`/compromisso/byowner/${user?.id}/dia/${day}`, {
+          headers: {
+            Authorization: `Bearer ${userToken}`,
+          },
+        })
+        .then(response => {
+          const formatedCompromisso: Compromisso[] = response.data;
+          console.log(formatedCompromisso);
+          if (response.status === 200) {
+            setCompromissos(formatedCompromisso);
+          } else if (response.status === 401) {
+            setUserToken(null);
+            navigation.navigate('Login');
+          }
+        })
+        .catch(err => {
+          console.log(err);
+          if (err.status === 401) {
+            navigation.navigate('Login');
+          }
+        });
+    } catch (err) {
+      console.log(err);
+    } finally {
+      stopLoading();
     }
   };
 
@@ -107,7 +108,8 @@ const AgendaScreen: React.FC<{navigation: AgendaScreenNavigationProp}> = ({
     showModal();
     console.log('DataString: ', data);
     console.log('DataString new Date: ', new Date(data));
-    setDateFromCalendar(new Date(data));
+    //setDateFromCalendar(new Date(data));
+    getCompromissosByDay(data);
   };
 
   const handleMonthChange = (data: string) => {
@@ -115,7 +117,6 @@ const AgendaScreen: React.FC<{navigation: AgendaScreenNavigationProp}> = ({
     const splitedMonth = data.split('-')[1];
     const monthNumber = parseInt(splitedMonth, 10);
     console.log('monthNumber: ', monthNumber);
-    setCurrentMonth(monthNumber);
     getCompromissosByMonth();
   };
 
@@ -123,10 +124,8 @@ const AgendaScreen: React.FC<{navigation: AgendaScreenNavigationProp}> = ({
     console.log('Teste');
     console.log(formData);
     try {
+      startLoading();
       console.log('formData', formData);
-      //console.log('user', user);
-      //console.log('userToken', userToken);
-      //console.log('user', user?.id);
 
       const response = await axiosInstance.post(
         `/compromisso?id=${user?.id}`,
@@ -138,87 +137,29 @@ const AgendaScreen: React.FC<{navigation: AgendaScreenNavigationProp}> = ({
         },
       );
 
-      console.log('compromisso response', response);
+      if (response.status === 200) {
+        hideModal();
+        getCompromissosByMonth();
+      } else if (response.status === 401) {
+      }
 
-      hideModal();
-      getCompromissosByMonth();
+      console.log('compromisso response', response);
     } catch (err) {
       hideModal();
       console.error(err);
+      showToast('error', `${err}`);
+    } finally {
+      stopLoading();
     }
   };
 
   useEffect(() => {
-    setPage(0);
-    //getCompromissos();
-    //console.log(new Date().getMonth);
-    getCompromissosByMonth();
+    //getCompromissosByMonth();
   }, []);
 
   return (
     <>
-      <ScrollView contentContainerStyle={styles.scrollView} onScroll={onScroll}>
-        <Text variant="titleMedium" style={{marginBottom: 20}}>
-          Agenda de compromissos
-        </Text>
-        <Calendario
-          onDayPress={handleDayPressed}
-          onMonthChange={handleMonthChange}
-        />
-
-        <Button
-          mode="contained"
-          style={styles.button}
-          onPress={getCompromissosByMonth}>
-          Resetar Lista
-        </Button>
-
-        {compromissos.length > 0 ? (
-          <DataTable style={{marginBottom: 70}}>
-            <DataTable.Header>
-              <DataTable.Title style={{flex: 4}}>Título</DataTable.Title>
-              <DataTable.Title style={{flex: 2}}>Data</DataTable.Title>
-              <DataTable.Title style={{flex: 2}}>Descri.</DataTable.Title>
-            </DataTable.Header>
-
-            {compromissos.slice(from, to).map(compromisso => (
-              <DataTable.Row key={compromisso.id}>
-                <Text numberOfLines={3} style={{flex: 3}}>
-                  {compromisso.titulo}
-                </Text>
-                <DataTable.Cell style={{flex: 2}}>
-                  {moment(compromisso.data).format('DD/MM/YYYY')}
-                </DataTable.Cell>
-                <DataTable.Cell style={{flex: 2}}>
-                  {compromisso.descricao}
-                </DataTable.Cell>
-              </DataTable.Row>
-            ))}
-
-            <DataTable.Pagination
-              page={page}
-              numberOfPages={Math.ceil(
-                compromissos.length / compromissosPerPage,
-              )}
-              onPageChange={page => setPage(page)}
-              label={`Pag. ${from + 1} de ${to} de ${compromissos.length}`}
-              numberOfItemsPerPageList={numberOfItemsPerPageList}
-              numberOfItemsPerPage={compromissosPerPage}
-              onItemsPerPageChange={onItemsPerPageChange}
-              showFastPaginationControls
-              selectPageDropdownLabel={'Itens por Pagina'}
-            />
-          </DataTable>
-        ) : (
-          <View style={styles.notFound}>
-            <Image
-              style={styles.sadDoge}
-              source={require('../../assets/images/sadDoge.webp')}
-            />
-            <Text>Nenhum compromisso cadastrado</Text>
-          </View>
-        )}
-      </ScrollView>
+      <AgendaComponent />
 
       <CustomModal
         visible={visibleModal}
@@ -233,6 +174,7 @@ const AgendaScreen: React.FC<{navigation: AgendaScreenNavigationProp}> = ({
           name={'nome'}
           label={'Nome'}
           control={control}
+          mode={'outlined'}
           rules={{required: 'Título de compromisso é Obrigatório'}}
           style={styles.input}
           secureTextEntry={false}
@@ -242,19 +184,27 @@ const AgendaScreen: React.FC<{navigation: AgendaScreenNavigationProp}> = ({
           label={'Data'}
           name={'data'}
           mode={'outlined'}
+          style={styles.input}
           initialValue={dateFromCalendar ? dateFromCalendar : undefined}
         />
-        {/* <ControlTextInput
-          name={'ids_pets'}
-          label={'Nome'}
+
+        {/* <Button onPress={showTimeModal} uppercase={false} mode="outlined">
+          Definir Hora
+        </Button>
+
+        <CustomTimeModal
+          onDismiss={hideTimeModal}
+          onConfirm={hideTimeModal}
+          name={'hora'}
+          label={'Hora'}
           control={control}
-          rules={{required: 'Título de compromisso é Obrigatório'}}
-          style={styles.input}
-          secureTextEntry={false}
+          visible={true}
         /> */}
+
         <ControlTextInput
           name={'descricao'}
           label={'Descrição'}
+          mode={'outlined'}
           multiline={true}
           numberOfLines={4}
           control={control}
@@ -271,14 +221,7 @@ const AgendaScreen: React.FC<{navigation: AgendaScreenNavigationProp}> = ({
         </Button>
       </CustomModal>
 
-      <CustomFabButton
-        visible={true}
-        style={styles.fabStyle}
-        isExtended={isExtended}
-        onPress={showModal}
-        label={'Add Compromisso'}
-        animateFrom={'left'}
-      />
+      <FAB icon="plus" style={styles.fab} onPress={showModal} />
       {isLoading ? <LoadingOverlay /> : <Text children={undefined} />}
       <Text style={{color: 'red', textAlign: 'center'}}>{}</Text>
       <Toast />
@@ -313,12 +256,6 @@ const styles = StyleSheet.create({
     padding: 20,
     alignSelf: 'center',
   },
-  fabStyle: {
-    bottom: 16,
-    right: 16,
-    position: 'absolute',
-    backgroundColor: '#5D6BB0',
-  },
   containerStyle: {
     backgroundColor: 'white',
     gap: 10,
@@ -338,5 +275,13 @@ const styles = StyleSheet.create({
     alignSelf: 'center',
     width: 100,
     height: 100,
+  },
+  fab: {
+    position: 'absolute',
+    margin: 16,
+    left: 0,
+    bottom: 0,
+    textColor: 'white',
+    backgroundColor: '#5D6BB0',
   },
 });

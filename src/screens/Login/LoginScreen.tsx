@@ -70,7 +70,6 @@ const LoginScreen: React.FC<{navigation: LoginScreenNavigationProp}> = ({
         style={styles.logo}
         source={require('../../assets/images/logo.webp')}
       />
-
       <ControlTextInput
         control={control}
         name="username"
@@ -81,7 +80,6 @@ const LoginScreen: React.FC<{navigation: LoginScreenNavigationProp}> = ({
         label="Nome de Usuário ou Email"
         secureTextEntry={false}
       />
-
       <ControlTextInput
         control={control}
         name="password"
@@ -98,7 +96,6 @@ const LoginScreen: React.FC<{navigation: LoginScreenNavigationProp}> = ({
       />
       <Text style={{color: 'red', textAlign: 'center'}}>{error}</Text>
       {isLoading ? <LoadingOverlay /> : <Text children={undefined}></Text>}
-
       <Text
         style={styles.links}
         onPress={() => navigation.navigate('RecuperacaoConta')}>
@@ -109,7 +106,6 @@ const LoginScreen: React.FC<{navigation: LoginScreenNavigationProp}> = ({
         onPress={() => navigation.navigate('Registro')}>
         Não possui conta? clique aqui!
       </Text>
-
       <Button
         icon="login"
         mode="contained"
