@@ -708,7 +708,7 @@ const styles = StyleSheet.create({
     position: 'absolute',
     margin: 16,
     right: 0,
-    bottom: 0,
+    bottom: 40,
     textColor: 'white',
     backgroundColor: '#5D6BB0',
   },

@@ -3,7 +3,14 @@
 import React, {useEffect, useState} from 'react';
 import {Card, Divider, FAB} from 'react-native-paper';
 import {BarChart, LineChart, PieChart} from 'react-native-chart-kit';
-import {Dimensions, ScrollView, StyleSheet, Text, View} from 'react-native';
+import {
+  Dimensions,
+  RefreshControl,
+  ScrollView,
+  StyleSheet,
+  Text,
+  View,
+} from 'react-native';
 import LoadingOverlay from '../../components/atoms/LoadingOverlay';
 import {useLoading} from '../../contexts/loadingContext';
 import axiosInstance from '../../utils/axiosIstance';
@@ -15,6 +22,7 @@ import {AbstractChartConfig} from 'react-native-chart-kit/dist/AbstractChart';
 import {ChartData} from 'react-native-chart-kit/dist/HelperTypes';
 import {LineChartData} from 'react-native-chart-kit/dist/line-chart/LineChart';
 import {Dataset} from 'react-native-chart-kit/dist/HelperTypes';
+import {LineChartDataClass} from '../../types/classes';
 
 const dataLineChartPre: LineChartData = {
   labels: [
@@ -81,31 +89,68 @@ const DashboardScreen: React.FC<{
   const {user, userToken, setUserToken} = useAuthContext();
   const {startLoading, stopLoading, isLoading} = useLoading();
   const {showToast} = useToast();
-  const [dataLineChart, setDataLineChart] = useState(dataLineChartPre);
+  const [dataLineChart, setDataLineChart] =
+    useState<LineChartData>(dataLineChartPre);
   const [dataBarChart, setDataBarChart] = useState(dataBarChartPre);
+  const [refreshing, setRefreshing] = React.useState(false);
 
   const handleSetLineChartGraphs = (despesaData: Despesa[]) => {
-    const formatedDataLineChart: Dataset[] = [];
-    //const despesaNomes
-    //const despesaValores
-
-    //let newDataLineChart: ChartData = new ChartData();
-
+    const newLineChart: LineChartDataClass[] = [];
+    const labelsDataSets: string[] = [];
+    const dataDataSet: Dataset[] = [];
     const arrayNumber: number[] = [];
 
-    despesaData.forEach(despesa => {
-      arrayNumber.push(despesa.valor);
-      //newDataLineChart.labels.push(despesa.nome);
+    /* despesaData.forEach(element => {
+      labelsDataSets.push(element.nome);
+      arrayNumber.push(element.id_pet);
+
+    }); */
+
+    /* despesaData.forEach(element => {
+      dataSet.data.push(element.valor);
     });
 
-    formatedDataLineChart.map(data => {
-      data.data = arrayNumber;
-    });
+    arrayNewDataSets.push(dataSet);
 
-    //newDataLineChart.datasets = formatedDataLineChart;
+    setDataLineChart({
+      labels: newLineChart.labels,
+      datasets: newLineChart.datasets,
+    });
+    setDataBarChart({
+      labels: newLineChart.labels,
+      datasets: newLineChart.datasets,
+    }); */
   };
 
-  const getGraphData = async () => {
+  const getGraphDataByMonth = async () => {
+    try {
+      startLoading();
+
+      const response = await axiosInstance.get(`/despesa/byowner/${user?.id}`, {
+        headers: {
+          Authorization: `Bearer ${userToken}`,
+        },
+      });
+      console.log(response.data);
+      console.log(response.status);
+      if (response.status === 200) {
+        showToast('success', 'Registros encontrados');
+        handleSetLineChartGraphs(response.data);
+      } else if (response.status === 401) {
+        showToast('error', 'Token Expirado, favor fazer login novamente');
+        setUserToken(null);
+        navigation.navigate('Login');
+      } else if (response.status === 404) {
+        showToast('error', 'Nenhum registro encontrado');
+      }
+    } catch (err) {
+      showToast('error', `${err}`);
+    } finally {
+      stopLoading();
+    }
+  };
+
+  const getGraphDataByPetMonth = async () => {
     try {
       startLoading();
 
@@ -133,13 +178,21 @@ const DashboardScreen: React.FC<{
     }
   };
 
+  const onRefresh = React.useCallback(() => {
+    getGraphDataByMonth();
+  }, []);
+
   useEffect(() => {
-    getGraphData();
+    getGraphDataByMonth();
   }, []);
 
   return (
     <View style={styles.container}>
-      <ScrollView>
+      <ScrollView
+        keyboardShouldPersistTaps={'always'}
+        refreshControl={
+          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+        }>
         <Card>
           <Card.Title
             title="Despesas Total por Mês"
@@ -187,7 +240,6 @@ const DashboardScreen: React.FC<{
           </Card.Content>
         </Card>
       </ScrollView>
-      <FAB icon="refresh" style={styles.fab} onPress={() => getGraphData()} />
       {isLoading ? <LoadingOverlay /> : <Text children={undefined} />}
       <Text style={{color: 'red', textAlign: 'center'}}>{}</Text>
       <Toast />

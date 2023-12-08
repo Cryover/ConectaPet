@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import React, {useEffect, useState} from 'react';
-import {StyleSheet} from 'react-native';
+import {StyleSheet, View, ViewStyle} from 'react-native';
 import {Button, FAB, Text} from 'react-native-paper';
 import CustomModal from '../../components/Modal/CustomModal';
 import {useForm} from 'react-hook-form';
@@ -153,6 +153,8 @@ const AgendaScreen: React.FC<{navigation: AgendaScreenNavigationProp}> = ({
     }
   };
 
+  const deleteCompromisso = () => {};
+
   useEffect(() => {
     //getCompromissosByMonth();
   }, []);
@@ -215,10 +217,35 @@ const AgendaScreen: React.FC<{navigation: AgendaScreenNavigationProp}> = ({
         <Button
           icon="plus"
           mode="contained"
-          style={styles.button}
+          style={styles.button as ViewStyle}
           onPress={handleSubmit(registerCompromisso)}>
           Registrar Compromisso
         </Button>
+      </CustomModal>
+
+      <CustomModal
+        visible={visibleConfirmModal}
+        onDismiss={hideConfirmModal}
+        containerStyle={styles.containerConfirmStyle}>
+        <Text
+          variant="titleMedium"
+          style={[styles.textCenter, {marginBottom: 10}]}>
+          Tem certeza que quer remover este Compromisso?
+        </Text>
+        <View style={styles.divButtons as ViewStyle}>
+          <Button
+            mode="outlined"
+            style={styles.button as ViewStyle}
+            onPress={deleteCompromisso}>
+            Sim
+          </Button>
+          <Button
+            mode="outlined"
+            style={styles.button as ViewStyle}
+            onPress={hideConfirmModal}>
+            Não
+          </Button>
+        </View>
       </CustomModal>
 
       <FAB icon="plus" style={styles.fab} onPress={showModal} />
@@ -240,12 +267,28 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     flexGrow: 1,
   },
+  containerConfirmStyle: {
+    backgroundColor: 'white',
+    gap: 5,
+    width: '80%',
+    borderRadius: 5,
+    height: 'auto',
+    alignSelf: 'center',
+    padding: 15,
+  },
   input: {
     width: 300,
   },
+  divButtons: {
+    flex: 1,
+    gap: 10,
+    marginTop: 10,
+  },
   button: {
-    marginTop: 20,
     color: '#5D6BB0',
+  },
+  buttonRemover: {
+    color: '#e03a10',
   },
   links: {
     marginTop: 20,

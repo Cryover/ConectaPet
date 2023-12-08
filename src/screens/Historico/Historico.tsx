@@ -26,6 +26,9 @@ import {useLoading} from '../../contexts/loadingContext';
 import {useToast} from '../../contexts/toastContext';
 import ControlSelectMultipleInput from '../../components/atoms/inputs/ControlSelectMultipleInput';
 import ControlAutoCompleteInput from '../../components/atoms/inputs/ControlAutoCompleteInput';
+import ControlSelectInput from '../../components/atoms/inputs/ControlSelectInput';
+import {PickerItemPropsClass} from '../../types/classes';
+import {PickerItemProps} from '@react-native-picker/picker';
 
 const HistoricoScreen: React.FC<{
   navigation: HistoricoScreenNavigationProp;
@@ -34,14 +37,13 @@ const HistoricoScreen: React.FC<{
   const {startLoading, stopLoading, isLoading} = useLoading();
   const {showToast} = useToast();
   const [refreshing, setRefreshing] = React.useState(false);
-  let [pets, setPets] = useState<Pet[]>([]);
   const [page, setPage] = useState<number>(0);
   const [numberOfItemsPerPageList] = useState([5, 10, 20]);
   const [despesasPerPage, onItemsPerPageChange] = useState(
     numberOfItemsPerPageList[0],
   );
-  const [despesas, setDespesas] = useState<any[]>([]);
-  const [state, setState] = useState({open: false});
+  let [pets, setPets] = useState<Pet[]>([]);
+  let [despesas, setDespesas] = useState<Despesa[]>([]);
   const from = page * despesasPerPage;
   const to = Math.min((page + 1) * despesasPerPage, despesas.length);
   const {control, handleSubmit} = useForm();
@@ -53,6 +55,7 @@ const HistoricoScreen: React.FC<{
   const [visibleConfirmModal, setVisibleConfirmModal] = useState(false);
   const [visibleEditModal, setVisibleEditModal] = useState(false);
   const [despesaSelected, setDespesaSelected] = useState<string>();
+  const [selectedPets, setSelectedPets] = useState<any[]>([]);
 
   const showModal = () => setVisibleModal(true);
   const hideModal = () => setVisibleModal(false);
@@ -72,6 +75,7 @@ const HistoricoScreen: React.FC<{
   const getDespesasByMonth = async () => {
     try {
       startLoading();
+
       await axiosInstance
         .get(`/despesa/byowner/${user?.id}/mes/${currentMonth}`, {
           headers: {
@@ -79,31 +83,14 @@ const HistoricoScreen: React.FC<{
           },
         })
         .then(response => {
-          console.log(response.status);
-
-          const formatedDespesa: Despesa[] = response.data;
-          console.log('formatedDespesa', formatedDespesa);
           console.log('response.data', response.data);
-          showToast(
-            'success',
-            `Encontrado ${formatedDespesa.length} com sucesso!`,
-          );
-          setDespesas(formatedDespesa);
-          console.log(despesas);
-          if (response.status === 401) {
-            showToast('error', 'Token Expirado, favor fazer login novamente');
-            setUserToken(null);
-            navigation.navigate('Login');
-          }
-          console.log('Response', response.status);
+          const formattedDespesas: Despesa[] = response.data;
+          setDespesas(formattedDespesas);
+          showToast('success', `Encontrou ${response.data.length} registros`);
+          return response.data;
         })
         .catch(err => {
           showToast('error', `${err}`);
-          if (err.status === 401) {
-            showToast('error', 'Token Expirado, favor fazer login novamente');
-            setUserToken(null);
-            navigation.navigate('Login');
-          }
         });
     } catch (err) {
       showToast('error', `${err}`);
@@ -116,47 +103,62 @@ const HistoricoScreen: React.FC<{
     try {
       startLoading();
 
-      const response = await axiosInstance.get(`/pets?id=${user?.id}`, {
-        headers: {
-          Authorization: `Bearer ${userToken}`,
-        },
-      });
-      if (response.status === 200) {
-        const formatedPets: Pet[] = response.data;
-        console.log('formatedPets', response.data);
+      await axiosInstance
+        .get(`/pets?id=${user?.id}`, {
+          headers: {
+            Authorization: `Bearer ${userToken}`,
+          },
+        })
+        .then(response => {
+          showToast('success', `Encontrou ${response.data.length} registros`);
+          console.log('response.data', response.data);
+          const formattedPets: Pet[] = response.data;
+          setPets(formattedPets);
+          handlePetsSelectOptionEntry();
+          return response;
+        })
+        .catch(err => {
+          showToast('error', `${err}`);
+        });
 
-        setPets(formatedPets);
-      } else if (response.status === 401) {
-        setUserToken(null);
-        navigation.navigate('Login');
-      }
+      handlePetsSelectOptionEntry();
     } catch (err) {
-      showToast('error', `Erro ${err} ao buscar pets de dono.`);
+      console.log(err);
     } finally {
       stopLoading();
     }
+  };
+
+  const handlePetsSelectOptionEntry = () => {
+    const optionsPetSelect = pets.map(pets => ({
+      label: pets.nome,
+      value: pets.id,
+    }));
+
+    setSelectedPets(optionsPetSelect);
   };
 
   const handleDayPressed = (data: string) => {
     showModal();
     console.log('DataString: ', data);
     console.log('DataString new Date: ', new Date(data));
-    setDateFromCalendar(new Date(data));
+    setDateFromCalendar(moment(data).toDate);
   };
 
   const handleMonthChange = (data: string) => {
     console.log('DataString Month: ', data);
-    const splitedMonth = data.split('-')[1];
-    //const monthNumber = parseInt(splitedMonth, 10);
-    let stringWithoutSpaces = splitedMonth.replace(/\s/g, '');
-    console.log('monthNumber: ', stringWithoutSpaces);
-    setCurrentMonth(stringWithoutSpaces);
+    const selectedMonth = moment(data).toDate().getMonth();
+
+    console.log('monthNumber: ', selectedMonth);
+    setCurrentMonth(selectedMonth);
     getDespesasByMonth();
   };
 
   const registerDespesa = async (formData: any) => {
     try {
       startLoading();
+      console.log('pets Register', pets);
+      console.log('formData', formData);
 
       const response = await axiosInstance.post(
         `/despesa?id=${user?.id}`,
@@ -167,10 +169,11 @@ const HistoricoScreen: React.FC<{
           },
         },
       );
-      if (response.status === 200) {
-        console.log('formatedPets', response.data);
+      if (response && response?.data) {
+        const formattedDespesa: Despesa[] = response.data;
+        console.log('formatedDespesa', response.data);
 
-        setDespesas(response.data);
+        setDespesas(formattedDespesa);
         showToast('sucess', 'Despesa Cadastrada com sucesso.');
       } else if (response.status === 401) {
         setUserToken(null);
@@ -180,6 +183,7 @@ const HistoricoScreen: React.FC<{
     } catch (err) {
       showToast('error', `${err}`);
     } finally {
+      hideEditModal();
       stopLoading();
     }
   };
@@ -209,19 +213,24 @@ const HistoricoScreen: React.FC<{
     }
   };
 
-  const editDespesa = async () => {
+  const editDespesa = async (formData: any) => {
     try {
       startLoading();
 
-      const response = await axiosInstance.patch(`/despesa?id=${user?.id}`, {
-        headers: {
-          Authorization: `Bearer ${userToken}`,
+      const response = await axiosInstance.patch(
+        `/despesa?id=${user?.id}`,
+        formData,
+        {
+          headers: {
+            Authorization: `Bearer ${userToken}`,
+          },
         },
-      });
+      );
       if (response.status === 200) {
         console.log('formatedDespesas', response.data);
         showToast('sucess', 'Despesa Alterada com sucesso.');
-        setDespesas(response.data);
+        const formattedDespesa: Despesa[] = response.data;
+        setDespesas(formattedDespesa);
       } else if (response.status === 401) {
         showToast('error', 'Token expirado favor fazer login novamente.');
         setUserToken(null);
@@ -240,8 +249,10 @@ const HistoricoScreen: React.FC<{
 
   useEffect(() => {
     setPage(0);
-    getDespesasByMonth();
+    setCurrentMonth(currentMonth);
     getPetsByOwner();
+    getDespesasByMonth();
+    console.log('PETS', pets);
   }, []);
 
   return (
@@ -259,7 +270,6 @@ const HistoricoScreen: React.FC<{
           onDayPress={handleDayPressed}
           onMonthChange={handleMonthChange}
         />
-        <Text>Teste</Text>
 
         {despesas && despesas?.length > 0 ? (
           <DataTable style={{marginBottom: 0}}>
@@ -270,38 +280,115 @@ const HistoricoScreen: React.FC<{
               <DataTable.Title style={{flex: 1}}>Comandos</DataTable.Title>
             </DataTable.Header>
 
-            {despesas?.map(despesa => (
-              <DataTable.Row key={despesa.id}>
-                <Text numberOfLines={3} style={{flex: 2}}>
-                  {despesa.nome}
-                </Text>
-                <DataTable.Cell style={{flex: 1}} numeric>
-                  R$ {despesa.valor}
-                </DataTable.Cell>
-                <DataTable.Cell style={{flex: 1}}>
-                  {moment(despesa.data.split(' ')[0], 'YYYY-MM-DD').format(
-                    'DD/MM/YYYY',
-                  )}
-                </DataTable.Cell>
-                <DataTable.Cell style={{flex: 1}}>
-                  <View style={{marginTop: 20, marginBottom: 10}}>
+            {despesas &&
+              despesas?.map(despesa => (
+                <>
+                  <DataTable.Row key={despesa?.id}>
+                    <Text numberOfLines={3} style={{flex: 2}}>
+                      {despesa.nome}
+                    </Text>
+                    <DataTable.Cell style={{flex: 1}} numeric>
+                      R$ {despesa.valor}
+                    </DataTable.Cell>
+                    <DataTable.Cell style={{flex: 1}}>
+                      {moment(despesa.data).format('DD/MM/YYYY')}
+                    </DataTable.Cell>
+                    <DataTable.Cell style={{flex: 1}}>
+                      <View style={{marginTop: 20, marginBottom: 10}}>
+                        <Button
+                          icon="pencil"
+                          mode="text"
+                          onPress={() => showEditModal(despesa.id)}>
+                          Editar
+                        </Button>
+                        <Button
+                          icon="close-circle-outline"
+                          mode="text"
+                          style={styles.buttonRemover as ViewStyle}
+                          onPress={() => showConfirmModal(despesa.id)}>
+                          Remover
+                        </Button>
+                      </View>
+                    </DataTable.Cell>
+                  </DataTable.Row>
+
+                  <CustomModal
+                    visible={visibleModal}
+                    onDismiss={hideModal}
+                    containerStyle={styles.containerStyle}>
+                    <Text
+                      variant="titleMedium"
+                      style={[styles.textCenter, {marginBottom: 10}]}>
+                      Cadastro de Despesa
+                    </Text>
+                    <ControlTextInput
+                      name={'nome'}
+                      label={'Nome'}
+                      mode={'outlined'}
+                      multiline={true}
+                      numberOfLines={4}
+                      control={control}
+                      rules={{required: 'Nome de despesa Obrigatório'}}
+                      style={styles.input}
+                      initialValue={despesa.nome}
+                    />
+                    {/* <ControlSelectMultipleInput
+                      control={control}
+                      name={'ids_pets'}
+                      label={''}
+                      options={pets}
+                      placeHolder={''}
+                      optionLabel={pets.}
+                      optionValue={pets[0].id}
+                      primaryColor={''}
+                    /> */}
+
+                    <ControlSelectInput
+                      control={control}
+                      name={'id_pet'}
+                      label={'Selecionar Pet'}
+                      options={selectedPets}
+                      //initialValue={despesa.}
+                    />
+
+                    <ControlDateInput
+                      control={control}
+                      label={'Data'}
+                      name={'data'}
+                      mode={'outlined'}
+                      rules={{required: 'Data de despesa Obrigatório'}}
+                      initialValue={moment(despesa.data).toDate()}
+                    />
+                    <ControlTextInput
+                      name={'valor'}
+                      label={'Valor'}
+                      mode={'outlined'}
+                      control={control}
+                      rules={{required: 'Valor de despesa Obrigatório'}}
+                      style={styles.input}
+                      initialValue={despesa.valor.toString()}
+                    />
+                    <ControlTextInput
+                      name={'observacao'}
+                      label={'Observação (Opcional)'}
+                      mode={'outlined'}
+                      control={control}
+                      style={styles.input}
+                      multiline={true}
+                      numberOfLines={4}
+                      initialValue={despesa.observacao}
+                    />
+
                     <Button
-                      icon="pencil"
-                      mode="text"
-                      onPress={() => showEditModal(despesa.id)}>
-                      Editar
+                      icon="plus"
+                      mode="contained"
+                      style={styles.button}
+                      onPress={handleSubmit(editDespesa)}>
+                      Enviar
                     </Button>
-                    <Button
-                      icon="close-circle-outline"
-                      mode="text"
-                      style={styles.buttonRemover as ViewStyle}
-                      onPress={() => showConfirmModal(despesa.id)}>
-                      Remover
-                    </Button>
-                  </View>
-                </DataTable.Cell>
-              </DataTable.Row>
-            ))}
+                  </CustomModal>
+                </>
+              ))}
 
             <DataTable.Pagination
               page={page}
@@ -324,11 +411,6 @@ const HistoricoScreen: React.FC<{
             <Text>{'Nenhuma despesa cadastrada neste mês'}</Text>
           </View>
         )}
-        <FAB icon="plus" style={styles.fab} onPress={showModal} />
-
-        {isLoading ? <LoadingOverlay /> : <Text children={undefined} />}
-        <Text style={{color: 'red', textAlign: 'center'}}>{}</Text>
-        <Toast />
       </ScrollView>
 
       <CustomModal
@@ -361,11 +443,11 @@ const HistoricoScreen: React.FC<{
           primaryColor={''}
         /> */}
 
-        <ControlAutoCompleteInput
+        <ControlSelectInput
           control={control}
-          name={''}
-          label={''}
-          options={[]}
+          name={'id_pet'}
+          label={'Selecionar Pet'}
+          options={selectedPets}
         />
 
         <ControlDateInput
@@ -374,7 +456,7 @@ const HistoricoScreen: React.FC<{
           name={'data'}
           mode={'outlined'}
           rules={{required: 'Data de despesa Obrigatório'}}
-          initialValue={dateFromCalendar ? dateFromCalendar : undefined}
+          initialValue={dateFromCalendar}
         />
         <ControlTextInput
           name={'valor'}
@@ -402,6 +484,36 @@ const HistoricoScreen: React.FC<{
           Registrar Despesa
         </Button>
       </CustomModal>
+
+      <CustomModal
+        visible={visibleConfirmModal}
+        onDismiss={hideConfirmModal}
+        containerStyle={styles.containerConfirmStyle}>
+        <Text
+          variant="titleMedium"
+          style={[styles.textCenter, {marginBottom: 10}]}>
+          Tem certeza que quer remover esta Despesa?
+        </Text>
+        <View style={styles.divButtons as ViewStyle}>
+          <Button
+            mode="outlined"
+            style={styles.button as ViewStyle}
+            onPress={deleteDespesa}>
+            Sim
+          </Button>
+          <Button
+            mode="outlined"
+            style={styles.button as ViewStyle}
+            onPress={hideConfirmModal}>
+            Não
+          </Button>
+        </View>
+      </CustomModal>
+
+      <FAB icon="plus" style={styles.fab} onPress={showModal} />
+      {isLoading ? <LoadingOverlay /> : <Text children={undefined} />}
+      <Text style={{color: 'red', textAlign: 'center'}}>{}</Text>
+      <Toast />
     </>
   );
 };
@@ -417,6 +529,15 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     flexGrow: 1,
   },
+  containerConfirmStyle: {
+    backgroundColor: 'white',
+    gap: 5,
+    width: '80%',
+    borderRadius: 5,
+    height: 'auto',
+    alignSelf: 'center',
+    padding: 15,
+  },
   input: {
     width: 300,
   },
@@ -427,6 +548,14 @@ const styles = StyleSheet.create({
   links: {
     marginTop: 20,
     color: 'white',
+  },
+  buttonRemover: {
+    color: '#e03a10',
+  },
+  divButtons: {
+    flex: 1,
+    gap: 10,
+    marginTop: 10,
   },
   modal: {
     backgroundColor: 'white',
@@ -463,8 +592,5 @@ const styles = StyleSheet.create({
     alignSelf: 'center',
     width: 100,
     height: 100,
-  },
-  buttonRemover: {
-    color: '#e03a10',
   },
 });

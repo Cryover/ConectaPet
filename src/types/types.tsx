@@ -83,10 +83,10 @@ export type Despesa = {
   data: string;
 };
 
-export type SelectOptionEntry = {
+export interface SelectOptionEntry {
   label: string;
   value: string;
-};
+}
 
 export type RootStackParamList = {
   Login: undefined;

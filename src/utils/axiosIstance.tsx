@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
 import axios from 'axios';
 import {API_PROD_URL} from '@env';
 
@@ -19,6 +18,10 @@ axiosInstance.interceptors.response.use(
     if (error.response) {
       const statusMessage =
         error.response.data.message || 'ERRO ' + error.response.status;
+
+      if (error.response.status === 401) {
+        return Promise.reject(statusMessage);
+      }
 
       if (error.response.status !== 404 && error.response.status !== 400) {
         console.log(

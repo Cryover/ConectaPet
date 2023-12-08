@@ -17,6 +17,7 @@ interface ControlSelectInputProps {
   options: SelectOptionEntry[];
   style?: StyleProp<TextStyle | ViewStyle>;
   onValueChange?: (value: any) => void;
+  initialValue?: any;
 }
 
 const ControlSelectInput: React.FC<ControlSelectInputProps> = ({
@@ -27,6 +28,7 @@ const ControlSelectInput: React.FC<ControlSelectInputProps> = ({
   options,
   style,
   onValueChange,
+  initialValue,
 }) => {
   return (
     <View style={style}>
@@ -51,7 +53,7 @@ const ControlSelectInput: React.FC<ControlSelectInputProps> = ({
           </Picker>
         )}
         name={name}
-        defaultValue={options[0].value}
+        defaultValue={initialValue ? initialValue : ''}
       />
     </View>
   );
